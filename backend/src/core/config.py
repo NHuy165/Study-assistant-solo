@@ -1,9 +1,10 @@
 from pathlib import Path
 
+from google import genai
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
-ENV_PATH = Path(__file__).resolve().parent.parent.parent / ".env"
+ENV_PATH = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
@@ -16,4 +17,6 @@ class Settings(BaseSettings):
     )
 
 
-settings = Settings()
+settings = Settings()  # type: ignore
+
+ai_client = genai.Client(api_key=settings.API_KEY_GEMINI)
