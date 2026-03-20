@@ -1,0 +1,18 @@
+fastapi[standard]
+
+# Database
+sqlmodel
+psycopg[binary]
+asyncpg
+
+# Security
+pyjwt
+pwdlib[argon2]
+python-dotenv
+
+# Testing
+pytest
+pytest_asyncio
+
+# API
+google-generativeai
