@@ -14,5 +14,7 @@ python-dotenv
 pytest
 pytest_asyncio
 
-# API
-google-generativeai
+# AI and RAG
+google-genai
+pypdf
+pgvector

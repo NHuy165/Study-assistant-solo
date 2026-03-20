@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 
 from backend.src.core.database import create_database_and_tables, dispose
-from backend.src.routes.core import router
+from backend.src.routes.study import router
 
 
 @asynccontextmanager
