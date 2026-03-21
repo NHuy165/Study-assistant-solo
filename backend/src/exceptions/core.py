@@ -1,0 +1,104 @@
+from enum import Enum
+
+from pydantic import BaseModel
+
+# ----- SCHEMAS ----- #
+
+
+class ExceptionType(str, Enum):
+    # 400
+    REQUEST = "REQUEST"
+
+    # 404
+    NOT_FOUND = "NOT_FOUND"
+
+    # 405
+    METHOD = "METHOD"
+
+    # 500
+    INTERNAL_ERROR = "INTERNAL_ERROR"
+
+
+class ExceptionCustom(Exception):
+    def __init__(
+        self,
+        status_code: int,
+        exception_type: ExceptionType,
+        message: str,
+        headers: dict | None = None,
+    ):
+        self.status_code = status_code
+        self.exception_type = exception_type
+        self.message = message
+        self.headers = headers
+
+        super().__init__(self.message)
+
+
+class ExceptionResponse(BaseModel):
+    exception_type: ExceptionType
+    message: str
+
+
+# ----- DOCUMENTATION RESPONSES ----- #
+
+
+class Responses:
+    RESPONSE_400_BAD_REQUEST = {
+        "model": ExceptionResponse,
+        "description": "Request error.",
+    }
+
+    RESPONSE_401_UNAUTHORIZED = {
+        "model": ExceptionResponse,
+        "description": "Authentication error.",
+    }
+    RESPONSE_403_FORBIDDEN = {
+        "model": ExceptionResponse,
+        "description": "Action is forbidden to the current account.",
+    }
+    RESPONSE_404_NOT_FOUND = {
+        "model": ExceptionResponse,
+        "description": "Resource not found.",
+    }
+
+    RESPONSE_405_METHOD = {
+        "model": ExceptionResponse,
+        "description": "Method not allowed.",
+    }
+
+    RESPONSE_409_CONFLICT = {
+        "model": ExceptionResponse,
+        "description": "Conflict with information in database.",
+    }
+
+    RESPONSE_422_UNPROCESSABLE_CONTENT = {
+        "model": ExceptionResponse,
+        "description": "Request validation error.",
+    }
+
+
+# ----- SPECIFIC ERRORS ----- #
+
+# === 400 === #
+
+
+class ExceptionRequest_400(ExceptionCustom):
+    def __init__(self, custom_message: str | None = None):
+        super().__init__(
+            status_code=400,
+            exception_type=ExceptionType.REQUEST,
+            message=custom_message if custom_message is not None else "Request error.",
+        )
+
+
+# === 404 === #
+
+
+class ExceptionNotFound_404(ExceptionCustom):
+    def __init__(self, obj: str, info: dict):
+        super().__init__(
+            status_code=404,
+            exception_type=ExceptionType.NOT_FOUND,
+            message=f"Could not find {obj} with the provided information: {info}",
+        )

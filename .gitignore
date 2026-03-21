@@ -205,3 +205,9 @@ cython_debug/
 marimo/_static/
 marimo/_lsp/
 __marimo__/
+
+# Custom:
+NEED_READ_FILES_GO_HERE/
+structure.txt
+to_do.txt
+bugs_fixed.txt
