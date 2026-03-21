@@ -5,6 +5,7 @@ from sqlmodel import text
 
 from backend.src.core.config import ai_client, settings
 from backend.src.core.database import SessionDep
+from backend.src.exceptions.core import ExceptionNotFound_404, ExceptionRequest_400
 from backend.src.models_schema.document_chunk import DocumentChunk
 from backend.src.models_schema.study import ModelPrompt, ModelResponse
 from backend.src.services.study.utils import embed, get_overlapping_chunks
@@ -15,6 +16,10 @@ async def save_chunks_service(
     session: SessionDep, file_name: str, page_offset: int = 0
 ):
     correct_path = Path(__file__).parent / "NEED_READ_FILES_GO_HERE" / file_name
+
+    if not correct_path.is_file():
+        raise ExceptionNotFound_404("file", {"name": file_name})
+
     reader = PdfReader(correct_path)
 
     chunk_index = 0
@@ -52,6 +57,8 @@ async def save_chunks_service(
 async def answer_query_service(
     session: SessionDep, prompt: ModelPrompt
 ) -> ModelResponse:
+
+    # Embedding user prompt
     embedded_prompt_vector = embed(prompt.question).embeddings[0].values  # type: ignore
 
     # RAG vector searching
@@ -89,13 +96,15 @@ async def answer_query_service(
     Answer:
     """
 
+    # Getting response from LLM
     response = ai_client.models.generate_content(
         model="gemini-2.5-flash",
         contents=final_prompt,
     )
 
-    # UPDATE THIS LATER
     if response.text is None:
-        raise
+        raise ExceptionRequest_400(
+            "A response could not be generated. Please recheck your question."
+        )
 
     return ModelResponse(answer=response.text)
