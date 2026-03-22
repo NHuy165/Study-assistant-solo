@@ -12,7 +12,7 @@ from backend.src.exceptions.handlers import (
     starlette_exceptions_handlers,
     validation_exceptions_handler,
 )
-from backend.src.routes.study import router
+from backend.src.routes import auth, study, users
 
 # ----- Setting up app ----- #
 
@@ -38,7 +38,18 @@ app.add_exception_handler(Exception, generic_exceptions_handler)
 # ----- Mounting routers ----- #
 
 app.include_router(
-    router,
+    study.router,
     prefix="/study",
     tags=["study"],
+)
+
+app.include_router(
+    users.router,
+    prefix="/users",
+    tags=["users"],
+)
+app.include_router(
+    auth.router,
+    prefix="",
+    tags=["auth"],
 )

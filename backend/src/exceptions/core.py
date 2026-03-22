@@ -9,11 +9,17 @@ class ExceptionType(str, Enum):
     # 400
     REQUEST = "REQUEST"
 
+    # 401
+    AUTHENTICATION = "AUTHENTICATION"
+
     # 404
     NOT_FOUND = "NOT_FOUND"
 
     # 405
     METHOD = "METHOD"
+
+    # 409
+    TAKEN_INFO = "TAKEN_INFO"
 
     # 500
     INTERNAL_ERROR = "INTERNAL_ERROR"
@@ -92,6 +98,19 @@ class ExceptionRequest_400(ExceptionCustom):
         )
 
 
+# === 401 === #
+
+
+class ExceptionAuthentication_401(ExceptionCustom):
+    def __init__(self):
+        super().__init__(
+            status_code=401,
+            exception_type=ExceptionType.AUTHENTICATION,
+            message="Invalid credentials.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
 # === 404 === #
 
 
@@ -101,4 +120,16 @@ class ExceptionNotFound_404(ExceptionCustom):
             status_code=404,
             exception_type=ExceptionType.NOT_FOUND,
             message=f"Could not find {obj} with the provided information: {info}",
+        )
+
+
+# === 409 === #
+
+
+class ExceptionTakenInfo_409(ExceptionCustom):
+    def __init__(self, obj: str, info: str):
+        super().__init__(
+            status_code=409,
+            exception_type=ExceptionType.TAKEN_INFO,
+            message=f"Another {obj} with this {info} already exists.",
         )
