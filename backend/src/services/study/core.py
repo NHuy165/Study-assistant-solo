@@ -12,9 +12,7 @@ from backend.src.services.study.utils import embed, get_overlapping_chunks
 
 
 # NEEDS OPTIMIZING
-async def save_chunks_service(
-    session: SessionDep, file_name: str, page_offset: int = 0
-):
+async def save_chunks(session: SessionDep, file_name: str, page_offset: int = 0):
     correct_path = Path(__file__).parent / "NEED_READ_FILES_GO_HERE" / file_name
 
     if not correct_path.is_file():
@@ -54,9 +52,7 @@ async def save_chunks_service(
 
 
 # NEEDS OPTIMIZING
-async def answer_query_service(
-    session: SessionDep, prompt: ModelPrompt
-) -> ModelResponse:
+async def answer_query(session: SessionDep, prompt: ModelPrompt) -> ModelResponse:
 
     # Embedding user prompt
     embedded_prompt_vector = embed(prompt.question).embeddings[0].values  # type: ignore
