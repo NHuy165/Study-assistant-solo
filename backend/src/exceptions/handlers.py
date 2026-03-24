@@ -56,7 +56,7 @@ async def validation_exceptions_handler(request: Request, exc: RequestValidation
 async def generic_exceptions_handler(request: Request, exc: Exception):
     exception_response = ExceptionResponse(
         exception_type=ExceptionType.INTERNAL_ERROR,
-        message="Internal server error.",
+        message=f"Internal server error. Details: {str(exc)}",
     )
 
     return JSONResponse(
