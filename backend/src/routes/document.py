@@ -1,0 +1,102 @@
+from typing import Annotated
+
+from fastapi import APIRouter, Body, UploadFile, status
+
+from backend.src.core.database import SessionDep
+from backend.src.core.dependencies import InteractionDep, UserDep
+from backend.src.exceptions.core import Responses
+from backend.src.models_schema.document import DocumentOutput, DocumentUpdate
+from backend.src.services import document, document_chunk
+
+router = APIRouter()
+
+
+# ----- CREATE ----- #
+
+
+@router.post(
+    "/{interaction_id}/upload",
+    response_model=DocumentOutput,
+    responses={
+        400: Responses.RESPONSE_400_BAD_REQUEST,
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def save_document(
+    user: UserDep,
+    session: SessionDep,
+    file: UploadFile,
+    interaction: InteractionDep,
+    page_offset: Annotated[int, Body()] = 0,
+):
+    document_output = await document.save_document(session, file, interaction)
+    await document_chunk.save_document_chunks(
+        session, file, document_output, page_offset
+    )
+
+    await session.refresh(document_output)
+
+    return document_output
+
+
+# ----- READ ----- #
+
+
+@router.get(
+    "/{interaction_id}/",
+    response_model=list[DocumentOutput],
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def read_all_documents(
+    user: UserDep,
+    session: SessionDep,
+    interaction: InteractionDep,
+):
+    documents_output = await document.read_all_documents(session, interaction)
+    return documents_output
+
+
+# ----- UPDATE ----- #
+
+
+@router.patch(
+    "/{document_id}",
+    response_model=DocumentOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def update_document(
+    user: UserDep,
+    session: SessionDep,
+    document_id: int,
+    document_update: DocumentUpdate,
+):
+    document_output = await document.update_document(
+        user, session, document_id, document_update
+    )
+    return document_output
+
+
+# ----- DELETE ----- #
+
+
+@router.delete(
+    "/{document_id}",
+    status_code=status.HTTP_204_NO_CONTENT,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def delete_document(
+    user: UserDep,
+    session: SessionDep,
+    document_id: int,
+):
+    await document.delete_document(user, session, document_id)

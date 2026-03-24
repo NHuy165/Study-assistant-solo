@@ -1,15 +1,20 @@
 from typing import Annotated
 
 import jwt
-from fastapi import Depends
+from fastapi import Depends, Path
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
+from sqlmodel import select
 
 from backend.src.core.config import settings
 from backend.src.core.database import SessionDep
-from backend.src.exceptions.core import ExceptionAuthentication_401
+from backend.src.exceptions.core import (
+    ExceptionAuthentication_401,
+    ExceptionNotFound_404,
+)
 from backend.src.models_schema.auth import TokenData
-from backend.src.models_schema.users import User
+from backend.src.models_schema.interaction import Interaction
+from backend.src.models_schema.user import User
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
 
@@ -47,3 +52,23 @@ async def get_current_user(
 
 
 UserDep = Annotated[User, Depends(get_current_user)]
+
+
+async def get_interaction_id(
+    user: UserDep, session: SessionDep, interaction_id: Annotated[int, Path()]
+) -> Interaction:
+    query = select(Interaction).where(
+        Interaction.user_id == user.id, Interaction.id == interaction_id
+    )
+
+    interaction = (await session.execute(query)).scalars().first()
+
+    if interaction is None:
+        raise ExceptionNotFound_404(
+            "Interaction", {"user_id": user.id, "id": interaction_id}
+        )
+
+    return interaction
+
+
+InteractionDep = Annotated[Interaction, Depends(get_interaction_id)]

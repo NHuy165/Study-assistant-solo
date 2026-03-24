@@ -12,7 +12,7 @@ from backend.src.exceptions.handlers import (
     starlette_exceptions_handlers,
     validation_exceptions_handler,
 )
-from backend.src.routes import auth, study, users
+from backend.src.routes import auth, document, interaction, llm_response, note, user
 
 # ----- Setting up app ----- #
 
@@ -38,18 +38,37 @@ app.add_exception_handler(Exception, generic_exceptions_handler)
 # ----- Mounting routers ----- #
 
 app.include_router(
-    study.router,
-    prefix="/study",
-    tags=["study"],
-)
-
-app.include_router(
-    users.router,
-    prefix="/users",
-    tags=["users"],
-)
-app.include_router(
     auth.router,
     prefix="",
     tags=["auth"],
+)
+
+app.include_router(
+    document.router,
+    prefix="/document",
+    tags=["document"],
+)
+
+app.include_router(
+    interaction.router,
+    prefix="/interaction",
+    tags=["interaction"],
+)
+
+app.include_router(
+    llm_response.router,
+    prefix="/llm-response",
+    tags=["llm-response"],
+)
+
+app.include_router(
+    note.router,
+    prefix="/note",
+    tags=["note"],
+)
+
+app.include_router(
+    user.router,
+    prefix="/user",
+    tags=["user"],
 )

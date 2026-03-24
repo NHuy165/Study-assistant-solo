@@ -1,15 +1,15 @@
 from pydantic import EmailStr
+from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from backend.src.core.database import SessionDep
 from backend.src.core.security import create_token, verify_password
 from backend.src.exceptions.core import ExceptionAuthentication_401
 from backend.src.models_schema.auth import Token
-from backend.src.models_schema.users import User
+from backend.src.models_schema.user import User
 
 
 async def authenticate_user(
-    session: SessionDep, email: EmailStr, password: str
+    session: AsyncSession, email: EmailStr, password: str
 ) -> User:
     query = select(User).where(User.email == email)
     user = (await session.execute(query)).scalars().first()
@@ -23,7 +23,9 @@ async def authenticate_user(
     return user
 
 
-async def login_for_token(session: SessionDep, email: EmailStr, password: str) -> Token:
+async def login_for_token(
+    session: AsyncSession, email: EmailStr, password: str
+) -> Token:
     user = await authenticate_user(session, email, password)
 
     data = {"sub": str(user.id)}

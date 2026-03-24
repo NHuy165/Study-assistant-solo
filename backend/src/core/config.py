@@ -17,6 +17,9 @@ class Settings(BaseSettings):
     DEFAULT_CHUNK_SIZE: int
     DEFAULT_CHUNK_OVERLAP: int
     TOKEN_EXPIRY_HOURS: int
+    EMBED_MODEL: str
+    ANSWER_MODEL: str
+    N_CHUNKS_RETRIEVED: int
 
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
