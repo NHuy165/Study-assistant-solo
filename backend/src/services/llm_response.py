@@ -20,7 +20,7 @@ def prompt_augmentation(chunks: list[DocumentChunk], prompt: str):
 
     context = "\n".join(
         [
-            f"Document {c.document.name}. Page {c.document_page_num}:\n{c.content_original}"
+            f"Document {c.document.name}. Page {c.document_page_num + c.document.page_offset}:\n{c.content_original}"
             for c in chunks
         ]
     )

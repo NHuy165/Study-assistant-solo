@@ -31,7 +31,7 @@ def embed(text: str) -> list[float]:
 
 
 async def save_document_chunks(
-    session: AsyncSession, file: UploadFile, document: Document, page_offset: int
+    session: AsyncSession, file: UploadFile, document: Document
 ) -> None:
     reader = PdfReader(file.file)
 
@@ -53,7 +53,7 @@ async def save_document_chunks(
             prepared_chunk = DocumentChunk(
                 content_original=chunk_text,
                 content_embedded=embed(chunk_text),
-                document_page_num=page_num + page_offset,
+                document_page_num=page_num,
                 document_chunk_index=chunk_index,
                 document=document,
             )

@@ -40,7 +40,7 @@ class InteractionOutput(InteractionBase):
 
 class InteractionUpdate(SQLModel):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = (
-        None  # User cannot explicitly enter a None
+        None  # User không được enter giá trị None
     )
     description: str = ""
 
