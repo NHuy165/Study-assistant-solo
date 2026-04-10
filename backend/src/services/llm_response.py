@@ -17,6 +17,7 @@ from backend.src.services.document_chunk import embed
 
 
 def prompt_augmentation(chunks: list[DocumentChunk], prompt: str):
+
     context = "\n".join(
         [
             f"Document {c.document.name}. Page {c.document_page_num}:\n{c.content_original}"
@@ -46,7 +47,7 @@ async def create_llm_response(
     llm_response_input: LLMResponseInput,
     interaction: Interaction,
 ) -> LLMResponse:
-    embedded_prompt = embed(llm_response_input.content)
+    embedded_prompt = embed(llm_response_input.prompt)
 
     # Retrieval
     query = (
@@ -61,9 +62,7 @@ async def create_llm_response(
     document_chunks = (await session.execute(query)).scalars().all()
 
     # Augmentation
-    final_prompt = prompt_augmentation(
-        list(document_chunks), llm_response_input.content
-    )
+    final_prompt = prompt_augmentation(list(document_chunks), llm_response_input.prompt)
 
     # Generation
     response = ai_client.models.generate_content(
@@ -79,7 +78,8 @@ async def create_llm_response(
 
     # Saving response
     llm_response = LLMResponse(
-        content=response.text,
+        prompt=llm_response_input.prompt,
+        answer=response.text,
         interaction=interaction,
     )
 
