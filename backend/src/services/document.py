@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from backend.src.exceptions.core import ExceptionNotFound_404, ExceptionRequest_400
-from backend.src.models_schema.document import Document, DocumentUpdate
+from backend.src.models_schema.document import Document, DocumentInput, DocumentUpdate
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.user import User
 
@@ -22,13 +22,23 @@ def verify_pdf(file: UploadFile):
 
 
 async def save_document(
-    session: AsyncSession, file: UploadFile, interaction: Interaction
+    session: AsyncSession,
+    file: UploadFile,
+    interaction: Interaction,
+    document_input: DocumentInput,
 ) -> Document:
     verify_pdf(file)
 
     assert file.filename is not None
 
-    document = Document(name=file.filename, interaction=interaction)
+    if document_input.name is None:
+        name = file.filename
+    else:
+        name = document_input.name
+
+    document = Document(
+        name=name, interaction=interaction, page_offset=document_input.page_offset
+    )
 
     session.add(document)
     await session.commit()

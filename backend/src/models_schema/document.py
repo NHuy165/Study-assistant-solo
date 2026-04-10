@@ -16,9 +16,14 @@ if TYPE_CHECKING:
 
 class DocumentBase(SQLModel):
     name: str
+    page_offset: int = 0
 
 
 # ----- INPUT ----- #
+
+
+class DocumentInput(DocumentBase):
+    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- OUTPUT ----- #
@@ -32,8 +37,9 @@ class DocumentOutput(DocumentBase):
 # ----- UPDATE ----- #
 
 
-class DocumentUpdate(SQLModel):
-    name: Annotated[str, Field(min_length=1)]
+class DocumentUpdate(DocumentBase):
+    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    page_offset: Annotated[int | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- TABLE MODEL ----- #
