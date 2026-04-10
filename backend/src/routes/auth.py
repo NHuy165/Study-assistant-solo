@@ -17,5 +17,8 @@ router = APIRouter()
 async def login_for_token(
     user: Annotated[OAuth2PasswordRequestForm, Depends()], session: SessionDep
 ):
+    """
+    Login endpoint. Returns a token when user enters correct credentials. Tokens have an expiration time.
+    """
     token = await auth.login_for_token(session, user.username, user.password)
     return token

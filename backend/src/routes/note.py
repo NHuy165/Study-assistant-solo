@@ -1,11 +1,8 @@
-from typing import Annotated
-
-from fastapi import APIRouter, Body, UploadFile, status
+from fastapi import APIRouter, status
 
 from backend.src.core.database import SessionDep
 from backend.src.core.dependencies import InteractionDep, UserDep
 from backend.src.exceptions.core import Responses
-from backend.src.models_schema.document import DocumentOutput, DocumentUpdate
 from backend.src.models_schema.note import NoteInput, NoteOutput, NoteUpdate
 from backend.src.services import note
 
@@ -29,6 +26,9 @@ async def create_note(
     interaction: InteractionDep,
     note_input: NoteInput,
 ):
+    """
+    Creates a note. Notes belong to an interaction.
+    """
     note_output = await note.create_note(session, interaction, note_input)
     return note_output
 
@@ -49,6 +49,9 @@ async def read_all_notes(
     session: SessionDep,
     interaction: InteractionDep,
 ):
+    """
+    Reads all notes related to an interaction.
+    """
     notes_output = await note.read_all_notes(session, interaction)
     return notes_output
 
@@ -70,6 +73,9 @@ async def update_note(
     note_id: int,
     note_update: NoteUpdate,
 ):
+    """
+    Updates a note.
+    """
     note_output = await note.update_note(user, session, note_id, note_update)
     return note_output
 
@@ -90,4 +96,7 @@ async def delete_note(
     session: SessionDep,
     note_id: int,
 ):
+    """
+    Deletes a note.
+    """
     await note.delete_note(user, session, note_id)
