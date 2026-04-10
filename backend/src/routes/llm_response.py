@@ -28,6 +28,9 @@ async def create_llm_response(
     llm_response_input: LLMResponseInput,
     interaction: InteractionDep,
 ):
+    """
+    Receives a user prompt and returns the model's answer. Conversations (prompts and answers) belong to an interaction.
+    """
     llm_response_output = await llm_response.create_llm_response(
         session, llm_response_input, interaction
     )
@@ -51,6 +54,9 @@ async def read_llm_responses(
     interaction: InteractionDep,
     limit: Annotated[int | None, Query(gt=0)] = None,
 ):
+    """
+    Reads past conversations in an interaction.
+    """
     llm_responses_output = await llm_response.read_llm_responses(
         session, interaction, limit
     )

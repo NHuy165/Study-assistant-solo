@@ -25,6 +25,9 @@ router = APIRouter()
 async def create_interaction(
     user: UserDep, session: SessionDep, interaction_input: InteractionInput
 ):
+    """
+    Creates an interaction.
+    """
     interaction_output = await interaction.create_interaction(
         user, session, interaction_input
     )
@@ -40,6 +43,9 @@ async def create_interaction(
     responses={401: Responses.RESPONSE_401_UNAUTHORIZED},
 )
 async def read_all_interactions(user: UserDep, session: SessionDep):
+    """
+    Gets all interactions of the current user.
+    """
     interaction_output = await interaction.read_all_interactions(user, session)
     return interaction_output
 
@@ -61,6 +67,9 @@ async def update_interaction(
     interaction_id: int,
     interaction_update: InteractionUpdate,
 ):
+    """
+    Updates an interaction's information.
+    """
     interaction_output = await interaction.update_interaction(
         user, session, interaction_id, interaction_update
     )
@@ -79,4 +88,7 @@ async def update_interaction(
     },
 )
 async def delete_interaction(user: UserDep, session: SessionDep, interaction_id: int):
+    """
+    Deletes an interaction, along with all of its associated information like uploaded documents, notes, history,...
+    """
     await interaction.delete_interaction(user, session, interaction_id)
