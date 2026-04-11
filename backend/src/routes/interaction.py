@@ -57,6 +57,7 @@ async def read_all_interactions(user: UserDep, session: SessionDep):
     "/{interaction_id}",
     response_model=InteractionOutput,
     responses={
+        400: Responses.RESPONSE_400_BAD_REQUEST,
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
     },

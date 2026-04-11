@@ -2,19 +2,19 @@ from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from backend.src.core.security import get_hashed_password
-from backend.src.exceptions.core import ExceptionTakenInfo_409
-from backend.src.models_schema.user import User, UserInput
+from backend.src.core.security import get_hashed_password, verify_password
+from backend.src.exceptions.core import (
+    ExceptionAuthentication_401,
+    ExceptionTakenInfo_409,
+)
+from backend.src.models_schema.user import (
+    User,
+    UserInput,
+    UserPasswordChange,
+    UserUpdate,
+)
 
 # ----- CREATE ----- #
-
-
-async def check_username_exists(session: AsyncSession, username: str):
-    query = select(User).where(User.username == username)
-    user = (await session.execute(query)).scalars().first()
-
-    if user is not None:
-        raise ExceptionTakenInfo_409("user", "username")
 
 
 async def check_email_exists(session: AsyncSession, email: EmailStr):
@@ -26,7 +26,6 @@ async def check_email_exists(session: AsyncSession, email: EmailStr):
 
 
 async def register_user(session: AsyncSession, user_input: UserInput) -> User:
-    await check_username_exists(session, user_input.username)
     await check_email_exists(session, user_input.email)
 
     user = User.model_validate(
@@ -39,3 +38,44 @@ async def register_user(session: AsyncSession, user_input: UserInput) -> User:
     await session.refresh(user)
 
     return user
+
+
+# ----- READ ----- #
+
+
+async def read_user(user: User) -> User:
+    return user
+
+
+# ----- UPDATE ----- #
+
+
+async def update_user(
+    user: User, session: AsyncSession, user_update: UserUpdate
+) -> User:
+    update_contents = user_update.model_dump(exclude_unset=True)
+
+    if (
+        update_contents.get("email", None)
+        and update_contents.get("email", None) != user.email
+    ):
+        await check_email_exists(session, update_contents["email"])
+
+    user.sqlmodel_update(update_contents)
+
+    await session.commit()
+    await session.refresh(user)
+
+    return user
+
+
+async def update_password(
+    user: User, session: AsyncSession, password_change: UserPasswordChange
+) -> None:
+    if not verify_password(password_change.old_password, user.hashed_password):
+        raise ExceptionAuthentication_401()
+
+    update = {"hashed_password": get_hashed_password(password_change.new_password)}
+    user.sqlmodel_update(update)
+
+    await session.commit()

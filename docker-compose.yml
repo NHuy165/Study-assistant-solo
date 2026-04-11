@@ -1,5 +1,4 @@
 services:
-
   # Database service
   db:
     image: pgvector/pgvector:pg16
@@ -17,6 +16,7 @@ services:
     build: .
     ports:
       - "8000:8000"
+      - "5678:5678" # <-- 1. Expose the debug port to your local machine
     env_file:
       - .env
     environment:
@@ -25,6 +25,8 @@ services:
       - db
     volumes:
       - ./backend:/code/backend
+    # 2. Override the CMD to wrap your app in the debugger
+    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "fastapi", "dev", "backend/src/main.py", "--port", "8000", "--host", "0.0.0.0"]
 
 volumes:
   postgres_data:

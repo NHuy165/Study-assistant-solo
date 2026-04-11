@@ -63,6 +63,7 @@ async def read_all_notes(
     "/{note_id}",
     response_model=NoteOutput,
     responses={
+        400: Responses.RESPONSE_400_BAD_REQUEST,
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
     },
