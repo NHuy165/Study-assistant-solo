@@ -1,8 +1,10 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic import EmailStr
+from pydantic import BeforeValidator, EmailStr
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
+
+from backend.src.models_schema.utils import beva_forbid_none
 
 if TYPE_CHECKING:
     from backend.src.models_schema.interaction import Interaction
@@ -28,6 +30,21 @@ class UserInput(UserBase):
 class UserOutput(UserBase):
     id: int
     created_at: datetime
+
+
+# ----- UPDATE ----- #
+
+
+class UserUpdate(UserBase):
+    username: Annotated[
+        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
+    ] = None
+    email: Annotated[EmailStr | None, BeforeValidator(beva_forbid_none)] = None
+
+
+class UserPasswordChange(SQLModel):
+    old_password: str
+    new_password: str
 
 
 # ----- TABLE MODEL ----- #
