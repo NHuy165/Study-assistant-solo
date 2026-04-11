@@ -5,6 +5,7 @@ from fastapi import UploadFile
 from pydantic import BeforeValidator
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
+from backend.src.models_schema.enums import DocumentType
 from backend.src.models_schema.utils import beva_forbid_none
 
 if TYPE_CHECKING:
@@ -32,6 +33,7 @@ class DocumentInput(DocumentBase):
 class DocumentOutput(DocumentBase):
     id: int
     created_at: datetime
+    type: DocumentType
 
 
 # ----- UPDATE ----- #
@@ -56,6 +58,7 @@ class Document(DocumentBase, table=True):
         sa_column=Column(DateTime(timezone=True)),
         default_factory=lambda: datetime.now(timezone.utc),
     )
+    type: DocumentType
 
     interaction: "Interaction" = Relationship(back_populates="documents")
     document_chunks: list["DocumentChunk"] = Relationship(

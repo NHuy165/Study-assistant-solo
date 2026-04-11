@@ -40,11 +40,6 @@ async def save_document(
     document_output = await document.save_document(
         session, file, interaction, document_input
     )
-    await document_chunk.save_document_chunks(
-        session,
-        file,
-        document_output,
-    )
 
     await session.refresh(document_output)
 
