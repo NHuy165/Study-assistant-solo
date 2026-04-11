@@ -4,21 +4,47 @@ from sqlmodel import select
 
 from backend.src.exceptions.core import ExceptionNotFound_404, ExceptionRequest_400
 from backend.src.models_schema.document import Document, DocumentInput, DocumentUpdate
+from backend.src.models_schema.enums import DocumentType
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.user import User
+from backend.src.services import document_chunk
 
 # ----- CREATE ----- #
 
 
 def verify_pdf(file: UploadFile):
+    # Content type
     if file.content_type != "application/pdf":
-        raise ExceptionRequest_400("Invalid PDF file.")
+        return False
 
+    # Header
     header = file.file.read(5)
     file.file.seek(0)
 
     if header != b"%PDF-":
-        raise ExceptionRequest_400("Invalid PDF file.")
+        return False
+
+    return True
+
+
+def verify_image(file: UploadFile) -> bool:
+    # Content type
+    allowed_types = {"image/jpeg", "image/png", "image/webp"}
+    if file.content_type not in allowed_types:
+        return False
+
+    # Header
+    header = file.file.read(12)
+    file.file.seek(0)
+
+    is_jpeg = header.startswith(b"\xff\xd8\xff")
+    is_png = header.startswith(b"\x89PNG\r\n\x1a\n")
+    is_webp = header.startswith(b"RIFF") and header[8:12] == b"WEBP"
+
+    if not (is_jpeg or is_png or is_webp):
+        return False
+
+    return True
 
 
 async def save_document(
@@ -27,7 +53,17 @@ async def save_document(
     interaction: Interaction,
     document_input: DocumentInput,
 ) -> Document:
-    verify_pdf(file)
+
+    if verify_pdf(file):
+        document_type = DocumentType.PDF
+        page_offset = document_input.page_offset
+    elif verify_image(file):
+        document_type = DocumentType.IMAGE
+        page_offset = 0
+    else:
+        raise ExceptionRequest_400(
+            "Invalid file. Only PDFs or image files of type JPEG, PNG, WEBP are allowed. Please recheck file extension and file contents."
+        )
 
     assert file.filename is not None
 
@@ -37,11 +73,29 @@ async def save_document(
         name = document_input.name
 
     document = Document(
-        name=name, interaction=interaction, page_offset=document_input.page_offset
+        name=name,
+        interaction=interaction,
+        page_offset=page_offset,
+        type=document_type,
     )
 
     session.add(document)
     await session.commit()
+    await session.refresh(document)
+
+    if document_type == DocumentType.PDF:
+        await document_chunk.save_pdf_chunks(
+            session,
+            file,
+            document,
+        )
+    elif document_type == DocumentType.IMAGE:
+        await document_chunk.save_image_chunks(
+            session,
+            file,
+            document,
+        )
+
     await session.refresh(document)
 
     return document
@@ -90,6 +144,10 @@ async def update_document(
 
     # Update logic
     update_data = document_update.model_dump(exclude_unset=True)
+
+    if document.type == DocumentType.IMAGE:
+        update_data["page_offset"] = 0
+
     document.sqlmodel_update(update_data)
 
     await session.commit()

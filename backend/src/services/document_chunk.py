@@ -4,6 +4,7 @@ from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.config import ai_client, settings
+from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.document import Document
 from backend.src.models_schema.document_chunk import DocumentChunk
 
@@ -30,7 +31,7 @@ def embed(text: str) -> list[float]:
     return embedded.embeddings[0].values
 
 
-async def save_document_chunks(
+async def save_pdf_chunks(
     session: AsyncSession, file: UploadFile, document: Document
 ) -> None:
     reader = PdfReader(file.file)
@@ -64,6 +65,45 @@ async def save_document_chunks(
             chunk_index += 1
             pos += settings.DEFAULT_CHUNK_SIZE - settings.DEFAULT_CHUNK_OVERLAP
 
+    await session.commit()
+
+
+async def save_image_chunks(
+    session: AsyncSession, file: UploadFile, document: Document
+) -> None:
+    # Extracting information from the image
+    image_bytes = await file.read()
+
+    prompt_text = """
+    Extract all readable text from this image exactly as written. 
+    Then, describe the layout, charts, figures, subjects, and any data points in exhaustive detail.
+    """
+
+    image_part = types.Part.from_bytes(
+        data=image_bytes,
+        mime_type=file.content_type,  # type: ignore
+    )
+
+    response = ai_client.models.generate_content(
+        model=settings.ANSWER_MODEL,
+        contents=[prompt_text, image_part],
+    )
+
+    image_description = response.text
+
+    print(response.text)  # TEMPORARY
+
+    # Validation
+    if image_description is None:
+        raise ExceptionRequest_400("Image could not be saved properly.")
+
+    prepared_chunk = DocumentChunk(
+        content_original=f"[IMAGE DESCRIPTION]: {image_description}",
+        content_embedded=embed(image_description),
+        document=document,
+    )
+
+    session.add(prepared_chunk)
     await session.commit()
 
 

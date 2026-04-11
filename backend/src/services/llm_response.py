@@ -6,6 +6,7 @@ from backend.src.core.config import ai_client, settings
 from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.document import Document
 from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.models_schema.enums import DocumentType
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.llm_response import (
     LLMResponse,
@@ -20,20 +21,25 @@ def prompt_augmentation(chunks: list[DocumentChunk], prompt: str):
 
     context = "\n".join(
         [
-            f"Document {c.document.name}. Page {c.document_page_num + c.document.page_offset}:\n{c.content_original}"
+            (
+                f"Document {c.document.name}. Page {c.document_page_num + c.document.page_offset}:\n{c.content_original}"  # type: ignore
+                if c.document.type == DocumentType.PDF
+                else f"Document {c.document.name} (IMAGE):\n{c.content_original}"
+            )
             for c in chunks
         ]
     )
 
     final_prompt = f"""
-    You are a helpful study assistant for primary school students. Answer the question using ONLY the provided context.
+    You are a helpful study assistant for Vietnamese primary school students, covering English, Maths and Literature (Vietnamese).
+    Answer the question using the provided context and any information you may have if it concerns the relevant knowledge. Prioritize user provided context over your own information.
     
-    If the answer is not in the context, say "I don't know" (adapt this to other languages).
+    If the answer is neither in the context nor your own information, or if it's not relevant to your role, say "I don't know" (adapt this to other languages).
     
     Question:
     {prompt}
     
-    Context:
+    User provided context:
     {context}
     
     Answer:
