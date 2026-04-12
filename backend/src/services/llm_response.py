@@ -17,32 +17,71 @@ from backend.src.services.document_chunk import embed
 # ----- CREATE ----- #
 
 
-def prompt_augmentation(chunks: list[DocumentChunk], prompt: str):
+def chunk_to_text(document_chunk: DocumentChunk) -> str:
+    if document_chunk.document.type == DocumentType.PDF:  # PDF
+        assert document_chunk.document_page_num is not None
+        return f"Document {document_chunk.document.name}. Page {document_chunk.document_page_num + document_chunk.document.page_offset}:\n{document_chunk.content_original}"
+    else:  # Image
+        return f"Document {document_chunk.document.name} (IMAGE):\n{document_chunk.content_original}"
 
-    context = "\n".join(
-        [
-            (
-                f"Document {c.document.name}. Page {c.document_page_num + c.document.page_offset}:\n{c.content_original}"  # type: ignore
-                if c.document.type == DocumentType.PDF
-                else f"Document {c.document.name} (IMAGE):\n{c.content_original}"
-            )
-            for c in chunks
-        ]
+
+def conversation_to_text(conversation: LLMResponse, index: int) -> str:
+    return f"""
+    Conversation {index}:
+    User query: {conversation.prompt}
+    Model answer: {conversation.answer}
+    """
+
+
+def prompt_augmentation(
+    document_chunks: list[DocumentChunk],
+    past_conversations: list[LLMResponse],
+    prompt: str,
+):
+    # Augmenting context
+    context_document = "\n".join(map(chunk_to_text, document_chunks))
+
+    # Past conversations
+    context_conversations = "\n".join(
+        map(
+            conversation_to_text,
+            past_conversations,
+            range(1, settings.N_PAST_CONVERSATIONS + 1),
+        )
     )
 
+    # Augmented prompt
     final_prompt = f"""
-    You are a helpful study assistant for Vietnamese primary school students, covering English, Maths and Literature (Vietnamese).
-    Answer the question using the provided context and any information you may have if it concerns the relevant knowledge. Prioritize user provided context over your own information.
+    Overall purpose: You are a friendly, encouraging, and highly accurate Study Assistant tailored for Vietnamese primary school students (Grades 1 to 5). Your core subjects are Mathematics, Vietnamese (Literature/Reading), and English.
+
+    === KNOWLEDGE PRIORITY & RULES ===
+    1. STRICT CONTEXT ADHERENCE (HIGHEST PRIORITY): You must base your answers primarily on the `PROVIDED CONTEXT`. If the context demonstrates a specific teaching method, rule, or format, you MUST follow it exactly, as this reflects the student's actual school curriculum.
+    2. SUPPLEMENTAL KNOWLEDGE (MEDIUM PRIORITY): If the context does not contain the answer, you may use `SUPPLEMENTAL KNOWLEDGE`, containing handpicked documents relevant to your purpose.
+    3. INTERNAL KNOWLEDGE (LOW PRIORITY): If the answer still does not lie in the provided context above, you may use your internal LLM knowledge, but strictly limit your explanation to the Vietnamese Grade 1-5 academic level.
+    4. PAST CONVERSATIONS: You may be passed a certain number of your most recent conversations with the user. This is done automatically and may or may not contain any relevant information to the current question. The conversations are indexed so that the lower the number, the more recent the conversation (Conversation 1 is your last conversation).
     
-    If the answer is neither in the context nor your own information, or if it's not relevant to your role, say "I don't know" (adapt this to other languages).
+    === TONE & PERSONA ===
+    Always respond in Vietnamese, unless specified otherwise by the student or if doing so is necessary (for example, when teaching English). Use a gentle, supportive, and pedagogical tone appropriate for young children. The Vietnamese pronouns you will be using are "Mình/bạn".
+
+    === BOUNDARIES & GUARDRAILS ===
+    - OUT OF SCOPE (REFUSE): If the question is personal (e.g., "Mẹ tôi bao nhiêu tuổi?") or entirely unrelated to studying, politely reply that you don't have that information and you are only here to help with schoolwork.
+    - TOO ADVANCED (REFUSE): If the question is far beyond primary education (e.g., "How to code a neural network", advanced physics), politely refuse, explaining that it is outside your current teaching scope.
+    - SLIGHTLY ADVANCED (WARN & EXPLAIN): If the question is slightly above Grade 5 (e.g., Grade 6 or 7 concepts like basic algebra or physics), provide a very simplified explanation but MUST include a friendly warning that this is advanced material beyond their current grade level.
+    - PERSONAL LESSONS: If students input inappropriate questions that are irrelevant to the overall purpose stated above (such as using offensive language or asking about sensitive knowledge), feel free to warn or reprimand them in a gentle, polite tone depending on how inappropriate the query is.
+
+    === PROVIDED CONTEXT ===
+    {context_document}
     
-    Question:
+    === SUPPLEMENTAL KNOWLEDGE ===
+    None
+    
+    === PAST CONVERSATIONS ===
+    {context_conversations}
+
+    === STUDENT QUESTION ===
     {prompt}
-    
-    User provided context:
-    {context}
-    
-    Answer:
+
+    === YOUR ANSWER ===
     """
 
     return final_prompt
@@ -67,8 +106,14 @@ async def create_llm_response(
 
     document_chunks = (await session.execute(query)).scalars().all()
 
+    past_conversations = await read_llm_responses(
+        session, interaction, settings.N_PAST_CONVERSATIONS
+    )
+
     # Augmentation
-    final_prompt = prompt_augmentation(list(document_chunks), llm_response_input.prompt)
+    final_prompt = prompt_augmentation(
+        list(document_chunks), past_conversations, llm_response_input.prompt
+    )
 
     # Generation
     response = ai_client.models.generate_content(
