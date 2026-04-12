@@ -8,18 +8,26 @@ ENV_PATH = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
+    # Private info
     POSTGRES_URL: PostgresDsn
     API_KEY_GEMINI: str
     PRIVATE_KEY: str
 
-    # Technical
+    # Technical config
+
+    # Auth
     JWT_ALGORITHM: str
-    DEFAULT_CHUNK_SIZE: int
-    DEFAULT_CHUNK_OVERLAP: int
     TOKEN_EXPIRY_HOURS: int
+
+    # Models
     EMBED_MODEL: str
     ANSWER_MODEL: str
+
+    # RAG
+    DEFAULT_CHUNK_SIZE: int
+    DEFAULT_CHUNK_OVERLAP: int
     N_CHUNKS_RETRIEVED: int
+    N_PAST_CONVERSATIONS: int
 
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
