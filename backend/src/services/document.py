@@ -13,11 +13,15 @@ from backend.src.services import document_chunk
 
 
 def verify_pdf(file: UploadFile):
-    # Content type
+    """
+    Verifies if the file is a PDF.
+    """
+
+    # === Content type === #
     if file.content_type != "application/pdf":
         return False
 
-    # Header
+    # === Header === #
     header = file.file.read(5)
     file.file.seek(0)
 
@@ -28,12 +32,16 @@ def verify_pdf(file: UploadFile):
 
 
 def verify_image(file: UploadFile) -> bool:
-    # Content type
+    """
+    Verifies if the file is an image.
+    """
+
+    # === Content type === #
     allowed_types = {"image/jpeg", "image/png", "image/webp"}
     if file.content_type not in allowed_types:
         return False
 
-    # Header
+    # === Header === #
     header = file.file.read(12)
     file.file.seek(0)
 
@@ -47,6 +55,80 @@ def verify_image(file: UploadFile) -> bool:
     return True
 
 
+def verify_text(file: UploadFile):
+    """
+    Verifies if the file is a text file.
+    """
+
+    # === Content type === #
+    if file.content_type is None:
+        return False
+
+    is_text = (
+        file.content_type.startswith("text/") or file.content_type == "application/json"
+    )
+    is_generic = file.content_type == "application/octet-stream"
+
+    if not (is_text or is_generic):
+        return False
+
+    # === Header === #
+    header = file.file.read(512)
+    file.file.seek(0)
+
+    if not header:
+        return False
+
+    try:
+        header.decode("utf-8")
+        return True
+
+    except UnicodeDecodeError:
+        return False
+
+
+def file_format_checker(
+    file: UploadFile, input_offset: int
+) -> tuple[DocumentType, int]:
+    if verify_pdf(file):
+        document_type = DocumentType.PDF
+        page_starts_at = input_offset
+    elif verify_image(file):
+        document_type = DocumentType.IMAGE
+        page_starts_at = 0
+    elif verify_text(file):
+        document_type = DocumentType.TEXT
+        page_starts_at = 0
+    else:
+        raise ExceptionRequest_400(
+            "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
+        )
+    return document_type, page_starts_at
+
+
+async def file_saver(
+    session: AsyncSession, file: UploadFile, document: Document
+) -> None:
+    if document.type == DocumentType.PDF:
+        await document_chunk.save_pdf_chunks(
+            session,
+            file,
+            document,
+        )
+    elif document.type == DocumentType.IMAGE:
+        await document_chunk.save_image_chunks(
+            session,
+            file,
+            document,
+        )
+    elif document.type == DocumentType.TEXT:
+        await document_chunk.save_text_chunks(
+            session,
+            file,
+            document,
+        )
+
+
 async def save_document(
     session: AsyncSession,
     file: UploadFile,
@@ -54,28 +136,20 @@ async def save_document(
     document_input: DocumentInput,
 ) -> Document:
 
-    if verify_pdf(file):
-        document_type = DocumentType.PDF
-        page_offset = document_input.page_offset
-    elif verify_image(file):
-        document_type = DocumentType.IMAGE
-        page_offset = 0
-    else:
-        raise ExceptionRequest_400(
-            "Invalid file. Only PDFs or image files of type JPEG, PNG, WEBP are allowed. Please recheck file extension and file contents."
-        )
-
-    assert file.filename is not None
+    document_type, page_starts_at = file_format_checker(
+        file, document_input.page_starts_at
+    )
 
     if document_input.name is None:
-        name = file.filename
+        name = file.filename if file.filename else ""
     else:
         name = document_input.name
 
+    # Saves document
     document = Document(
         name=name,
         interaction=interaction,
-        page_offset=page_offset,
+        page_starts_at=page_starts_at,
         type=document_type,
     )
 
@@ -83,18 +157,8 @@ async def save_document(
     await session.commit()
     await session.refresh(document)
 
-    if document_type == DocumentType.PDF:
-        await document_chunk.save_pdf_chunks(
-            session,
-            file,
-            document,
-        )
-    elif document_type == DocumentType.IMAGE:
-        await document_chunk.save_image_chunks(
-            session,
-            file,
-            document,
-        )
+    # Saves document contents
+    await file_saver(session, file, document)
 
     await session.refresh(document)
 
@@ -146,7 +210,7 @@ async def update_document(
     update_data = document_update.model_dump(exclude_unset=True)
 
     if document.type == DocumentType.IMAGE:
-        update_data["page_offset"] = 0
+        update_data["page_starts_at"] = 0
 
     document.sqlmodel_update(update_data)
 
