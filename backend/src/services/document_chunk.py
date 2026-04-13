@@ -1,5 +1,6 @@
 from fastapi import UploadFile
 from google.genai import types
+from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
 
@@ -10,6 +11,12 @@ from backend.src.models_schema.document_chunk import DocumentChunk
 from backend.src.models_schema.enums import DocumentType
 
 # ----- CREATE ----- #
+
+smart_splitter = RecursiveCharacterTextSplitter(
+    chunk_size=settings.DEFAULT_CHUNK_SIZE,
+    chunk_overlap=settings.DEFAULT_CHUNK_OVERLAP,
+    separators=["\n\n", "\n", ".", " ", ""],
+)
 
 
 def embed(text: str) -> list[float]:
@@ -46,12 +53,10 @@ async def save_pdf_chunks(
         if len(page_text.strip()) == 0:
             continue
 
-        pos = 0
-
         # Chopping text in 1 page into chunks
-        while pos < len(page_text):
-            chunk_text = page_text[pos : pos + settings.DEFAULT_CHUNK_SIZE]
+        split_chunks = smart_splitter.split_text(page_text)
 
+        for chunk_text in split_chunks:
             embedding_content = (
                 f"Source: {DocumentType.PDF.value} file {document.name}, page {page_num + document.page_starts_at}:\n"
                 + chunk_text
@@ -67,9 +72,41 @@ async def save_pdf_chunks(
 
             session.add(prepared_chunk)
 
-            # Moving position forwards
             chunk_index += 1
-            pos += settings.DEFAULT_CHUNK_SIZE - settings.DEFAULT_CHUNK_OVERLAP
+
+    await session.commit()
+
+
+async def save_text_chunks(
+    session: AsyncSession, file: UploadFile, document: Document
+) -> None:
+    # Reads the file
+    text_bytes = await file.read()
+    try:
+        contents = text_bytes.decode("utf-8")
+    except UnicodeDecodeError:
+        raise ExceptionRequest_400(
+            "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
+        )
+
+    if len(contents.strip()) == 0:
+        return
+
+    split_chunks = smart_splitter.split_text(contents)
+
+    for chunk_index, chunk_text in enumerate(split_chunks):
+        embedding_content = (
+            f"Source: {DocumentType.TEXT.value} file {document.name}:\n" + chunk_text
+        )
+
+        prepared_chunk = DocumentChunk(
+            content_original=chunk_text,
+            content_embedded=embed(embedding_content),
+            document_chunk_index=chunk_index,
+            document=document,
+        )
+
+        session.add(prepared_chunk)
 
     await session.commit()
 
@@ -97,6 +134,7 @@ async def save_image_chunks(
     )
 
     image_description = response.text
+
     # Validation
     if image_description is None:
         raise ExceptionRequest_400("Image could not be saved properly.")
@@ -113,46 +151,6 @@ async def save_image_chunks(
     )
 
     session.add(prepared_chunk)
-    await session.commit()
-
-
-async def save_text_chunks(
-    session: AsyncSession, file: UploadFile, document: Document
-) -> None:
-    # Reads the file
-    text_bytes = await file.read()
-    try:
-        contents = text_bytes.decode("utf-8")
-    except UnicodeDecodeError:
-        raise ExceptionRequest_400(
-            "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
-        )
-
-    if len(contents.strip()) == 0:
-        return
-
-    chunk_index = 0
-    pos = 0
-
-    while pos < len(contents):
-        chunk_text = contents[pos : pos + settings.DEFAULT_CHUNK_SIZE]
-
-        embedding_content = (
-            f"Source: {DocumentType.TEXT.value} file {document.name}:\n" + chunk_text
-        )
-
-        prepared_chunk = DocumentChunk(
-            content_original=chunk_text,
-            content_embedded=embed(embedding_content),
-            document_chunk_index=chunk_index,
-            document=document,
-        )
-
-        session.add(prepared_chunk)
-
-        chunk_index += 1
-        pos += settings.DEFAULT_CHUNK_SIZE - settings.DEFAULT_CHUNK_OVERLAP
-
     await session.commit()
 
 

@@ -1,0 +1,83 @@
+from sqlalchemy.ext.asyncio import AsyncSession
+from sqlmodel import col, select
+
+from backend.src.core.config import ai_client, settings
+from backend.src.exceptions.core import ExceptionRequest_400
+from backend.src.models_schema.interaction import Interaction
+from backend.src.models_schema.llm_response import (
+    LLMResponse,
+    LLMResponseInput,
+)
+from backend.src.services.document_chunk import embed
+from backend.src.services.llm_response.augmentation import prompt_augmentation
+from backend.src.services.llm_response.retrieval import retrieval
+
+# ----- CREATE ----- #
+
+
+async def create_llm_response(
+    session: AsyncSession,
+    llm_response_input: LLMResponseInput,
+    interaction: Interaction,
+) -> LLMResponse:
+
+    # Retrieval
+    embedded_prompt = embed(llm_response_input.prompt)
+    document_chunks = await retrieval(session, interaction, embedded_prompt)
+
+    past_conversations = await read_llm_responses(
+        session, interaction, settings.N_PAST_CONVERSATIONS
+    )
+
+    # Augmentation
+    final_prompt = prompt_augmentation(
+        document_chunks, past_conversations, llm_response_input.prompt
+    )
+
+    # Generation
+    response = ai_client.models.generate_content(
+        model=settings.ANSWER_MODEL,
+        contents=final_prompt,
+    )
+
+    # Validation
+    if response.text is None:
+        raise ExceptionRequest_400(
+            "A response could not be generated. Please recheck your question."
+        )
+
+    # Saving response
+    llm_response = LLMResponse(
+        prompt=llm_response_input.prompt,
+        answer=response.text,
+        interaction=interaction,
+    )
+
+    session.add(llm_response)
+    await session.commit()
+    await session.refresh(llm_response)
+
+    return llm_response
+
+
+# ----- READ ----- #
+
+
+async def read_llm_responses(
+    session: AsyncSession, interaction: Interaction, limit: int | None
+) -> list[LLMResponse]:
+    query = (
+        select(LLMResponse)
+        .where(LLMResponse.interaction_id == interaction.id)
+        .order_by(col(LLMResponse.created_at).desc())
+    )
+    if limit is not None:
+        query = query.limit(limit)
+
+    llm_responses = (await session.execute(query)).scalars().all()
+
+    return list(llm_responses)
+
+
+# ----- UPDATE ----- #
+# ----- DELETE ----- #
