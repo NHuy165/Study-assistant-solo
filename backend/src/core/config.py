@@ -28,6 +28,7 @@ class Settings(BaseSettings):
     DEFAULT_CHUNK_OVERLAP: int
     N_CHUNKS_RETRIEVED: int
     N_PAST_CONVERSATIONS: int
+    N_CHUNKS_WINDOW: int
 
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,

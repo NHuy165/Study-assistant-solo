@@ -19,3 +19,4 @@ debugpy
 google-genai
 pypdf
 pgvector
+langchain-text-splitters
