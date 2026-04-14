@@ -1,7 +1,7 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
-from backend.src.core.ai_api import GoogleAPI
+from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.llm_response import (
@@ -21,7 +21,7 @@ async def create_llm_response(
 ) -> LLMResponse:
 
     # Retrieval
-    embedded_prompt = GoogleAPI.embed(llm_response_input.prompt)
+    embedded_prompt = GlobalAPI.embed(llm_response_input.prompt)
     document_chunks = await retrieval(session, interaction, embedded_prompt)
 
     past_conversations = await read_llm_responses(
@@ -34,7 +34,7 @@ async def create_llm_response(
     )
 
     # Generation
-    answer = GoogleAPI.generate_content(final_prompt)
+    answer = GlobalAPI.generate_content(final_prompt)
 
     # Saving response
     llm_response = LLMResponse(

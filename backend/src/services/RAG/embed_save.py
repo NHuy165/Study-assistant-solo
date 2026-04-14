@@ -5,7 +5,7 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.core.ai_api import GoogleAPI
+from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.document import Document
@@ -85,7 +85,7 @@ class PdfExtractor(DocumentExtractor):
 
                 prepared_chunk = DocumentChunk(
                     content_original=chunk_text,
-                    content_embedded=GoogleAPI.embed(embedding_content),
+                    content_embedded=GlobalAPI.embed(embedding_content),
                     document_page_num=page_num,
                     document_chunk_index=chunk_index,
                     document=document,
@@ -124,7 +124,7 @@ class ImageExtractor(DocumentExtractor):
         cls, session: AsyncSession, file: UploadFile, document: Document
     ) -> None:
         # Reads the image using the model
-        image_description = await GoogleAPI.describe_image(file)
+        image_description = await GlobalAPI.describe_image(file)
 
         embedding_content = (
             f"Source: {DocumentType.IMAGE.value} file {document.name}:\n"
@@ -133,7 +133,7 @@ class ImageExtractor(DocumentExtractor):
 
         prepared_chunk = DocumentChunk(
             content_original=f"[IMAGE DESCRIPTION]: {image_description}",
-            content_embedded=GoogleAPI.embed(embedding_content),
+            content_embedded=GlobalAPI.embed(embedding_content),
             document=document,
         )
 
@@ -199,7 +199,7 @@ class TextExtractor(DocumentExtractor):
 
             prepared_chunk = DocumentChunk(
                 content_original=chunk_text,
-                content_embedded=GoogleAPI.embed(embedding_content),
+                content_embedded=GlobalAPI.embed(embedding_content),
                 document_chunk_index=chunk_index,
                 document=document,
             )

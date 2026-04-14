@@ -17,6 +17,7 @@ debugpy
 
 # AI and RAG
 google-genai
+ollama
 pypdf
 pgvector
 langchain-text-splitters
