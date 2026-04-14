@@ -22,7 +22,12 @@ async def create_llm_response(
 
     # Retrieval
     embedded_prompt = GlobalAPI.embed(llm_response_input.prompt)
-    document_chunks = await retrieval(session, interaction, embedded_prompt)
+    document_chunks = await retrieval(
+        session=session,
+        interaction=interaction,
+        raw_prompt=llm_response_input.prompt,
+        embedded_prompt=embedded_prompt,
+    )
 
     past_conversations = await read_llm_responses(
         session, interaction, settings.N_PAST_CONVERSATIONS

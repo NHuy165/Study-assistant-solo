@@ -124,7 +124,10 @@ class OllamaAPI(API):
 
         # Reads the image using the model
         response = ollama_client.generate(
-            model=settings.VISION_MODEL_OLLAMA, prompt=prompt_text, images=[image_bytes]
+            model=settings.VISION_MODEL_OLLAMA,
+            prompt=prompt_text,
+            images=[image_bytes],
+            options={"num_ctx": 8192},
         )
 
         result_text = response.get("response")
@@ -140,6 +143,7 @@ class OllamaAPI(API):
         response = ollama_client.generate(
             model=settings.ANSWER_MODEL_OLLAMA,
             prompt=prompt,
+            options={"num_ctx": 8192},
         )
 
         result_text = response.get("response")
