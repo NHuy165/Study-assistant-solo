@@ -1,17 +1,15 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
-from backend.src.core.ai_api import ai_client
+from backend.src.core.ai_api import GoogleAPI
 from backend.src.core.config import settings
-from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.llm_response import (
     LLMResponse,
     LLMResponseInput,
 )
-from backend.src.services.document_chunk import embed
-from backend.src.services.llm_response.augmentation import prompt_augmentation
-from backend.src.services.llm_response.retrieval import retrieval
+from backend.src.services.RAG.augmentation import prompt_augmentation
+from backend.src.services.RAG.retrieval import retrieval
 
 # ----- CREATE ----- #
 
@@ -23,7 +21,7 @@ async def create_llm_response(
 ) -> LLMResponse:
 
     # Retrieval
-    embedded_prompt = embed(llm_response_input.prompt)
+    embedded_prompt = GoogleAPI.embed(llm_response_input.prompt)
     document_chunks = await retrieval(session, interaction, embedded_prompt)
 
     past_conversations = await read_llm_responses(
@@ -36,21 +34,12 @@ async def create_llm_response(
     )
 
     # Generation
-    response = ai_client.models.generate_content(
-        model=settings.ANSWER_MODEL,
-        contents=final_prompt,
-    )
-
-    # Validation
-    if response.text is None:
-        raise ExceptionRequest_400(
-            "A response could not be generated. Please recheck your question."
-        )
+    answer = GoogleAPI.generate_content(final_prompt)
 
     # Saving response
     llm_response = LLMResponse(
         prompt=llm_response_input.prompt,
-        answer=response.text,
+        answer=answer,
         interaction=interaction,
     )
 
