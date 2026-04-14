@@ -1,16 +1,15 @@
 from typing import Annotated
 
-from fastapi import APIRouter, Body, Form, Query, UploadFile, status
+from fastapi import APIRouter, Query, UploadFile, status
 
-from backend.src.core.database import SessionDep
-from backend.src.core.dependencies import InteractionDep, UserDep
+from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.document import (
     DocumentInput,
     DocumentOutput,
     DocumentUpdate,
 )
-from backend.src.services import document, document_chunk
+from backend.src.services import document
 
 router = APIRouter()
 

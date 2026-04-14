@@ -1,7 +1,8 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
-from backend.src.core.config import ai_client, settings
+from backend.src.core.ai_api import ai_client
+from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.llm_response import (

@@ -2,8 +2,7 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.src.core.database import SessionDep
-from backend.src.core.dependencies import InteractionDep, UserDep
+from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.llm_response import LLMResponseInput, LLMResponseOutput
 from backend.src.services.llm_response import main

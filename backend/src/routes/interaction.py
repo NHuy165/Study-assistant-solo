@@ -1,7 +1,6 @@
 from fastapi import APIRouter, status
 
-from backend.src.core.database import SessionDep
-from backend.src.core.dependencies import UserDep
+from backend.src.core.dependencies import SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.interaction import (
     InteractionInput,
