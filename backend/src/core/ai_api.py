@@ -1,6 +1,7 @@
 from abc import ABC, abstractmethod
 from typing import Any
 
+import ollama
 from fastapi import UploadFile
 from google import genai
 
@@ -8,6 +9,7 @@ from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
 
 ai_client = genai.Client(api_key=settings.API_KEY_GEMINI)
+ollama_client = ollama.Client(host=settings.OLLAMA_HOST)
 
 
 class API(ABC):
@@ -21,7 +23,7 @@ class API(ABC):
 
     @classmethod
     @abstractmethod
-    def describe_image(cls, file: UploadFile) -> str:
+    async def describe_image(cls, file: UploadFile) -> str:
         """
         Generates a detailed description of the image.
         """
@@ -92,3 +94,79 @@ class GoogleAPI(API):
             )
 
         return response.text
+
+
+class OllamaAPI(API):
+    @classmethod
+    def embed(cls, content: str) -> list[float]:
+        response = ollama_client.embeddings(
+            model=settings.EMBED_MODEL_OLLAMA,
+            prompt=content,
+        )
+
+        embeddings = response.get("embedding")
+
+        # Let this throw an internal error if wrong
+        assert embeddings is not None
+        assert isinstance(embeddings, list)
+
+        if len(embeddings) > settings.DEFAULT_EMBED_DIMENSIONALITY:
+            embeddings = embeddings[: settings.DEFAULT_EMBED_DIMENSIONALITY]
+
+        return embeddings
+
+    @classmethod
+    async def describe_image(cls, file: UploadFile) -> str:
+        # Extracting information from the image
+        image_bytes = await file.read()
+
+        prompt_text = "Extract all readable text from this image exactly as written.\nThen, describe the layout, charts, figures, subjects, and any data points in exhaustive detail."
+
+        # Reads the image using the model
+        response = ollama_client.generate(
+            model=settings.VISION_MODEL_OLLAMA, prompt=prompt_text, images=[image_bytes]
+        )
+
+        result_text = response.get("response")
+
+        # Validation
+        if not result_text:
+            raise ExceptionRequest_400("Image could not be saved properly.")
+
+        return result_text
+
+    @classmethod
+    def generate_content(cls, prompt: str) -> str:
+        response = ollama_client.generate(
+            model=settings.ANSWER_MODEL_OLLAMA,
+            prompt=prompt,
+        )
+
+        result_text = response.get("response")
+
+        # Validation
+        if not result_text:
+            raise ExceptionRequest_400(
+                "A response could not be generated. Please recheck your question."
+            )
+
+        return result_text
+
+
+class GlobalAPI(API):
+    models: dict[str, type[API]] = {
+        "GOOGLE": GoogleAPI,
+        "OLLAMA": OllamaAPI,
+    }
+
+    @classmethod
+    def embed(cls, content: str) -> list[float]:
+        return cls.models[settings.MODEL_IN_USE].embed(content)
+
+    @classmethod
+    async def describe_image(cls, file: UploadFile) -> str:
+        return await cls.models[settings.MODEL_IN_USE].describe_image(file)
+
+    @classmethod
+    def generate_content(cls, prompt: str) -> str:
+        return cls.models[settings.MODEL_IN_USE].generate_content(prompt)

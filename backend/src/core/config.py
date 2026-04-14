@@ -19,9 +19,16 @@ class Settings(BaseSettings):
     TOKEN_EXPIRY_HOURS: int
 
     # Models
+    MODEL_IN_USE: str
+
     EMBED_MODEL_GOOGLE: str
     VISION_MODEL_GOOGLE: str
     ANSWER_MODEL_GOOGLE: str
+
+    OLLAMA_HOST: str
+    EMBED_MODEL_OLLAMA: str
+    VISION_MODEL_OLLAMA: str
+    ANSWER_MODEL_OLLAMA: str
 
     # RAG
     DEFAULT_CHUNK_SIZE: int
