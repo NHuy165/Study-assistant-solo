@@ -4,7 +4,8 @@ from langchain_text_splitters import RecursiveCharacterTextSplitter
 from pypdf import PdfReader
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.core.config import ai_client, settings
+from backend.src.core.ai_api import ai_client
+from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
 from backend.src.models_schema.document import Document
 from backend.src.models_schema.document_chunk import DocumentChunk

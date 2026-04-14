@@ -1,6 +1,5 @@
 from pathlib import Path
 
-from google import genai
 from pydantic import PostgresDsn
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
@@ -37,5 +36,3 @@ class Settings(BaseSettings):
 
 
 settings = Settings()  # type: ignore
-
-ai_client = genai.Client(api_key=settings.API_KEY_GEMINI)

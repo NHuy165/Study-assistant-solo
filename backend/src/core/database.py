@@ -26,6 +26,3 @@ async def dispose():
 async def get_async_session():
     async with AsyncSession(engine) as session:
         yield session
-
-
-SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
