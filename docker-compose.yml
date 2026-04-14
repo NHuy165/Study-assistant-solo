@@ -11,6 +11,25 @@ services:
     volumes:
       - postgres_data:/var/lib/postgresql/data
 
+  db-init:
+    image: postgres:16
+    depends_on:
+      db:
+        condition: service_started
+    environment:
+      PGPASSWORD: Q6L0N2H0LQS5016SQL5888
+    entrypoint: ["/bin/sh"]
+    command:
+      - "-c"
+      - |
+        echo "Waiting for Postgres database to be ready..."
+        while ! pg_isready -h db -U postgres; do sleep 1; done
+        
+        echo "Database active. Enabling pg_trgm extension..."
+        psql -h db -U postgres -d group_project_sample -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
+        
+        echo "pg_trgm extension enabled successfully! Exiting."
+
   # Backend Service
   api:
     build: .
