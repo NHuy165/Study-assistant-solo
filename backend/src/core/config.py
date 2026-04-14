@@ -19,12 +19,14 @@ class Settings(BaseSettings):
     TOKEN_EXPIRY_HOURS: int
 
     # Models
-    EMBED_MODEL: str
-    ANSWER_MODEL: str
+    EMBED_MODEL_GOOGLE: str
+    VISION_MODEL_GOOGLE: str
+    ANSWER_MODEL_GOOGLE: str
 
     # RAG
     DEFAULT_CHUNK_SIZE: int
     DEFAULT_CHUNK_OVERLAP: int
+    DEFAULT_EMBED_DIMENSIONALITY: int
     N_CHUNKS_RETRIEVED: int
     N_PAST_CONVERSATIONS: int
     N_CHUNKS_WINDOW: int

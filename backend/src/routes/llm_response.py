@@ -5,7 +5,7 @@ from fastapi import APIRouter, Query
 from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.llm_response import LLMResponseInput, LLMResponseOutput
-from backend.src.services.llm_response import main
+from backend.src.services import llm_response
 
 router = APIRouter()
 
@@ -30,7 +30,7 @@ async def create_llm_response(
     """
     Receives a user prompt and returns the model's answer. Conversations (prompts and answers) belong to an interaction.
     """
-    llm_response_output = await main.create_llm_response(
+    llm_response_output = await llm_response.create_llm_response(
         session, llm_response_input, interaction
     )
 
@@ -56,5 +56,7 @@ async def read_llm_responses(
     """
     Reads past conversations in an interaction.
     """
-    llm_responses_output = await main.read_llm_responses(session, interaction, limit)
+    llm_responses_output = await llm_response.read_llm_responses(
+        session, interaction, limit
+    )
     return llm_responses_output

@@ -1,7 +1,6 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Annotated
 
-from fastapi import UploadFile
 from pydantic import BeforeValidator
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
