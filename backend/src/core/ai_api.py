@@ -9,13 +9,13 @@ from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
 
 ai_client = genai.Client(api_key=settings.API_KEY_GEMINI)
-ollama_client = ollama.Client(host=settings.OLLAMA_HOST)
+ollama_client = ollama.AsyncClient(host=settings.OLLAMA_HOST)
 
 
 class API(ABC):
     @classmethod
     @abstractmethod
-    def embed(cls, content: str) -> list[float]:
+    async def embed(cls, content: str) -> list[float]:
         """
         Embeds text into a 768-D vector.
         """
@@ -31,7 +31,7 @@ class API(ABC):
 
     @classmethod
     @abstractmethod
-    def generate_content(cls, prompt: str) -> str:
+    async def generate_content(cls, prompt: str) -> str:
         """
         Generates an LLM response from a prompt.
         """
@@ -40,8 +40,8 @@ class API(ABC):
 
 class GoogleAPI(API):
     @classmethod
-    def embed(cls, content: str) -> list[float]:
-        response = ai_client.models.embed_content(
+    async def embed(cls, content: str) -> list[float]:
+        response = await ai_client.aio.models.embed_content(
             model=settings.EMBED_MODEL_GOOGLE,
             contents=content,
             # Content is truncated from 3072-D to 768-D
@@ -69,7 +69,7 @@ class GoogleAPI(API):
         )
 
         # Reads the image using the model
-        response = ai_client.models.generate_content(
+        response = await ai_client.aio.models.generate_content(
             model=settings.VISION_MODEL_GOOGLE,
             contents=[prompt_text, image_part],
         )
@@ -81,8 +81,8 @@ class GoogleAPI(API):
         return response.text
 
     @classmethod
-    def generate_content(cls, prompt: str) -> str:
-        response = ai_client.models.generate_content(
+    async def generate_content(cls, prompt: str) -> str:
+        response = await ai_client.aio.models.generate_content(
             model=settings.ANSWER_MODEL_GOOGLE,
             contents=prompt,
         )
@@ -98,8 +98,8 @@ class GoogleAPI(API):
 
 class OllamaAPI(API):
     @classmethod
-    def embed(cls, content: str) -> list[float]:
-        response = ollama_client.embeddings(
+    async def embed(cls, content: str) -> list[float]:
+        response = await ollama_client.embeddings(
             model=settings.EMBED_MODEL_OLLAMA,
             prompt=content,
         )
@@ -123,7 +123,7 @@ class OllamaAPI(API):
         prompt_text = "Extract all readable text from this image exactly as written.\nThen, describe the layout, charts, figures, subjects, and any data points in exhaustive detail."
 
         # Reads the image using the model
-        response = ollama_client.generate(
+        response = await ollama_client.generate(
             model=settings.VISION_MODEL_OLLAMA,
             prompt=prompt_text,
             images=[image_bytes],
@@ -139,8 +139,8 @@ class OllamaAPI(API):
         return result_text
 
     @classmethod
-    def generate_content(cls, prompt: str) -> str:
-        response = ollama_client.generate(
+    async def generate_content(cls, prompt: str) -> str:
+        response = await ollama_client.generate(
             model=settings.ANSWER_MODEL_OLLAMA,
             prompt=prompt,
             options={"num_ctx": 8192},
@@ -164,13 +164,13 @@ class GlobalAPI(API):
     }
 
     @classmethod
-    def embed(cls, content: str) -> list[float]:
-        return cls.models[settings.MODEL_IN_USE].embed(content)
+    async def embed(cls, content: str) -> list[float]:
+        return await cls.models[settings.MODEL_IN_USE].embed(content)
 
     @classmethod
     async def describe_image(cls, file: UploadFile) -> str:
         return await cls.models[settings.MODEL_IN_USE].describe_image(file)
 
     @classmethod
-    def generate_content(cls, prompt: str) -> str:
-        return cls.models[settings.MODEL_IN_USE].generate_content(prompt)
+    async def generate_content(cls, prompt: str) -> str:
+        return await cls.models[settings.MODEL_IN_USE].generate_content(prompt)
