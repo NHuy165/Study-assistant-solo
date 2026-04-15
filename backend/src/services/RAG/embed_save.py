@@ -85,7 +85,7 @@ class PdfExtractor(DocumentExtractor):
 
                 prepared_chunk = DocumentChunk(
                     content_original=chunk_text,
-                    content_embedded=GlobalAPI.embed(embedding_content),
+                    content_embedded=await GlobalAPI.embed(embedding_content),
                     document_page_num=page_num,
                     document_chunk_index=chunk_index,
                     document=document,
@@ -133,7 +133,7 @@ class ImageExtractor(DocumentExtractor):
 
         prepared_chunk = DocumentChunk(
             content_original=f"[IMAGE DESCRIPTION]: {image_description}",
-            content_embedded=GlobalAPI.embed(embedding_content),
+            content_embedded=await GlobalAPI.embed(embedding_content),
             document=document,
         )
 
@@ -199,7 +199,7 @@ class TextExtractor(DocumentExtractor):
 
             prepared_chunk = DocumentChunk(
                 content_original=chunk_text,
-                content_embedded=GlobalAPI.embed(embedding_content),
+                content_embedded=await GlobalAPI.embed(embedding_content),
                 document_chunk_index=chunk_index,
                 document=document,
             )

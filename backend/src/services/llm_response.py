@@ -9,7 +9,9 @@ from backend.src.models_schema.llm_response import (
     LLMResponseInput,
 )
 from backend.src.services.RAG.augmentation import prompt_augmentation
+from backend.src.services.RAG.formatters import conversations_formatter
 from backend.src.services.RAG.retrieval import retrieval
+from backend.src.services.RAG.rewrite import rewrite_prompt
 
 # ----- CREATE ----- #
 
@@ -20,26 +22,33 @@ async def create_llm_response(
     interaction: Interaction,
 ) -> LLMResponse:
 
-    # Retrieval
-    embedded_prompt = GlobalAPI.embed(llm_response_input.prompt)
+    # Gets past conversations
+    past_conversations = await read_llm_responses(
+        session, interaction, settings.N_PAST_CONVERSATIONS
+    )
+    formatted_past_conversations = conversations_formatter(past_conversations)
+
+    # Retrieval (using the rewritten prompt)
+    rewritten_prompt = await rewrite_prompt(
+        llm_response_input.prompt, formatted_past_conversations
+    )
+    print("PROMPT VIẾT LẠI LÀ:")
+    print(rewritten_prompt)
+    embedded_prompt = await GlobalAPI.embed(rewritten_prompt)
     document_chunks = await retrieval(
         session=session,
         interaction=interaction,
-        raw_prompt=llm_response_input.prompt,
+        raw_prompt=rewritten_prompt,
         embedded_prompt=embedded_prompt,
-    )
-
-    past_conversations = await read_llm_responses(
-        session, interaction, settings.N_PAST_CONVERSATIONS
     )
 
     # Augmentation
     final_prompt = prompt_augmentation(
-        document_chunks, past_conversations, llm_response_input.prompt
+        document_chunks, formatted_past_conversations, llm_response_input.prompt
     )
 
     # Generation
-    answer = GlobalAPI.generate_content(final_prompt)
+    answer = await GlobalAPI.generate_content(final_prompt)
 
     # Saving response
     llm_response = LLMResponse(
