@@ -4,15 +4,13 @@ from sqlmodel import select
 
 from backend.src.exceptions.core import ExceptionNotFound_404, ExceptionRequest_400
 from backend.src.models_schema.document import Document, DocumentInput, DocumentUpdate
-from backend.src.models_schema.enums import DocumentType
 from backend.src.models_schema.interaction import Interaction
+from backend.src.models_schema.miscellaneous.enums import DocumentType
 from backend.src.models_schema.user import User
-from backend.src.services.RAG.embed_save import (
-    DocumentExtractor,
-    ImageExtractor,
-    PdfExtractor,
-    TextExtractor,
-)
+from backend.src.RAG.chunking.base import DocumentExtractor
+from backend.src.RAG.chunking.image import ImageExtractor
+from backend.src.RAG.chunking.PDF import PdfExtractor
+from backend.src.RAG.chunking.text import TextExtractor
 
 # ----- CREATE ----- #
 

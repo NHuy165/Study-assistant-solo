@@ -1,11 +1,13 @@
-from backend.src.core.prompts import (
-    ANSWER_GENERATION_BASE,
-    STUDY_ACTIVITY_BASE,
-)
-from backend.src.models_schema.augmentation_params import (
+from backend.src.models_schema.RAG.augmentation import (
     AnswerGenerationParams,
     AugmentationParams,
     StudyActivityParams,
+)
+from backend.src.RAG.augmentation.chunk_rewriting.rewrite import PromptRewriteParams
+from backend.src.RAG.augmentation.core.base_prompts import (
+    ANSWER_GENERATION_BASE,
+    PROMPT_REWRITE_BASE,
+    STUDY_ACTIVITY_BASE,
 )
 
 
@@ -23,4 +25,7 @@ answer_generation_augmentation = augmentation_generator(
 )
 study_activity_augmentation = augmentation_generator(
     STUDY_ACTIVITY_BASE, StudyActivityParams
+)
+prompt_rewrite_augmentation = augmentation_generator(
+    PROMPT_REWRITE_BASE, PromptRewriteParams
 )

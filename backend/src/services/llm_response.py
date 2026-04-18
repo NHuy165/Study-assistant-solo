@@ -3,19 +3,23 @@ from sqlmodel import col, select
 
 from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
-from backend.src.models_schema.augmentation_params import AnswerGenerationParams
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.llm_response import (
     LLMResponse,
     LLMResponseInput,
 )
-from backend.src.services.RAG.augmentation import answer_generation_augmentation
-from backend.src.services.RAG.formatters import (
+from backend.src.models_schema.RAG.augmentation import AnswerGenerationParams
+from backend.src.RAG.augmentation.chunk_rewriting.rewrite import rewrite_prompt
+from backend.src.RAG.augmentation.core.specific_augmentations import (
+    answer_generation_augmentation,
+)
+from backend.src.RAG.augmentation.formatters.chunks.core import (
     chunks_formatter,
+)
+from backend.src.RAG.augmentation.formatters.conversations.core import (
     conversations_formatter,
 )
-from backend.src.services.RAG.retrieval import retrieval
-from backend.src.services.RAG.rewrite import rewrite_prompt
+from backend.src.RAG.retrieval.core import retrieval
 
 # ----- CREATE ----- #
 

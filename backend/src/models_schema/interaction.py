@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated
 from pydantic import BeforeValidator
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
-from backend.src.models_schema.utils import beva_forbid_none
+from backend.src.models_schema.miscellaneous.utils import beva_forbid_none
 
 if TYPE_CHECKING:
     from backend.src.models_schema.activity.study_activity import StudyActivity

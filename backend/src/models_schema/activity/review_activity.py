@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Annotated
 from sqlalchemy.dialects.postgresql import JSONB
 from sqlmodel import Column, Field, Relationship, SQLModel
 
-from backend.src.models_schema.enums import ReviewActivityType
+from backend.src.models_schema.miscellaneous.enums import ReviewActivityType
 
 if TYPE_CHECKING:
     from backend.src.models_schema.activity.study_activity import StudyActivity
