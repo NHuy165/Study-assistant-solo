@@ -4,6 +4,7 @@ from typing import Iterable
 from backend.src.models_schema.document_chunk import DocumentChunk
 from backend.src.models_schema.enums import DocumentType
 from backend.src.models_schema.llm_response import LLMResponse
+from backend.src.services.RAG.stitch import chunks_stitcher
 
 # ----- CHUNK FORMAT ----- #
 
@@ -84,6 +85,20 @@ def stitched_content_formatter(
         raise Exception("Unknown document type")
 
     return formatter_class.format(index, head_chunk, page_end, stitched_content)
+
+
+def chunks_formatter(chunks: Iterable[DocumentChunk]) -> str:
+    """
+    Converts document chunks into text (through stitching and formatting).
+    """
+    stitched_contents = chunks_stitcher(chunks)
+
+    formatted_chunks = "\n\n".join(
+        stitched_content_formatter(i, *content_block)
+        for i, content_block in enumerate(stitched_contents, start=1)
+    )
+
+    return formatted_chunks
 
 
 # ----- CONVERSATION FORMAT ----- #

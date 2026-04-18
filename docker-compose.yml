@@ -50,7 +50,7 @@ services:
         condition: service_completed_successfully
     volumes:
       - ./backend:/code/backend
-    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "fastapi", "dev", "backend/src/main.py", "--port", "8000", "--host", "0.0.0.0"]
+    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "fastapi", "run", "backend/src/main.py", "--port", "8000", "--host", "0.0.0.0"]
 
   ollama:
     image: ollama/ollama
