@@ -3,7 +3,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 from sqlalchemy import JSON
 from sqlmodel import Column, Field, Relationship, SQLModel
 
-from backend.src.models_schema.enums import ExerciseActivityType
+from backend.src.models_schema.miscellaneous.enums import ExerciseActivityType
 
 if TYPE_CHECKING:
     from backend.src.models_schema.activity.study_activity import StudyActivity

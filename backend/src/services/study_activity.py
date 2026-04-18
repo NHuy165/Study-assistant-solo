@@ -4,13 +4,13 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionRequest_400
-from backend.src.models_schema.activity.activity_schemas import (
-    ExerciseActivityValidationBase,
-    ReviewActivityValidationBase,
-)
 from backend.src.models_schema.activity.exercise_activity import (
     ExerciseActivity,
     ExerciseActivityInput,
+)
+from backend.src.models_schema.activity.json_validation import (
+    ExerciseActivityValidationBase,
+    ReviewActivityValidationBase,
 )
 from backend.src.models_schema.activity.review_activity import (
     ReviewActivity,
@@ -20,20 +20,22 @@ from backend.src.models_schema.activity.study_activity import (
     StudyActivity,
     StudyActivityInput,
 )
-from backend.src.models_schema.augmentation_params import (
+from backend.src.models_schema.interaction import Interaction
+from backend.src.models_schema.miscellaneous.enums import StudyActivityType
+from backend.src.models_schema.RAG.augmentation import (
     StudyActivityParams,
 )
-from backend.src.models_schema.enums import StudyActivityType
-from backend.src.models_schema.interaction import Interaction
-from backend.src.services.llm_response import read_llm_responses
-from backend.src.services.RAG.augmentation import study_activity_augmentation
-from backend.src.services.RAG.formatters import (
-    chunks_formatter,
+from backend.src.RAG.augmentation.chunk_rewriting.rewrite import rewrite_prompt
+from backend.src.RAG.augmentation.core.specific_augmentations import (
+    study_activity_augmentation,
+)
+from backend.src.RAG.augmentation.formatters.chunks.core import chunks_formatter
+from backend.src.RAG.augmentation.formatters.conversations.core import (
     conversations_formatter,
 )
-from backend.src.services.RAG.retrieval import retrieval
-from backend.src.services.RAG.rewrite import rewrite_prompt
-from backend.src.services.RAG.schema_map import schema_map
+from backend.src.RAG.augmentation.study_activity.type_mappings import schema_map
+from backend.src.RAG.retrieval.core import retrieval
+from backend.src.services.llm_response import read_llm_responses
 
 # ----- CREATE ----- #
 

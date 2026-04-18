@@ -52,7 +52,7 @@ Your task is to read the student's current raw input AND the conversation histor
 {context_conversations}
 
 === CURRENT RAW PROMPT ===
-{raw_prompt}
+{prompt}
 
 === OPTIMIZED SEARCH QUERY ===
 """

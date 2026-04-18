@@ -1,7 +1,7 @@
 from typing import Iterable
 
 from backend.src.models_schema.document_chunk import DocumentChunk
-from backend.src.models_schema.enums import DocumentType
+from backend.src.models_schema.miscellaneous.enums import DocumentType
 
 
 def stitch(

@@ -4,7 +4,7 @@ from typing import TYPE_CHECKING, Annotated, Optional
 from pydantic import BaseModel
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
-from backend.src.models_schema.enums import StudyActivityType, SubjectType
+from backend.src.models_schema.miscellaneous.enums import StudyActivityType, SubjectType
 
 if TYPE_CHECKING:
     from backend.src.models_schema.activity.exercise_activity import ExerciseActivity
