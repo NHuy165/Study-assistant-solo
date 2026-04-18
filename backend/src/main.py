@@ -15,7 +15,15 @@ from backend.src.exceptions.handlers import (
     starlette_exceptions_handlers,
     validation_exceptions_handler,
 )
-from backend.src.routes import auth, document, interaction, llm_response, note, user
+from backend.src.routes import (
+    auth,
+    document,
+    interaction,
+    llm_response,
+    note,
+    study_activity,
+    user,
+)
 
 # ----- Setting up app ----- #
 
@@ -91,4 +99,10 @@ app.include_router(
     user.router,
     prefix="/user",
     tags=["user"],
+)
+
+app.include_router(
+    study_activity.router,
+    prefix="/study-activity",
+    tags=["study-activity"],
 )
