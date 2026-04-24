@@ -4,18 +4,17 @@ from backend.src.models_schema.activity.json_validation import (
     StudyActivityValidationBase,
 )
 from backend.src.models_schema.miscellaneous.enums import (
-    ExerciseActivityType,
-    ReviewActivityType,
+    StudyActivityFormat,
 )
-from backend.src.RAG.augmentation.study_activity.instructions import (
+from backend.src.RAG.augmentation.study_activity.instruction_schemas import (
     flashcard_schema,
     mcq_schema,
 )
 
 schema_map: dict[
-    ExerciseActivityType | ReviewActivityType,
+    StudyActivityFormat | StudyActivityFormat,
     tuple[str, type[StudyActivityValidationBase]],
 ] = {
-    ExerciseActivityType.MCQ: (mcq_schema, MCQJsonSchema),
-    ReviewActivityType.FLASHCARDS: (flashcard_schema, FlashcardsJsonSchema),
+    StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (mcq_schema, MCQJsonSchema),
+    StudyActivityFormat.FLASHCARDS: (flashcard_schema, FlashcardsJsonSchema),
 }

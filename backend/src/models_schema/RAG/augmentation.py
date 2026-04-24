@@ -15,7 +15,7 @@ class StudyActivityParams(AugmentationParams):
     context_document: str
     subject_type: str
     json_schema: str
-    study_activity_type: str
+    activity_format: str
 
 
 class PromptRewriteParams(AugmentationParams):

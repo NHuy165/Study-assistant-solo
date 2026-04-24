@@ -65,7 +65,7 @@ Your core objective is to generate highly accurate, age-appropriate educational 
 === GENERATED CONTENTS ===
 The generated contents are to follow the following parameters:
 - TARGET SUBJECT: {subject_type}
-- EXERCISE TYPE: {study_activity_type}
+- MATERIAL FORMAT: {activity_format}
 - USER PROMPT: Generated contents need to follow the user's prompt closely and fulfill any requirements they may specify. Generated content is based on the data specified in the following `KNOWLEDGE PRIORITY & RULES` section.
 
 === KNOWLEDGE PRIORITY & RULES ===

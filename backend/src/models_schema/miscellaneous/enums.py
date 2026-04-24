@@ -18,11 +18,23 @@ class StudyActivityType(str, Enum):
     EXERCISE = "EXERCISE"
 
 
-class ExerciseActivityType(str, Enum):
-    MCQ = "MULTIPLE_CHOICE_QUESTIONS"
+class StudyActivityFormat(str, Enum):
+    # EXERCISE
+    MULTIPLE_CHOICE_QUESTIONS = "MULTIPLE_CHOICE_QUESTIONS"
     OPEN_ENDED = "OPEN_ENDED"
 
-
-class ReviewActivityType(str, Enum):
+    # REVIEW
     FLASHCARDS = "FLASHCARDS"
-    MINDMAP = "MINDMAP"
+    TAP_TO_REVIEW = "TAP_TO_REVIEW"
+
+
+class ReviewItemContentType(str, Enum):
+    FLASHCARDS_FRONT = "FLASHCARDS_FRONT"
+    FLASHCARDS_BACK = "FLASHCARDS_BACK"
+
+    TAP_TO_REVIEW_TEXT = "TAP_TO_REVIEW_TEXT"
+    TAP_TO_REVIEW_GAP = "TAP_TO_REVIEW_GAP"
+
+
+class ExerciseItemContentType(str, Enum):
+    MULTIPLE_CHOICE_QUESTIONS_CHOICE = "MULTIPLE_CHOICE_QUESTIONS_CHOICE"

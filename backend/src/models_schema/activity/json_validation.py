@@ -22,14 +22,7 @@ class FlashcardSchema(BaseModel):
 class StudyActivityValidationBase(BaseModel):
     name: str
     description: str
-
-
-class ExerciseActivityValidationBase(StudyActivityValidationBase):
-    questions: list[Any]
-
-
-class ReviewActivityValidationBase(StudyActivityValidationBase):
-    contents: list[Any]
+    activity_items: list[Any]
 
 
 # ----- SPECIFIC ACTIVITY SCHEMAS ----- #
@@ -37,12 +30,12 @@ class ReviewActivityValidationBase(StudyActivityValidationBase):
 # === Exercise === #
 
 
-class MCQJsonSchema(ExerciseActivityValidationBase):
-    questions: list[MCQSchema]
+class MCQJsonSchema(StudyActivityValidationBase):
+    activity_items: list[MCQSchema]
 
 
 # === Review === #
 
 
-class FlashcardsJsonSchema(ReviewActivityValidationBase):
-    contents: list[FlashcardSchema]
+class FlashcardsJsonSchema(StudyActivityValidationBase):
+    activity_items: list[FlashcardSchema]
