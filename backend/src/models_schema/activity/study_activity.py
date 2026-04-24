@@ -1,14 +1,27 @@
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Annotated, Optional
+from typing import TYPE_CHECKING, Annotated
 
-from pydantic import BaseModel
+from pydantic import BeforeValidator
+from sqlalchemy import CheckConstraint
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
-from backend.src.models_schema.miscellaneous.enums import StudyActivityType, SubjectType
+from backend.src.models_schema.miscellaneous.enums import (
+    StudyActivityFormat,
+    StudyActivityType,
+    SubjectType,
+)
+from backend.src.models_schema.miscellaneous.utils import beva_forbid_none
 
 if TYPE_CHECKING:
-    from backend.src.models_schema.activity.exercise_activity import ExerciseActivity
-    from backend.src.models_schema.activity.review_activity import ReviewActivity
+    from backend.src.models_schema.activity.exercise_item import (
+        ExerciseItem,
+        ExerciseItemOutput,
+        ExerciseItemOutputAnswer,
+    )
+    from backend.src.models_schema.activity.review_item import (
+        ReviewItem,
+        ReviewItemOutput,
+    )
     from backend.src.models_schema.interaction import Interaction
 
 # ----- BASE ---- #
@@ -16,7 +29,8 @@ if TYPE_CHECKING:
 
 class StudyActivityBase(SQLModel):
     prompt: str
-    study_activity_type: StudyActivityType
+    activity_type: StudyActivityType
+    activity_format: StudyActivityFormat
     subject_type: SubjectType
 
 
@@ -25,6 +39,36 @@ class StudyActivityBase(SQLModel):
 
 class StudyActivityInput(StudyActivityBase):
     pass
+
+
+# ----- OUTPUT ----- #
+
+
+class StudyActivityOutput(StudyActivityBase):
+    id: int
+    name: str
+    description: str
+    created_at: datetime
+
+    is_submitted: bool
+    submitted_at: datetime | None
+    total_score: float | None
+
+
+class StudyActivityOutputComplete(StudyActivityOutput):
+    items: (
+        list["ReviewItemOutput"]
+        | list["ExerciseItemOutput"]
+        | list["ExerciseItemOutputAnswer"]
+    )
+
+
+# ----- UPDATE ----- #
+
+
+class StudyActivityUpdate(SQLModel):
+    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- TABLE MODEL ----- #
@@ -43,15 +87,47 @@ class StudyActivity(StudyActivityBase, table=True):
     name: str
     description: str
 
+    is_submitted: bool = False  # Exercise only
+    total_score: float | None = None  # Exercise only
+
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True)),
         default_factory=lambda: datetime.now(timezone.utc),
     )
+    submitted_at: Annotated[
+        datetime | None, Field(sa_column=Column(DateTime(timezone=True)))
+    ] = None
 
     interaction: "Interaction" = Relationship(back_populates="study_activities")
-    exercise_activity: Optional["ExerciseActivity"] = Relationship(
+    review_items: list["ReviewItem"] = Relationship(
         back_populates="study_activity", cascade_delete=True
     )
-    review_activity: Optional["ReviewActivity"] = Relationship(
+    exercise_items: list["ExerciseItem"] = Relationship(
         back_populates="study_activity", cascade_delete=True
     )
+
+    __table_args__ = (
+        CheckConstraint(
+            """
+            (activity_type = 'EXERCISE' AND activity_format IN ('MULTIPLE_CHOICE_QUESTIONS', 'OPEN_ENDED'))
+            OR
+            (activity_type = 'REVIEW' AND activity_format IN ('FLASHCARDS', 'TAP_TO_REVIEW'))
+            """,
+            name="CK_activity_type_activity_format",
+        ),
+        CheckConstraint(
+            """
+            (activity_type = 'EXERCISE')
+            OR
+            (activity_type = 'REVIEW' AND is_submitted = false)
+            """,
+            name="CK_activity_type_is_submitted",
+        ),
+    )
+
+
+from backend.src.models_schema.activity.exercise_item import (
+    ExerciseItemOutput,
+    ExerciseItemOutputAnswer,
+)
+from backend.src.models_schema.activity.review_item import ReviewItemOutput
