@@ -38,6 +38,9 @@ class Settings(BaseSettings):
     N_PAST_CONVERSATIONS: int
     N_CHUNKS_WINDOW: int
 
+    # STUDY ACTIVITY
+    DEFAULT_EXERCISE_TOTAL_SCORE: float
+
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
         env_file_encoding="utf-8",
