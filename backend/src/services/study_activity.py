@@ -59,10 +59,13 @@ async def save_multiple_choice_questions(
     if n_items == 0:
         return
 
+    assert study_activity.total_score is not None
+    question_score = study_activity.total_score / n_items
+
     for i_item in range(n_items):
         # Saving the item
         exercise_item = ExerciseItem(
-            max_score=study_activity.total_score / n_items,
+            max_score=question_score,
             question=specific_activity_data.activity_items[i_item].question,
             study_activity=study_activity,
         )
@@ -229,8 +232,8 @@ async def create_study_activity(
 
     if study_activity_input.activity_type == StudyActivityType.EXERCISE:
         query = query.options(
-            selectinload(StudyActivity.exercise_items).selectinload(
-                ExerciseItem.contents
+            selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
+                ExerciseItem.contents  # type: ignore
             )
         )
 
@@ -238,23 +241,48 @@ async def create_study_activity(
         assert study_activity is not None
 
         items_validator = TypeAdapter(list[ExerciseItemOutput])
+        assert study_activity.id is not None
+
         study_activity_output_complete = StudyActivityOutputComplete(
-            **study_activity,
+            prompt=study_activity.prompt,
+            activity_type=study_activity.activity_type,
+            activity_format=study_activity.activity_format,
+            subject_type=study_activity.subject_type,
+            id=study_activity.id,
+            name=study_activity.name,
+            description=study_activity.description,
+            created_at=study_activity.created_at,
+            is_submitted=study_activity.is_submitted,
+            submitted_at=study_activity.submitted_at,
+            total_score=study_activity.total_score,
             items=items_validator.validate_python(study_activity.exercise_items),
         )
 
         return study_activity_output_complete
     else:
         query = query.options(
-            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)
+            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
         )
 
         study_activity = (await session.execute(query)).scalars().first()
         assert study_activity is not None
 
         items_validator = TypeAdapter(list[ReviewItemOutput])
+
+        assert study_activity.id is not None
+
         study_activity_output_complete = StudyActivityOutputComplete(
-            **study_activity,
+            prompt=study_activity.prompt,
+            activity_type=study_activity.activity_type,
+            activity_format=study_activity.activity_format,
+            subject_type=study_activity.subject_type,
+            id=study_activity.id,
+            name=study_activity.name,
+            description=study_activity.description,
+            created_at=study_activity.created_at,
+            is_submitted=study_activity.is_submitted,
+            submitted_at=study_activity.submitted_at,
+            total_score=study_activity.total_score,
             items=items_validator.validate_python(study_activity.review_items),
         )
 
