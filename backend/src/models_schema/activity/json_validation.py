@@ -16,6 +16,11 @@ class FlashcardSchema(BaseModel):
     back: str
 
 
+class TapToReviewSchema(BaseModel):
+    text: str
+    gaps: list[str]
+
+
 # ----- ACTIVITY BASE SCHEMAS  ----- #
 
 
@@ -39,3 +44,7 @@ class MCQJsonSchema(StudyActivityValidationBase):
 
 class FlashcardsJsonSchema(StudyActivityValidationBase):
     activity_items: list[FlashcardSchema]
+
+
+class TapToReviewJsonSchema(StudyActivityValidationBase):
+    activity_items: list[TapToReviewSchema]
