@@ -15,6 +15,7 @@ from backend.src.models_schema.activity.json_validation import (
     FlashcardsJsonSchema,
     MCQJsonSchema,
     StudyActivityValidationBase,
+    TapToReviewJsonSchema,
 )
 from backend.src.models_schema.activity.review_item import ReviewItem, ReviewItemOutput
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
@@ -53,7 +54,7 @@ async def save_multiple_choice_questions(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    specific_activity_data = MCQJsonSchema.model_validate(activity_data)
+    assert isinstance(activity_data, MCQJsonSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -66,7 +67,7 @@ async def save_multiple_choice_questions(
         # Saving the item
         exercise_item = ExerciseItem(
             max_score=question_score,
-            question=specific_activity_data.activity_items[i_item].question,
+            question=activity_data.activity_items[i_item].question,
             study_activity=study_activity,
         )
         session.add(exercise_item)
@@ -74,15 +75,13 @@ async def save_multiple_choice_questions(
         await session.refresh(exercise_item)
 
         # Saving the contents of the item
-        n_contents = len(specific_activity_data.activity_items[i_item].answers)
+        n_contents = len(activity_data.activity_items[i_item].answers)
         for i_content in range(n_contents):
             exercise_item_content = ExerciseItemContent(
-                content=specific_activity_data.activity_items[i_item].answers[
-                    i_content
-                ],
+                content=activity_data.activity_items[i_item].answers[i_content],
                 type=ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
                 is_correct=True
-                if i_content == specific_activity_data.activity_items[i_item].correct
+                if i_content == activity_data.activity_items[i_item].correct
                 else False,
                 exercise_item=exercise_item,
             )
@@ -103,7 +102,7 @@ async def save_flashcards(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    specific_activity_data = FlashcardsJsonSchema.model_validate(activity_data)
+    assert isinstance(activity_data, FlashcardsJsonSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -120,14 +119,14 @@ async def save_flashcards(
 
         # Saving the contents of the item
         front_content = ReviewItemContent(
-            content=specific_activity_data.activity_items[i_item].front,
+            content=activity_data.activity_items[i_item].front,
             type=ReviewItemContentType.FLASHCARDS_FRONT,
             review_item=review_item,
         )
         session.add(front_content)
 
         back_content = ReviewItemContent(
-            content=specific_activity_data.activity_items[i_item].back,
+            content=activity_data.activity_items[i_item].back,
             type=ReviewItemContentType.FLASHCARDS_BACK,
             review_item=review_item,
         )
@@ -140,7 +139,38 @@ async def save_tap_to_review(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    pass
+    assert isinstance(activity_data, TapToReviewJsonSchema)
+
+    n_items = len(activity_data.activity_items)
+    if n_items == 0:
+        return
+
+    for i_item in range(n_items):
+        # Saving the item
+        review_item = ReviewItem(
+            study_activity=study_activity,
+        )
+        session.add(review_item)
+        await session.commit()
+        await session.refresh(review_item)
+
+        # Saving the contents of the item
+        text_content = ReviewItemContent(
+            content=activity_data.activity_items[i_item].text,
+            type=ReviewItemContentType.TAP_TO_REVIEW_TEXT,
+            review_item=review_item,
+        )
+        session.add(text_content)
+
+        n_gaps_contents = len(activity_data.activity_items[i_item].gaps)
+        for i_gap_content in range(n_gaps_contents):
+            review_item_content = ReviewItemContent(
+                content=activity_data.activity_items[i_item].gaps[i_gap_content],
+                type=ReviewItemContentType.TAP_TO_REVIEW_GAP,
+                review_item=review_item,
+            )
+            session.add(review_item_content)
+            await session.commit()
 
 
 save_mapper = {
