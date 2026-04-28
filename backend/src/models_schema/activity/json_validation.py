@@ -16,9 +16,10 @@ class FlashcardSchema(BaseModel):
     back: str
 
 
-class TapToReviewSchema(BaseModel):
+class GapFillSchema(BaseModel):
     text: str
-    gaps: list[str]
+    correct: list[str]
+    distractors: list[str]
 
 
 class OpenEndedSchema(BaseModel):
@@ -50,8 +51,8 @@ class FlashcardsJsonSchema(StudyActivityValidationBase):
     activity_items: list[FlashcardSchema]
 
 
-class TapToReviewJsonSchema(StudyActivityValidationBase):
-    activity_items: list[TapToReviewSchema]
+class GapFillJsonSchema(StudyActivityValidationBase):
+    activity_items: list[GapFillSchema]
 
 
 class OpenEndedJsonSchema(StudyActivityValidationBase):
