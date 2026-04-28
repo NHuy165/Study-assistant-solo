@@ -3,7 +3,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
 
-from backend.src.core.ai_api import GlobalAPI
+from backend.src.core.ai_api import ExceptionRequest_400, GlobalAPI
 from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.activity.exercise_item import (
@@ -377,7 +377,32 @@ async def update_study_activity(
     study_activity_id: int,
     study_activity_update: StudyActivityUpdate,
 ) -> StudyActivity:  # type: ignore
-    pass
+    query = (
+        select(StudyActivity)
+        .join(Interaction)
+        .where(StudyActivity.id == study_activity_id, Interaction.user_id == user.id)
+    )
+
+    study_activity = (await session.execute(query)).scalars().first()
+
+    if study_activity is None:
+        raise ExceptionNotFound_404(
+            "StudyActivity",
+            {
+                "id": study_activity_id,
+                "interaction.user_id": user.id,
+            },
+        )
+
+    update_data = study_activity_update.model_dump(exclude_unset=True)
+
+    study_activity.sqlmodel_update(update_data)
+
+    session.add(study_activity)
+    await session.commit()
+    await session.refresh(study_activity)
+
+    return study_activity
 
 
 async def answer_exercise_item(
@@ -386,7 +411,55 @@ async def answer_exercise_item(
     exercise_item_id: int,
     exercise_item_update: ExerciseItemUpdate,
 ) -> ExerciseItem:  # type: ignore
-    pass
+    query = (
+        select(ExerciseItem, StudyActivity)
+        .join(StudyActivity)
+        .join(Interaction)
+        .where(ExerciseItem.id == exercise_item_id, Interaction.user_id == user.id)
+        .options(selectinload(ExerciseItem.contents))  # type: ignore
+    )
+
+    row = (await session.execute(query)).first()
+
+    if row is None:
+        raise ExceptionNotFound_404(
+            "ExerciseItem",
+            {
+                "id": exercise_item_id,
+                "interaction.user_id": user.id,
+            },
+        )
+
+    exercise_item, study_activity = row
+
+    assert isinstance(exercise_item, ExerciseItem)
+    assert isinstance(study_activity, StudyActivity)
+
+    if study_activity.activity_format == StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS:
+        if not isinstance(exercise_item_update.attempt, int):
+            raise ExceptionRequest_400(
+                custom_message="Answers to multiple choice questions need to be an integer pointing to the id of the correct answer."
+            )
+
+        if exercise_item_update.attempt not in (
+            content.id for content in exercise_item.contents
+        ):
+            raise ExceptionRequest_400(
+                custom_message="Answer did not match the id of any of the answers of the current question."
+            )
+    else:
+        if not isinstance(exercise_item_update.attempt, str):
+            raise ExceptionRequest_400(
+                custom_message="Answer needs to be of type string."
+            )
+
+    exercise_item.attempt = str(exercise_item_update.attempt)
+
+    session.add(exercise_item)
+    await session.commit()
+    await session.refresh(exercise_item)
+
+    return exercise_item
 
 
 async def submit_exercise_activity(

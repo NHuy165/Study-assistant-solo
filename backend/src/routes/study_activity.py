@@ -97,7 +97,14 @@ async def read_study_activity_complete(
 # ----- UPDATE ----- #
 
 
-@router.patch("/{study_activity_id}", response_model=StudyActivityOutput)
+@router.patch(
+    "/{study_activity_id}/update",
+    response_model=StudyActivityOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def update_study_activity(
     user: UserDep,
     session: SessionDep,
@@ -115,7 +122,14 @@ async def update_study_activity(
     )
 
 
-@router.patch("/{exercise_item_id}", response_model=ExerciseItemOutput)
+@router.patch(
+    "/{exercise_item_id}/answer",
+    response_model=ExerciseItemOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def answer_exercise_item(
     user: UserDep,
     session: SessionDep,
@@ -133,7 +147,7 @@ async def answer_exercise_item(
     )
 
 
-@router.patch("/{study_activity_id}", response_model=ExerciseItemOutput)
+@router.patch("/{study_activity_id}/submit", response_model=StudyActivityOutputComplete)
 async def submit_exercise_activity(
     user: UserDep,
     session: SessionDep,
