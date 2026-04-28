@@ -14,9 +14,11 @@ python-dotenv
 pytest
 pytest_asyncio
 debugpy
+debugpy
 
 # AI and RAG
 google-genai
+ollama
 ollama
 pypdf
 pgvector

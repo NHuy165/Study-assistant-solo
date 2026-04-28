@@ -1,9 +1,9 @@
 from backend.src.models_schema.RAG.augmentation import (
     AnswerGenerationParams,
     AugmentationParams,
+    PromptRewriteParams,
     StudyActivityParams,
 )
-from backend.src.RAG.augmentation.chunk_rewriting.rewrite import PromptRewriteParams
 from backend.src.RAG.augmentation.core.base_prompts import (
     ANSWER_GENERATION_BASE,
     PROMPT_REWRITE_BASE,

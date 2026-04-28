@@ -111,7 +111,7 @@ class StudyActivity(StudyActivityBase, table=True):
             """
             (activity_type = 'EXERCISE' AND activity_format IN ('MULTIPLE_CHOICE_QUESTIONS', 'OPEN_ENDED'))
             OR
-            (activity_type = 'REVIEW' AND activity_format IN ('FLASHCARDS', 'TAP_TO_REVIEW'))
+            (activity_type = 'REVIEW' AND activity_format IN ('FLASHCARDS', 'GAP_FILL'))
             """,
             name="CK_activity_type_activity_format",
         ),

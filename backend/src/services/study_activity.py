@@ -13,10 +13,10 @@ from backend.src.models_schema.activity.exercise_item import (
 from backend.src.models_schema.activity.exercise_item_content import ExerciseItemContent
 from backend.src.models_schema.activity.json_validation import (
     FlashcardsJsonSchema,
+    GapFillJsonSchema,
     MCQJsonSchema,
     OpenEndedJsonSchema,
     StudyActivityValidationBase,
-    TapToReviewJsonSchema,
 )
 from backend.src.models_schema.activity.review_item import ReviewItem, ReviewItemOutput
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
@@ -35,7 +35,6 @@ from backend.src.models_schema.miscellaneous.enums import (
 )
 from backend.src.models_schema.RAG.augmentation import StudyActivityParams
 from backend.src.models_schema.user import User
-from backend.src.RAG.augmentation.chunk_rewriting.rewrite import rewrite_prompt
 from backend.src.RAG.augmentation.core.specific_augmentations import (
     study_activity_augmentation,
 )
@@ -45,6 +44,7 @@ from backend.src.RAG.augmentation.formatters.conversations.core import (
 )
 from backend.src.RAG.augmentation.study_activity.type_mappings import schema_map
 from backend.src.RAG.retrieval.core import retrieval
+from backend.src.RAG.retrieval.prompt_rewrite import rewrite_prompt
 from backend.src.services.llm_response import read_llm_responses
 
 # ----- CREATE ----- #
@@ -87,7 +87,8 @@ async def save_multiple_choice_questions(
                 exercise_item=exercise_item,
             )
             session.add(exercise_item_content)
-            await session.commit()
+
+        await session.commit()
 
 
 async def save_open_ended(
@@ -112,16 +113,16 @@ async def save_open_ended(
             study_activity=study_activity,
         )
         session.add(exercise_item)
-        await session.commit()
-        await session.refresh(exercise_item)
+
+    await session.commit()
 
 
-async def save_tap_to_review(
+async def save_gap_fill(
     session: AsyncSession,
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, TapToReviewJsonSchema)
+    assert isinstance(activity_data, GapFillJsonSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -139,20 +140,32 @@ async def save_tap_to_review(
         # Saving the contents of the item
         text_content = ReviewItemContent(
             content=activity_data.activity_items[i_item].text,
-            type=ReviewItemContentType.TAP_TO_REVIEW_TEXT,
+            type=ReviewItemContentType.GAP_FILL_TEXT,
             review_item=review_item,
         )
         session.add(text_content)
 
-        n_gaps_contents = len(activity_data.activity_items[i_item].gaps)
-        for i_gap_content in range(n_gaps_contents):
+        n_correct_contents = len(activity_data.activity_items[i_item].correct)
+        for i_correct_content in range(n_correct_contents):
             review_item_content = ReviewItemContent(
-                content=activity_data.activity_items[i_item].gaps[i_gap_content],
-                type=ReviewItemContentType.TAP_TO_REVIEW_GAP,
+                content=activity_data.activity_items[i_item].correct[i_correct_content],
+                type=ReviewItemContentType.GAP_FILL_CORRECT,
                 review_item=review_item,
             )
             session.add(review_item_content)
-            await session.commit()
+
+        n_distractors_contents = len(activity_data.activity_items[i_item].distractors)
+        for i_distractor_content in range(n_distractors_contents):
+            review_item_content = ReviewItemContent(
+                content=activity_data.activity_items[i_item].distractors[
+                    i_distractor_content
+                ],
+                type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
+                review_item=review_item,
+            )
+            session.add(review_item_content)
+
+        await session.commit()
 
 
 async def save_flashcards(
@@ -189,6 +202,7 @@ async def save_flashcards(
             review_item=review_item,
         )
         session.add(back_content)
+
         await session.commit()
 
 
@@ -196,7 +210,7 @@ save_mapper = {
     StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: save_multiple_choice_questions,
     StudyActivityFormat.OPEN_ENDED: save_open_ended,
     StudyActivityFormat.FLASHCARDS: save_flashcards,
-    StudyActivityFormat.TAP_TO_REVIEW: save_tap_to_review,
+    StudyActivityFormat.GAP_FILL: save_gap_fill,
 }
 
 

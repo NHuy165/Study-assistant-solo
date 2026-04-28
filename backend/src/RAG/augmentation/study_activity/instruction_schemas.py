@@ -39,24 +39,26 @@ Additional information:
 - The default number of flashcards is 10. This can be changed according to the user's explicit request.
 """
 
-tap_to_review_schema = """
+gap_fill_schema = """
 {
     "name": "string (A concise name of this set of clozes)",
     "description": "string (A description of the contents of the clozes and what knowledge they cover)",
     "activity_items": [
         {
             "text": "string"
-            "gaps": ["string1", "string2", ...]
+            "correct": ["string1", "string2", ...]
+            "distractors": ["string1", "string2", ...]
         }
     ]
 }
 
 Additional information:
-- Description: A cloze deletion problem where the user has to click the censored words to reveal them. Each paragraph may contain information about a specific study problem. Keep in mind that this is not a PROBLEM, but a review material.
-- The "activity_items" key is a JSON array containing the paragraphs of information. Each paragraph is described using a paragraph with missing words and the missing words themselves in correct order.
-- "text": The paragraph of information, usually about a method to a problem, a definition, facts about a specific concept, anything that the user should remember. Each censored word is marked by the string $!GAP!$
-- "gaps": The censored word that will be revealed when the user clicks it. The array has to contain the words in the correct order based on the paragraph in "text". The censored words should be important concepts, points of information that are essential to the overall information being displayed in "text", basically something that the user has to engrave in memories. The number of gaps HAS TO MATCH the number of $!GAP!$ in the paragraph.
-- The default number of paragraphs is 10. This can be changed according to the user's explicit request.
+- Description: A banked cloze test where the student is given some text with blanks, together with a list of given words containing both the correct words and surplus wrong answers.
+- The "activity_items" key is a JSON array containing separate unrelated problems. Each problem contains the text with blanks, a list of the correct words in the correct order to fill in those blanks, and a list of surplus wrong answers.
+- "text": The main information with blanks, each text may only contain an amount of text equivalent to 2 or 3 sentences, 4 at maximum. Each blank is marked by the string $!BLANK!$
+- "correct": The words that will correctly fill in the blanks of the main text. The array has to contain the words in the correct order based on the text provided in "text". The blanked out words should be important concepts, points of information that are essential to the overall information being displayed in "text", basically something that the user has to engrave in memories. The number of correct words HAS TO MATCH the number of $!BLANK!$ in the main text.
+- "distractors": The wrong words, given to confuse the student and test their ability to discern between the right answers and the wrong ones. These words should be somewhat semantically similar to the correct words, but the actual words have to be different. The number of distractors provided should be arbitrary, the more distractors provided, the harder the problem will be.
+- The default number of texts is 10. This can be changed according to the user's explicit request.
 """
 
 open_ended_schema = """
