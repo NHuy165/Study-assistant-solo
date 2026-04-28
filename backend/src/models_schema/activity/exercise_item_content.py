@@ -1,5 +1,6 @@
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Self
 
+from pydantic import ValidationInfo, model_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 from backend.src.models_schema.miscellaneous.enums import ExerciseItemContentType
@@ -20,10 +21,13 @@ class ExerciseItemContentBase(SQLModel):
 
 class ExerciseItemContentOutput(ExerciseItemContentBase):
     id: int
+    is_correct: bool | None = None
 
-
-class ExerciseItemContentOutputAnswer(ExerciseItemContentOutput):
-    is_correct: bool
+    @model_validator(mode="after")
+    def scrub_answers(self, info: ValidationInfo) -> Self:
+        if not info.context or info.context.get("show_answers") is not True:
+            self.is_correct = None
+        return self
 
 
 # ----- TABLE MODEL ----- #

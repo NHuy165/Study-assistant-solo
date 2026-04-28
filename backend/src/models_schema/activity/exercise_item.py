@@ -6,7 +6,6 @@ if TYPE_CHECKING:
     from backend.src.models_schema.activity.exercise_item_content import (
         ExerciseItemContent,
         ExerciseItemContentOutput,
-        ExerciseItemContentOutputAnswer,
     )
     from backend.src.models_schema.activity.study_activity import StudyActivity
 
@@ -26,13 +25,6 @@ class ExerciseItemOutput(ExerciseItemBase):
     user_score: float
     attempt: str | None
     contents: list["ExerciseItemContentOutput"]
-
-
-class ExerciseItemOutputAnswer(ExerciseItemBase):
-    id: int
-    user_score: float
-    attempt: str | None
-    contents: "ExerciseItemContentOutputAnswer"
 
 
 # ----- UPDATE ----- #
@@ -65,5 +57,4 @@ class ExerciseItem(ExerciseItemBase, table=True):
 
 from backend.src.models_schema.activity.exercise_item_content import (
     ExerciseItemContentOutput,
-    ExerciseItemContentOutputAnswer,
 )

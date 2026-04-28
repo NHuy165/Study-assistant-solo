@@ -5,6 +5,7 @@ from sqlmodel import select
 
 from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
+from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.activity.exercise_item import (
     ExerciseItem,
     ExerciseItemOutput,
@@ -300,56 +301,18 @@ async def create_study_activity(
             )
         )
 
-        study_activity = (await session.execute(query)).scalars().first()
-        assert study_activity is not None
-
-        items_validator = TypeAdapter(list[ExerciseItemOutput])
-        assert study_activity.id is not None
-
-        study_activity_output_complete = StudyActivityOutputComplete(
-            prompt=study_activity.prompt,
-            activity_type=study_activity.activity_type,
-            activity_format=study_activity.activity_format,
-            subject_type=study_activity.subject_type,
-            id=study_activity.id,
-            name=study_activity.name,
-            description=study_activity.description,
-            created_at=study_activity.created_at,
-            is_submitted=study_activity.is_submitted,
-            submitted_at=study_activity.submitted_at,
-            total_score=study_activity.total_score,
-            items=items_validator.validate_python(study_activity.exercise_items),
-        )
-
-        return study_activity_output_complete
     else:
         query = query.options(
             selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
         )
 
-        study_activity = (await session.execute(query)).scalars().first()
-        assert study_activity is not None
+    study_activity = (await session.execute(query)).scalars().first()
 
-        items_validator = TypeAdapter(list[ReviewItemOutput])
+    study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+        study_activity
+    )
 
-        assert study_activity.id is not None
-
-        study_activity_output_complete = StudyActivityOutputComplete(
-            prompt=study_activity.prompt,
-            activity_type=study_activity.activity_type,
-            activity_format=study_activity.activity_format,
-            subject_type=study_activity.subject_type,
-            id=study_activity.id,
-            name=study_activity.name,
-            description=study_activity.description,
-            created_at=study_activity.created_at,
-            is_submitted=study_activity.is_submitted,
-            submitted_at=study_activity.submitted_at,
-            total_score=study_activity.total_score,
-            items=items_validator.validate_python(study_activity.review_items),
-        )
-
-        return study_activity_output_complete
+    return study_activity_output_complete
 
 
 # ----- READ ----- #
@@ -358,16 +321,51 @@ async def create_study_activity(
 async def read_all_study_activity(
     session: AsyncSession,
     interaction: Interaction,
-) -> list[StudyActivity]:  # type: ignore
-    pass
+) -> list[StudyActivity]:
+    query = select(StudyActivity).where(StudyActivity.interaction_id == interaction.id)
+    study_activities = (await session.execute(query)).scalars().all()
+
+    return list(study_activities)
 
 
 async def read_study_activity_complete(
     user: User,
     session: AsyncSession,
     study_activity_id: int,
-) -> StudyActivity:  # type: ignore
-    pass
+) -> StudyActivityOutputComplete:
+
+    query = (
+        select(StudyActivity)
+        .join(Interaction)
+        .where(StudyActivity.id == study_activity_id, Interaction.user_id == user.id)
+        .options(
+            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents),  # type: ignore
+            selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
+                ExerciseItem.contents  # type: ignore
+            ),
+        )
+    )
+    study_activity = (await session.execute(query)).scalars().first()
+
+    if study_activity is None:
+        raise ExceptionNotFound_404(
+            "StudyActivity",
+            {
+                "id": study_activity_id,
+                "interaction.user_id": user.id,
+            },
+        )
+
+    if study_activity.is_submitted:
+        study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+            study_activity, context={"show_answers": True}
+        )
+    else:
+        study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+            study_activity
+        )
+
+    return study_activity_output_complete
 
 
 # ----- UPDATE ----- #
