@@ -152,14 +152,21 @@ async def submit_exercise_activity(
 # ----- DELETE ----- #
 
 
-@router.delete("/{study_activity_id}", status_code=204)
+@router.delete(
+    "/{study_activity_id}",
+    status_code=204,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def delete_study_activity(
     user: UserDep,
     session: SessionDep,
     study_activity_id: int,
 ):
     """
-    Nộp tài liệu dạng Exercise.
+    Xóa một tài liệu.
     """
     return await study_activity.delete_study_activity(
         user,
