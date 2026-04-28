@@ -405,4 +405,22 @@ async def delete_study_activity(
     session: AsyncSession,
     study_activity_id: int,
 ) -> None:
-    pass
+    query = (
+        select(StudyActivity)
+        .join(Interaction)
+        .where(StudyActivity.id == study_activity_id, Interaction.user_id == user.id)
+    )
+
+    study_activity = (await session.execute(query)).scalars().first()
+
+    if study_activity is None:
+        raise ExceptionNotFound_404(
+            "StudyActivity",
+            {
+                "id": study_activity_id,
+                "interaction.user_id": user.id,
+            },
+        )
+
+    await session.delete(study_activity)
+    await session.commit()
