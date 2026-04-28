@@ -21,6 +21,10 @@ class TapToReviewSchema(BaseModel):
     gaps: list[str]
 
 
+class OpenEndedSchema(BaseModel):
+    question: str
+
+
 # ----- ACTIVITY BASE SCHEMAS  ----- #
 
 
@@ -48,3 +52,7 @@ class FlashcardsJsonSchema(StudyActivityValidationBase):
 
 class TapToReviewJsonSchema(StudyActivityValidationBase):
     activity_items: list[TapToReviewSchema]
+
+
+class OpenEndedJsonSchema(StudyActivityValidationBase):
+    activity_items: list[OpenEndedSchema]

@@ -14,6 +14,7 @@ from backend.src.models_schema.activity.exercise_item_content import ExerciseIte
 from backend.src.models_schema.activity.json_validation import (
     FlashcardsJsonSchema,
     MCQJsonSchema,
+    OpenEndedJsonSchema,
     StudyActivityValidationBase,
     TapToReviewJsonSchema,
 )
@@ -94,44 +95,25 @@ async def save_open_ended(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    pass
-
-
-async def save_flashcards(
-    session: AsyncSession,
-    activity_data: StudyActivityValidationBase,
-    study_activity: StudyActivity,
-) -> None:
-    assert isinstance(activity_data, FlashcardsJsonSchema)
+    assert isinstance(activity_data, OpenEndedJsonSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
         return
 
+    assert study_activity.total_score is not None
+    question_score = study_activity.total_score / n_items
+
     for i_item in range(n_items):
         # Saving the item
-        review_item = ReviewItem(
+        exercise_item = ExerciseItem(
+            max_score=question_score,
+            question=activity_data.activity_items[i_item].question,
             study_activity=study_activity,
         )
-        session.add(review_item)
+        session.add(exercise_item)
         await session.commit()
-        await session.refresh(review_item)
-
-        # Saving the contents of the item
-        front_content = ReviewItemContent(
-            content=activity_data.activity_items[i_item].front,
-            type=ReviewItemContentType.FLASHCARDS_FRONT,
-            review_item=review_item,
-        )
-        session.add(front_content)
-
-        back_content = ReviewItemContent(
-            content=activity_data.activity_items[i_item].back,
-            type=ReviewItemContentType.FLASHCARDS_BACK,
-            review_item=review_item,
-        )
-        session.add(back_content)
-        await session.commit()
+        await session.refresh(exercise_item)
 
 
 async def save_tap_to_review(
@@ -171,6 +153,43 @@ async def save_tap_to_review(
             )
             session.add(review_item_content)
             await session.commit()
+
+
+async def save_flashcards(
+    session: AsyncSession,
+    activity_data: StudyActivityValidationBase,
+    study_activity: StudyActivity,
+) -> None:
+    assert isinstance(activity_data, FlashcardsJsonSchema)
+
+    n_items = len(activity_data.activity_items)
+    if n_items == 0:
+        return
+
+    for i_item in range(n_items):
+        # Saving the item
+        review_item = ReviewItem(
+            study_activity=study_activity,
+        )
+        session.add(review_item)
+        await session.commit()
+        await session.refresh(review_item)
+
+        # Saving the contents of the item
+        front_content = ReviewItemContent(
+            content=activity_data.activity_items[i_item].front,
+            type=ReviewItemContentType.FLASHCARDS_FRONT,
+            review_item=review_item,
+        )
+        session.add(front_content)
+
+        back_content = ReviewItemContent(
+            content=activity_data.activity_items[i_item].back,
+            type=ReviewItemContentType.FLASHCARDS_BACK,
+            review_item=review_item,
+        )
+        session.add(back_content)
+        await session.commit()
 
 
 save_mapper = {
