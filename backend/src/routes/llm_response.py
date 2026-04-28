@@ -17,7 +17,6 @@ router = APIRouter()
     "/{interaction_id}/chat",
     response_model=LLMResponseOutput,
     responses={
-        400: Responses.RESPONSE_400_BAD_REQUEST,
         401: Responses.RESPONSE_401_UNAUTHORIZED,
     },
 )

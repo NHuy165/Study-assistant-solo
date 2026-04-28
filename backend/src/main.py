@@ -40,6 +40,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     lifespan=lifespan,
     responses={
+        400: Responses.RESPONSE_400_BAD_REQUEST,
         500: Responses.RESPONSE_500_INTERNAL_SERVER_ERROR,
     },
 )

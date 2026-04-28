@@ -1,6 +1,7 @@
 from fastapi import APIRouter
 
 from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
+from backend.src.exceptions.core import Responses
 from backend.src.models_schema.activity.exercise_item import (
     ExerciseItemOutput,
     ExerciseItemUpdate,
@@ -21,7 +22,14 @@ router = APIRouter()
 # ----- CREATE ----- #
 
 
-@router.post("/{interaction_id}/create", response_model=StudyActivityOutputComplete)
+@router.post(
+    "/{interaction_id}/create",
+    response_model=StudyActivityOutputComplete,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def create_study_activity(
     user: UserDep,
     session: SessionDep,
@@ -41,7 +49,14 @@ async def create_study_activity(
 # ----- READ ----- #
 
 
-@router.get("/{interaction_id}/", response_model=list[StudyActivityOutput])
+@router.get(
+    "/{interaction_id}/",
+    response_model=list[StudyActivityOutput],
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def read_all_study_activity(
     user: UserDep,
     session: SessionDep,
@@ -56,7 +71,14 @@ async def read_all_study_activity(
     )
 
 
-@router.get("/{study_activity_id}", response_model=StudyActivityOutputComplete)
+@router.get(
+    "/{study_activity_id}",
+    response_model=StudyActivityOutputComplete,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
 async def read_study_activity_complete(
     user: UserDep,
     session: SessionDep,

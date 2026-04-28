@@ -21,7 +21,6 @@ router = APIRouter()
     "/{interaction_id}/upload",
     response_model=DocumentOutput,
     responses={
-        400: Responses.RESPONSE_400_BAD_REQUEST,
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
     },
@@ -75,7 +74,6 @@ async def read_all_documents(
     "/{document_id}",
     response_model=DocumentOutput,
     responses={
-        400: Responses.RESPONSE_400_BAD_REQUEST,
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
     },
