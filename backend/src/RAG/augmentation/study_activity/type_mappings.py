@@ -1,6 +1,7 @@
 from backend.src.models_schema.activity.json_validation import (
     FlashcardsJsonSchema,
     MCQJsonSchema,
+    OpenEndedJsonSchema,
     StudyActivityValidationBase,
     TapToReviewJsonSchema,
 )
@@ -10,6 +11,7 @@ from backend.src.models_schema.miscellaneous.enums import (
 from backend.src.RAG.augmentation.study_activity.instruction_schemas import (
     flashcards_schema,
     multiple_choice_questions_schema,
+    open_ended_schema,
     tap_to_review_schema,
 )
 
@@ -23,4 +25,5 @@ schema_map: dict[
     ),
     StudyActivityFormat.FLASHCARDS: (flashcards_schema, FlashcardsJsonSchema),
     StudyActivityFormat.TAP_TO_REVIEW: (tap_to_review_schema, TapToReviewJsonSchema),
+    StudyActivityFormat.OPEN_ENDED: (open_ended_schema, OpenEndedJsonSchema),
 }

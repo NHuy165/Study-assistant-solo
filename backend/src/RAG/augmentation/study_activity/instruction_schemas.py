@@ -58,3 +58,21 @@ Additional information:
 - "gaps": The censored word that will be revealed when the user clicks it. The array has to contain the words in the correct order based on the paragraph in "text". The censored words should be important concepts, points of information that are essential to the overall information being displayed in "text", basically something that the user has to engrave in memories. The number of gaps HAS TO MATCH the number of $!GAP!$ in the paragraph.
 - The default number of paragraphs is 10. This can be changed according to the user's explicit request.
 """
+
+open_ended_schema = """
+{
+    "name": "string (A concise name of this set of open-ended questions)",
+    "description": "string (A description of the contents of the clozes and what the open-ended questions ask about)",
+    "activity_items": [
+        {
+            "question": "string"
+        }
+    ]
+}
+
+Additional information:
+- Description: A simple set of open-ended (also known as essay) questions that have definitive answers. The user is graded not only on the answers they provide but also how they describe their thought process.
+- The "activity_items" key is a JSON array containing the open-ended questions.
+- "question": The contents of each question.
+- The default number of questions is 10. This can be changed according to the user's explicit request.
+"""
