@@ -1,3 +1,5 @@
+from datetime import datetime, timezone
+
 from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -544,11 +546,6 @@ async def submit_exercise_activity(
     # Grades if not yet graded
     if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
         # === Preparing the json input === #
-        # questions_adapter = TypeAdapter(list[OpenEndedGradingInitiationSchema])
-        # questions = [
-        #     OpenEndedGradingInitiationSchema.model_validate(item.model_dump())
-        #     for item in study_activity.exercise_items
-        # ]
         questions = OpenEndedGradingInitiationJsonSchema.model_validate(
             {
                 "questions_answers": [
@@ -613,6 +610,7 @@ async def submit_exercise_activity(
     await session.refresh(study_activity)
     study_activity.total_score = total_score
     study_activity.is_submitted = True
+    study_activity.submitted_at = datetime.now(timezone.utc)
     session.add(study_activity)
     await session.commit()
 
