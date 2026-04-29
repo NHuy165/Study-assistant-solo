@@ -34,7 +34,7 @@ class ImageExtractor(DocumentExtractor):
         cls, session: AsyncSession, file: UploadFile, document: Document
     ) -> None:
         # Reads the image using the model
-        image_description = await GlobalAPI.describe_image(file)
+        image_description = await GlobalAPI.caption_image(file)
 
         embedding_content = (
             f"Source: {DocumentType.IMAGE.value} file {document.name}:\n"

@@ -23,7 +23,7 @@ class API(ABC):
 
     @classmethod
     @abstractmethod
-    async def describe_image(cls, file: UploadFile) -> str:
+    async def caption_image(cls, file: UploadFile) -> str:
         """
         Generates a detailed description of the image.
         """
@@ -31,7 +31,7 @@ class API(ABC):
 
     @classmethod
     @abstractmethod
-    async def generate_content(cls, prompt: str) -> str:
+    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
         """
         Generates an LLM response from a prompt.
         """
@@ -57,7 +57,7 @@ class GoogleAPI(API):
         return response.embeddings[0].values
 
     @classmethod
-    async def describe_image(cls, file: UploadFile) -> str:
+    async def caption_image(cls, file: UploadFile) -> str:
         # Extracting information from the image
         image_bytes = await file.read()
 
@@ -81,10 +81,15 @@ class GoogleAPI(API):
         return response.text
 
     @classmethod
-    async def generate_content(cls, prompt: str) -> str:
+    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+        config = genai.types.GenerateContentConfig()
+        if json_required:
+            config.response_mime_type = "application/json"
+
         response = await ai_client.aio.models.generate_content(
             model=settings.ANSWER_MODEL_GOOGLE,
             contents=prompt,
+            config=config,
         )
 
         # Validation
@@ -116,7 +121,7 @@ class OllamaAPI(API):
         return embeddings
 
     @classmethod
-    async def describe_image(cls, file: UploadFile) -> str:
+    async def caption_image(cls, file: UploadFile) -> str:
         # Extracting information from the image
         image_bytes = await file.read()
 
@@ -139,12 +144,20 @@ class OllamaAPI(API):
         return result_text
 
     @classmethod
-    async def generate_content(cls, prompt: str) -> str:
-        response = await ollama_client.generate(
-            model=settings.ANSWER_MODEL_OLLAMA,
-            prompt=prompt,
-            options={"num_ctx": 8192},
-        )
+    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+        if json_required:
+            response = await ollama_client.generate(
+                model=settings.ANSWER_MODEL_OLLAMA,
+                prompt=prompt,
+                options={"num_ctx": 8192},
+                format="json",
+            )
+        else:
+            response = await ollama_client.generate(
+                model=settings.ANSWER_MODEL_OLLAMA,
+                prompt=prompt,
+                options={"num_ctx": 8192},
+            )
 
         result_text = response.get("response")
 
@@ -157,7 +170,7 @@ class OllamaAPI(API):
         return result_text
 
 
-class GlobalAPI(API):
+class GlobalAPI:
     models: dict[str, type[API]] = {
         "GOOGLE": GoogleAPI,
         "OLLAMA": OllamaAPI,
@@ -165,12 +178,30 @@ class GlobalAPI(API):
 
     @classmethod
     async def embed(cls, content: str) -> list[float]:
-        return await cls.models[settings.MODEL_IN_USE].embed(content)
+        return await cls.models[settings.MODEL_IN_USE_EMBED].embed(content)
 
     @classmethod
-    async def describe_image(cls, file: UploadFile) -> str:
-        return await cls.models[settings.MODEL_IN_USE].describe_image(file)
+    async def caption_image(cls, file: UploadFile) -> str:
+        return await cls.models[settings.MODEL_IN_USE_CAPTION_IMAGE].caption_image(file)
 
     @classmethod
-    async def generate_content(cls, prompt: str) -> str:
-        return await cls.models[settings.MODEL_IN_USE].generate_content(prompt)
+    async def generate_chat(cls, prompt: str) -> str:
+        return await cls.models[settings.MODEL_IN_USE_EMBED].generate_content(prompt)
+
+    @classmethod
+    async def rewrite_prompt(cls, prompt: str) -> str:
+        return await cls.models[settings.MODEL_IN_USE_REWRITE_PROMPT].generate_content(
+            prompt
+        )
+
+    @classmethod
+    async def generate_material(cls, prompt: str) -> str:
+        return await cls.models[
+            settings.MODEL_IN_USE_GENERATE_MATERIAL
+        ].generate_content(prompt, json_required=True)
+
+    @classmethod
+    async def grade_answers(cls, prompt: str) -> str:
+        return await cls.models[settings.MODEL_IN_USE_GRADE_ANSWERS].generate_content(
+            prompt
+        )

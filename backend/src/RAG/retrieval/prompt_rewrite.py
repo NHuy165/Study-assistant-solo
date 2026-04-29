@@ -12,6 +12,6 @@ async def rewrite_prompt(raw_prompt: str, context_conversations: str) -> str:
     )
     augmented_prompt = prompt_rewrite_augmentation(params)
 
-    rewritten_prompt = await GlobalAPI.generate_content(augmented_prompt)
+    rewritten_prompt = await GlobalAPI.rewrite_prompt(augmented_prompt)
 
     return rewritten_prompt
