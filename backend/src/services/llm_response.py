@@ -57,7 +57,7 @@ async def create_llm_response(
     final_prompt = answer_generation_augmentation(augmentation_params)
 
     # Generation
-    answer = await GlobalAPI.generate_content(final_prompt)
+    answer = await GlobalAPI.generate_chat(final_prompt)
 
     # Saving response
     llm_response = LLMResponse(

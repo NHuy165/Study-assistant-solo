@@ -275,7 +275,7 @@ async def create_study_activity(
     final_prompt = study_activity_augmentation(params)
 
     # Generation
-    generated_activity = await GlobalAPI.generate_content(final_prompt)
+    generated_activity = await GlobalAPI.generate_material(final_prompt)
 
     # Validates content from model
     validated_activity = response_validator.model_validate_json(generated_activity)
