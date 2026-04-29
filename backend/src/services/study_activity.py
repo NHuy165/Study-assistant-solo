@@ -1,4 +1,3 @@
-from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import select
@@ -8,7 +7,6 @@ from backend.src.core.config import settings
 from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.activity.exercise_item import (
     ExerciseItem,
-    ExerciseItemOutput,
     ExerciseItemUpdate,
 )
 from backend.src.models_schema.activity.exercise_item_content import ExerciseItemContent
@@ -19,7 +17,7 @@ from backend.src.models_schema.activity.json_validation import (
     OpenEndedJsonSchema,
     StudyActivityValidationBase,
 )
-from backend.src.models_schema.activity.review_item import ReviewItem, ReviewItemOutput
+from backend.src.models_schema.activity.review_item import ReviewItem
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
 from backend.src.models_schema.activity.study_activity import (
     StudyActivity,
@@ -43,12 +41,30 @@ from backend.src.RAG.augmentation.formatters.chunks.core import chunks_formatter
 from backend.src.RAG.augmentation.formatters.conversations.core import (
     conversations_formatter,
 )
-from backend.src.RAG.augmentation.study_activity.type_mappings import schema_map
+from backend.src.RAG.augmentation.prompts_formatting.instruction_schemas import (
+    flashcards_schema,
+    gap_fill_schema,
+    multiple_choice_questions_schema,
+    open_ended_schema,
+)
 from backend.src.RAG.retrieval.core import retrieval
 from backend.src.RAG.retrieval.prompt_rewrite import rewrite_prompt
 from backend.src.services.llm_response import read_llm_responses
 
 # ----- CREATE ----- #
+
+schema_map: dict[
+    StudyActivityFormat | StudyActivityFormat,
+    tuple[str, type[StudyActivityValidationBase]],
+] = {
+    StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (
+        multiple_choice_questions_schema,
+        MCQJsonSchema,
+    ),
+    StudyActivityFormat.FLASHCARDS: (flashcards_schema, FlashcardsJsonSchema),
+    StudyActivityFormat.GAP_FILL: (gap_fill_schema, GapFillJsonSchema),
+    StudyActivityFormat.OPEN_ENDED: (open_ended_schema, OpenEndedJsonSchema),
+}
 
 
 async def save_multiple_choice_questions(
