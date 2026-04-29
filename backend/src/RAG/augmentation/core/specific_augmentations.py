@@ -4,7 +4,7 @@ from backend.src.models_schema.RAG.augmentation import (
     PromptRewriteParams,
     StudyActivityParams,
 )
-from backend.src.RAG.augmentation.core.base_prompts import (
+from backend.src.RAG.augmentation.prompts_formatting.base_prompts import (
     ANSWER_GENERATION_BASE,
     PROMPT_REWRITE_BASE,
     STUDY_ACTIVITY_BASE,
