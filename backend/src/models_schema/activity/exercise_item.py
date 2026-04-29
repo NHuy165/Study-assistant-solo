@@ -1,5 +1,6 @@
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Self
 
+from pydantic import ValidationInfo, model_validator
 from sqlmodel import Field, Relationship, SQLModel
 
 if TYPE_CHECKING:
@@ -22,9 +23,17 @@ class ExerciseItemBase(SQLModel):
 
 class ExerciseItemOutput(ExerciseItemBase):
     id: int
-    user_score: float
+    user_score: float | None = None
+    explanation: str | None = None
     attempt: str | None
     contents: list["ExerciseItemContentOutput"]
+
+    @model_validator(mode="after")
+    def scrub_score(self, info: ValidationInfo) -> Self:
+        if not info.context or info.context.get("show_answers") is not True:
+            self.user_score = None
+            self.explanation = None
+        return self
 
 
 # ----- UPDATE ----- #
@@ -48,6 +57,7 @@ class ExerciseItem(ExerciseItemBase, table=True):
 
     user_score: float = 0
     attempt: str | None = None
+    explanation: str | None = None  # Only for open-ended questions
 
     study_activity: "StudyActivity" = Relationship(back_populates="exercise_items")
     contents: list["ExerciseItemContent"] = Relationship(
