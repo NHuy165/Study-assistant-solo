@@ -1,10 +1,14 @@
+from pydantic import TypeAdapter
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlmodel import select
+from sqlmodel import func, select
 
 from backend.src.core.ai_api import ExceptionRequest_400, GlobalAPI
 from backend.src.core.config import settings
-from backend.src.exceptions.core import ExceptionNotFound_404
+from backend.src.exceptions.core import (
+    ExceptionNotFound_404,
+    ExceptionSubmittedExercise_409,
+)
 from backend.src.models_schema.activity.exercise_item import (
     ExerciseItem,
     ExerciseItemUpdate,
@@ -14,7 +18,11 @@ from backend.src.models_schema.activity.json_validation import (
     FlashcardsJsonSchema,
     GapFillJsonSchema,
     MCQJsonSchema,
-    OpenEndedJsonSchema,
+    OpenEndedCreationJsonSchema,
+    OpenEndedGradingInitiationJsonSchema,
+    OpenEndedGradingInitiationSchema,
+    OpenEndedGradingResultJsonSchema,
+    OpenEndedGradingResultSchema,
     StudyActivityValidationBase,
 )
 from backend.src.models_schema.activity.review_item import ReviewItem
@@ -32,9 +40,13 @@ from backend.src.models_schema.miscellaneous.enums import (
     StudyActivityFormat,
     StudyActivityType,
 )
-from backend.src.models_schema.RAG.augmentation import StudyActivityParams
+from backend.src.models_schema.RAG.augmentation import (
+    AnswersGradingParams,
+    StudyActivityParams,
+)
 from backend.src.models_schema.user import User
 from backend.src.RAG.augmentation.core.specific_augmentations import (
+    answers_grading_augmentation,
     study_activity_augmentation,
 )
 from backend.src.RAG.augmentation.formatters.chunks.core import chunks_formatter
@@ -63,7 +75,7 @@ schema_map: dict[
     ),
     StudyActivityFormat.FLASHCARDS: (flashcards_schema, FlashcardsJsonSchema),
     StudyActivityFormat.GAP_FILL: (gap_fill_schema, GapFillJsonSchema),
-    StudyActivityFormat.OPEN_ENDED: (open_ended_schema, OpenEndedJsonSchema),
+    StudyActivityFormat.OPEN_ENDED: (open_ended_schema, OpenEndedCreationJsonSchema),
 }
 
 
@@ -113,7 +125,7 @@ async def save_open_ended(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, OpenEndedJsonSchema)
+    assert isinstance(activity_data, OpenEndedCreationJsonSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -451,15 +463,24 @@ async def answer_exercise_item(
     assert isinstance(exercise_item, ExerciseItem)
     assert isinstance(study_activity, StudyActivity)
 
+    if study_activity.is_submitted:
+        raise ExceptionSubmittedExercise_409()
+
     if study_activity.activity_format == StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS:
         if not isinstance(exercise_item_update.attempt, int):
             raise ExceptionRequest_400(
                 custom_message="Answers to multiple choice questions need to be an integer pointing to the id of the correct answer."
             )
 
-        if exercise_item_update.attempt not in (
-            content.id for content in exercise_item.contents
-        ):
+        # MCQ questions get graded right as they're answered, just not shown
+        for content in exercise_item.contents:
+            if exercise_item_update.attempt == content.id:
+                if content.is_correct:
+                    exercise_item.user_score = exercise_item.max_score
+                else:
+                    exercise_item.user_score = 0
+                break
+        else:
             raise ExceptionRequest_400(
                 custom_message="Answer did not match the id of any of the answers of the current question."
             )
@@ -482,8 +503,137 @@ async def submit_exercise_activity(
     user: User,
     session: AsyncSession,
     study_activity_id: int,
-) -> StudyActivity:  # type: ignore
-    pass
+) -> StudyActivityOutputComplete:
+
+    # Fetches study activity
+    query = (
+        select(StudyActivity, Interaction)
+        .join(Interaction)
+        .where(
+            StudyActivity.id == study_activity_id,
+            Interaction.user_id == user.id,
+            StudyActivity.activity_type == StudyActivityType.EXERCISE,
+        )
+        .options(
+            selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
+                ExerciseItem.contents  # type: ignore
+            ),
+        )
+    )
+
+    row = (await session.execute(query)).first()
+
+    if row is None:
+        raise ExceptionNotFound_404(
+            "StudyActivity",
+            {
+                "id": study_activity_id,
+                "interaction.user_id": user.id,
+                "activity_type": StudyActivityType.EXERCISE.value,
+            },
+        )
+
+    study_activity, interaction = row
+
+    assert isinstance(study_activity, StudyActivity)
+    assert isinstance(interaction, Interaction)
+
+    if study_activity.is_submitted:
+        raise ExceptionSubmittedExercise_409()
+
+    # Grades if not yet graded
+    if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
+        # === Preparing the json input === #
+        # questions_adapter = TypeAdapter(list[OpenEndedGradingInitiationSchema])
+        # questions = [
+        #     OpenEndedGradingInitiationSchema.model_validate(item.model_dump())
+        #     for item in study_activity.exercise_items
+        # ]
+        questions = OpenEndedGradingInitiationJsonSchema.model_validate(
+            {
+                "questions_answers": [
+                    item.model_dump() for item in study_activity.exercise_items
+                ]
+            }
+        )
+
+        # === Preparing the context document === #
+        prompt = "\n".join(item.question for item in study_activity.exercise_items)
+        embedded_prompt = await GlobalAPI.embed(prompt)
+        document_chunks = await retrieval(
+            session=session,
+            interaction=interaction,
+            raw_prompt=prompt,
+            embedded_prompt=embedded_prompt,
+        )
+        formatted_chunks = chunks_formatter(document_chunks)
+
+        params = AnswersGradingParams(
+            prompt=questions.model_dump_json(),
+            creation_prompt=study_activity.prompt,
+            context_document=formatted_chunks,
+        )
+
+        final_prompt = answers_grading_augmentation(params)
+
+        # === Grading === #
+        graded_results = await GlobalAPI.grade_answers(final_prompt)
+
+        validated_graded_results = OpenEndedGradingResultJsonSchema.model_validate_json(
+            graded_results
+        )
+
+        # === Updates the results === #
+        results_map: dict[int, OpenEndedGradingResultSchema] = {
+            res.id: res for res in validated_graded_results.grading_results
+        }
+
+        for exercise_item in study_activity.exercise_items:
+            assert exercise_item.id is not None
+            graded_result = results_map.get(exercise_item.id)
+
+            if graded_result is None:
+                raise Exception("Something went wrong with the model exercise grading.")
+
+            exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
+            session.add(exercise_item)
+
+        await session.commit()
+
+    # Updates total score
+    query_total_score = (
+        select(func.sum(ExerciseItem.user_score))
+        .select_from(ExerciseItem)
+        .where(ExerciseItem.study_activity_id == study_activity_id)
+    )
+    total_score = (await session.execute(query_total_score)).scalars().first()
+
+    assert total_score is not None
+
+    await session.refresh(study_activity)
+    study_activity.total_score = total_score
+    study_activity.is_submitted = True
+    session.add(study_activity)
+    await session.commit()
+
+    # Refetchs
+    query_refetch = (
+        select(StudyActivity)
+        .where(StudyActivity.id == study_activity_id)
+        .options(
+            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents),  # type: ignore
+            selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
+                ExerciseItem.contents  # type: ignore
+            ),
+        )
+    )
+    study_activity_refetch = (await session.execute(query_refetch)).scalars().first()
+
+    study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+        study_activity_refetch, context={"show_answers": True}
+    )
+
+    return study_activity_output_complete
 
 
 # ----- DELETE ----- #

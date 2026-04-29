@@ -20,3 +20,8 @@ class StudyActivityParams(AugmentationParams):
 
 class PromptRewriteParams(AugmentationParams):
     context_conversations: str
+
+
+class AnswersGradingParams(AugmentationParams):
+    creation_prompt: str
+    context_document: str

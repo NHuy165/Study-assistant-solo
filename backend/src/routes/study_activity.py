@@ -128,6 +128,7 @@ async def update_study_activity(
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
+        409: Responses.RESPONSE_409_CONFLICT,
     },
 )
 async def answer_exercise_item(
@@ -147,7 +148,15 @@ async def answer_exercise_item(
     )
 
 
-@router.patch("/{study_activity_id}/submit", response_model=StudyActivityOutputComplete)
+@router.patch(
+    "/{study_activity_id}/submit",
+    response_model=StudyActivityOutputComplete,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+        409: Responses.RESPONSE_409_CONFLICT,
+    },
+)
 async def submit_exercise_activity(
     user: UserDep,
     session: SessionDep,

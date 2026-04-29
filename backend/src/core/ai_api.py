@@ -203,5 +203,5 @@ class GlobalAPI:
     @classmethod
     async def grade_answers(cls, prompt: str) -> str:
         return await cls.models[settings.MODEL_IN_USE_GRADE_ANSWERS].generate_content(
-            prompt
+            prompt, json_required=True
         )
