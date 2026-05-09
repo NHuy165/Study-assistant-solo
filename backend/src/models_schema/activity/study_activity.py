@@ -51,7 +51,6 @@ class StudyActivityOutput(StudyActivityBase):
 
     is_submitted: bool
     submitted_at: datetime | None
-    total_score: float | None
 
 
 class StudyActivityOutputComplete(StudyActivityOutput):
@@ -83,7 +82,6 @@ class StudyActivity(StudyActivityBase, table=True):
     description: str
 
     is_submitted: bool = False  # Exercise only
-    total_score: float | None = None  # Exercise only
 
     created_at: datetime = Field(
         sa_column=Column(DateTime(timezone=True)),
