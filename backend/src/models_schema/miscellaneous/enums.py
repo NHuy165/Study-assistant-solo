@@ -39,3 +39,28 @@ class ReviewItemContentType(str, Enum):
 
 class ExerciseItemContentType(str, Enum):
     MULTIPLE_CHOICE_QUESTIONS_CHOICE = "MULTIPLE_CHOICE_QUESTIONS_CHOICE"
+
+
+class AggregateTarget(str, Enum):
+    COUNT = "COUNT"
+    SCORE = "SCORE"
+
+
+class CriterionAttribute(str, Enum):
+    SUBJECT_TYPE = "subject_type"
+    ACTIVITY_TYPE = "activity_type"
+    ACTIVITY_FORMAT = "activity_format"
+    CREATED_AT = "created_at"
+    SUBMITTED_AT = "submitted_at"
+    IS_SUBMITTED = "is_submitted"
+    STUDY_ACTIVITY_ID = "study_activity_id"
+
+
+class OperatorType(str, Enum):
+    EQ = "EQ"
+    NE = "NE"
+    GT = "GT"
+    GE = "GE"
+    LT = "LT"
+    LE = "LE"
+    GROUP_BY = "GROUP_BY"

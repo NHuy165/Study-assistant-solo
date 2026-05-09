@@ -22,6 +22,7 @@ from backend.src.routes import (
     llm_response,
     note,
     study_activity,
+    study_progress,
     user,
 )
 
@@ -106,4 +107,10 @@ app.include_router(
     study_activity.router,
     prefix="/study-activity",
     tags=["study-activity"],
+)
+
+app.include_router(
+    study_progress.router,
+    prefix="/study-progress",
+    tags=["study-progress"],
 )

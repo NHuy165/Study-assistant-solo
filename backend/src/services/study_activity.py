@@ -92,8 +92,7 @@ async def save_multiple_choice_questions(
     if n_items == 0:
         return
 
-    assert study_activity.total_score is not None
-    question_score = study_activity.total_score / n_items
+    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / n_items
 
     for i_item in range(n_items):
         # Saving the item
@@ -133,8 +132,7 @@ async def save_open_ended(
     if n_items == 0:
         return
 
-    assert study_activity.total_score is not None
-    question_score = study_activity.total_score / n_items
+    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / n_items
 
     for i_item in range(n_items):
         # Saving the item
@@ -303,9 +301,6 @@ async def create_study_activity(
         subject_type=study_activity_input.subject_type,
         name=validated_activity.name,
         description=validated_activity.description,
-        total_score=settings.DEFAULT_EXERCISE_TOTAL_SCORE
-        if study_activity_input.activity_type == StudyActivityType.EXERCISE
-        else None,
         interaction=interaction,
     )
 
@@ -597,18 +592,8 @@ async def submit_exercise_activity(
 
         await session.commit()
 
-    # Updates total score
-    query_total_score = (
-        select(func.sum(ExerciseItem.user_score))
-        .select_from(ExerciseItem)
-        .where(ExerciseItem.study_activity_id == study_activity_id)
-    )
-    total_score = (await session.execute(query_total_score)).scalars().first()
-
-    assert total_score is not None
-
+    # Updates
     await session.refresh(study_activity)
-    study_activity.total_score = total_score
     study_activity.is_submitted = True
     study_activity.submitted_at = datetime.now(timezone.utc)
     session.add(study_activity)
