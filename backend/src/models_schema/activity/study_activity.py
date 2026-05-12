@@ -27,7 +27,7 @@ if TYPE_CHECKING:
 
 
 class StudyActivityBase(SQLModel):
-    prompt: str
+    prompt: str | None
     activity_type: StudyActivityType
     activity_format: StudyActivityFormat
     subject_type: SubjectType
@@ -37,7 +37,13 @@ class StudyActivityBase(SQLModel):
 
 
 class StudyActivityInput(StudyActivityBase):
-    pass
+    prompt: str
+
+
+class FlashcardsActivityInput(SQLModel):
+    subject_type: SubjectType
+    name: str
+    description: str
 
 
 # ----- OUTPUT ----- #
@@ -115,6 +121,13 @@ class StudyActivity(StudyActivityBase, table=True):
             (activity_type = 'REVIEW' AND is_submitted = false)
             """,
             name="CK_activity_type_is_submitted",
+        ),
+        CheckConstraint(
+            """
+            (activity_format = 'FLASHCARDS')
+            OR
+            (activity_format <> 'FLASHCARDS' AND prompt IS NOT NULL)
+            """
         ),
     )
 
