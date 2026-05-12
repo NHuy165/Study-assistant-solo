@@ -16,12 +16,28 @@ class ReviewItemBase(SQLModel):
     pass
 
 
+# ----- INPUT ----- #
+
+
+class FlashcardInput(SQLModel):
+    front: str
+    back: str
+
+
 # ----- OUTPUT ----- #
 
 
 class ReviewItemOutput(ReviewItemBase):
     id: int
     contents: list["ReviewItemContentOutput"]
+
+
+# ----- UPDATE ----- #
+
+
+class FlashcardUpdate(SQLModel):
+    front: str
+    back: str
 
 
 # ----- TABLE MODEL ----- #

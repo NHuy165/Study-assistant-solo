@@ -9,7 +9,13 @@ from backend.src.models_schema.activity.exercise_item import (
 from backend.src.models_schema.activity.exercise_item_content import (
     ExerciseItemContentBase,
 )
+from backend.src.models_schema.activity.review_item import (
+    FlashcardInput,
+    FlashcardUpdate,
+    ReviewItemOutput,
+)
 from backend.src.models_schema.activity.study_activity import (
+    FlashcardsActivityInput,
     StudyActivityInput,
     StudyActivityOutput,
     StudyActivityOutputComplete,
@@ -43,6 +49,54 @@ async def create_study_activity(
         session,
         interaction,
         study_activity_input,
+    )
+
+
+@router.post(
+    "/{interaction_id}/flashcards/create",
+    response_model=StudyActivityOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+    },
+)
+async def create_flashcards_activity(
+    user: UserDep,
+    session: SessionDep,
+    interaction: InteractionDep,
+    flashcards_activity_input: FlashcardsActivityInput,
+):
+    """
+    Tạo một tài liệu Flashcards rỗng.
+    """
+    return await study_activity.create_flashcards_activity(
+        session,
+        interaction,
+        flashcards_activity_input,
+    )
+
+
+@router.post(
+    "/{flashcards_activity_id}/add-cards",
+    response_model=StudyActivityOutputComplete,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def add_flashcards(
+    user: UserDep,
+    session: SessionDep,
+    flashcards_activity_id: int,
+    flashcard_inputs: list[FlashcardInput],
+):
+    """
+    Thêm flashcards cho một tài liệu Flashcards.
+    """
+    return await study_activity.add_flashcards(
+        user,
+        session,
+        flashcard_inputs,
+        flashcards_activity_id,
     )
 
 
@@ -119,6 +173,31 @@ async def update_study_activity(
         session,
         study_activity_id,
         study_activity_update,
+    )
+
+
+@router.patch(
+    "/flashcards/{flashcard_id}",
+    response_model=ReviewItemOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def update_flashcard(
+    user: UserDep,
+    session: SessionDep,
+    flashcard_id: int,
+    flashcard_update: FlashcardUpdate,
+):
+    """
+    Chỉnh sửa một flashcard.
+    """
+    return await study_activity.update_flashcard(
+        user,
+        session,
+        flashcard_id,
+        flashcard_update,
     )
 
 

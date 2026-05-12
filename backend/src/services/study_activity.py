@@ -27,9 +27,14 @@ from backend.src.models_schema.activity.json_validation import (
     OpenEndedGradingResultSchema,
     StudyActivityValidationBase,
 )
-from backend.src.models_schema.activity.review_item import ReviewItem
+from backend.src.models_schema.activity.review_item import (
+    FlashcardInput,
+    FlashcardUpdate,
+    ReviewItem,
+)
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
 from backend.src.models_schema.activity.study_activity import (
+    FlashcardsActivityInput,
     StudyActivity,
     StudyActivityInput,
     StudyActivityOutputComplete,
@@ -68,7 +73,7 @@ from backend.src.services.llm_response import read_llm_responses
 # ----- CREATE ----- #
 
 schema_map: dict[
-    StudyActivityFormat | StudyActivityFormat,
+    StudyActivityFormat,
     tuple[str, type[StudyActivityValidationBase]],
 ] = {
     StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (
@@ -102,8 +107,6 @@ async def save_multiple_choice_questions(
             study_activity=study_activity,
         )
         session.add(exercise_item)
-        await session.commit()
-        await session.refresh(exercise_item)
 
         # Saving the contents of the item
         n_contents = len(activity_data.activity_items[i_item].answers)
@@ -117,8 +120,6 @@ async def save_multiple_choice_questions(
                 exercise_item=exercise_item,
             )
             session.add(exercise_item_content)
-
-        await session.commit()
 
 
 async def save_open_ended(
@@ -143,8 +144,6 @@ async def save_open_ended(
         )
         session.add(exercise_item)
 
-    await session.commit()
-
 
 async def save_gap_fill(
     session: AsyncSession,
@@ -163,8 +162,6 @@ async def save_gap_fill(
             study_activity=study_activity,
         )
         session.add(review_item)
-        await session.commit()
-        await session.refresh(review_item)
 
         # Saving the contents of the item
         text_content = ReviewItemContent(
@@ -194,8 +191,6 @@ async def save_gap_fill(
             )
             session.add(review_item_content)
 
-        await session.commit()
-
 
 async def save_flashcards(
     session: AsyncSession,
@@ -214,8 +209,6 @@ async def save_flashcards(
             study_activity=study_activity,
         )
         session.add(review_item)
-        await session.commit()
-        await session.refresh(review_item)
 
         # Saving the contents of the item
         front_content = ReviewItemContent(
@@ -231,8 +224,6 @@ async def save_flashcards(
             review_item=review_item,
         )
         session.add(back_content)
-
-        await session.commit()
 
 
 save_mapper = {
@@ -305,16 +296,15 @@ async def create_study_activity(
     )
 
     session.add(study_activity)
-    await session.commit()
-    await session.refresh(study_activity)
 
     saver = save_mapper[study_activity_input.activity_format]
     await saver(
         session=session, activity_data=validated_activity, study_activity=study_activity
     )
 
-    # === Refetch with all contents === #
+    await session.commit()  # Commits EVERYTHING
 
+    # === Refetch with all contents === #
     await session.refresh(study_activity)
 
     query = select(StudyActivity).where(StudyActivity.id == study_activity.id)
@@ -338,6 +328,92 @@ async def create_study_activity(
     )
 
     return study_activity_output_complete
+
+
+async def create_flashcards_activity(
+    session: AsyncSession,
+    interaction: Interaction,
+    flashcards_activity_input: FlashcardsActivityInput,
+) -> StudyActivity:
+
+    flashcards_activity = StudyActivity(
+        prompt=None,
+        activity_type=StudyActivityType.REVIEW,
+        activity_format=StudyActivityFormat.FLASHCARDS,
+        subject_type=flashcards_activity_input.subject_type,
+        name=flashcards_activity_input.name,
+        description=flashcards_activity_input.description,
+        interaction=interaction,
+    )
+
+    session.add(flashcards_activity)
+    await session.commit()
+    await session.refresh(flashcards_activity)
+
+    return flashcards_activity
+
+
+async def add_flashcards(
+    user: User,
+    session: AsyncSession,
+    flashcard_inputs: list[FlashcardInput],
+    flashcards_activity_id: int,
+) -> StudyActivityOutputComplete:
+    query = (
+        select(StudyActivity)
+        .join(Interaction)
+        .where(
+            StudyActivity.id == flashcards_activity_id,
+            StudyActivity.activity_format == StudyActivityFormat.FLASHCARDS,
+            Interaction.user_id == user.id,
+        )
+    )
+    flashcards_activity = (await session.execute(query)).scalars().first()
+
+    if flashcards_activity is None:
+        raise ExceptionNotFound_404(
+            "StudyActivity",
+            {
+                "id": flashcards_activity_id,
+                "user_id": user.id,
+                "activity_format": StudyActivityFormat.FLASHCARDS.value,
+            },
+        )
+
+    for inp in flashcard_inputs:
+        flashcard = ReviewItem(study_activity=flashcards_activity)
+        session.add(flashcard)
+
+        front = ReviewItemContent(
+            content=inp.front,
+            type=ReviewItemContentType.FLASHCARDS_FRONT,
+            review_item=flashcard,
+        )
+        back = ReviewItemContent(
+            content=inp.back,
+            type=ReviewItemContentType.FLASHCARDS_BACK,
+            review_item=flashcard,
+        )
+
+        session.add(front)
+        session.add(back)
+
+    await session.commit()
+
+    # Refetches
+    query = (
+        select(StudyActivity)
+        .where(StudyActivity.id == flashcards_activity_id)
+        .options(
+            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
+        )
+    )
+
+    result = (await session.execute(query)).scalars().first()
+
+    flashcards_activity = StudyActivityOutputComplete.model_validate(result)
+
+    return flashcards_activity
 
 
 # ----- READ ----- #
@@ -430,6 +506,48 @@ async def update_study_activity(
     return study_activity
 
 
+async def update_flashcard(
+    user: User,
+    session: AsyncSession,
+    flashcard_id: int,
+    flashcard_update: FlashcardUpdate,
+) -> ReviewItem:
+    query = (
+        select(ReviewItem)
+        .join(StudyActivity)
+        .join(Interaction)
+        .where(
+            ReviewItem.id == flashcard_id,
+            StudyActivity.activity_format == StudyActivityFormat.FLASHCARDS,
+            Interaction.user_id == user.id,
+        )
+        .options(selectinload(ReviewItem.contents))  # type: ignore
+    )
+
+    flashcard = (await session.execute(query)).scalars().first()
+
+    if flashcard is None:
+        raise ExceptionNotFound_404(
+            "ReviewItem",
+            {
+                "id": flashcard_id,
+                "user_id": user.id,
+                "activity_format": StudyActivityFormat.FLASHCARDS.value,
+            },
+        )
+
+    for face in flashcard.contents:
+        if face.type == ReviewItemContentType.FLASHCARDS_BACK:
+            face.content = flashcard_update.back
+        elif face.type == ReviewItemContentType.FLASHCARDS_FRONT:
+            face.content = flashcard_update.front
+
+    await session.commit()
+    await session.refresh(flashcard, attribute_names=["contents"])
+
+    return flashcard
+
+
 async def answer_exercise_item(
     user: User,
     session: AsyncSession,
@@ -451,7 +569,7 @@ async def answer_exercise_item(
             "ExerciseItem",
             {
                 "id": exercise_item_id,
-                "interaction.user_id": user.id,
+                "user_id": user.id,
             },
         )
 
@@ -491,7 +609,7 @@ async def answer_exercise_item(
 
     session.add(exercise_item)
     await session.commit()
-    await session.refresh(exercise_item)
+    await session.refresh(exercise_item, attribute_names=["contents"])
 
     return exercise_item
 
@@ -525,7 +643,7 @@ async def submit_exercise_activity(
             "StudyActivity",
             {
                 "id": study_activity_id,
-                "interaction.user_id": user.id,
+                "user_id": user.id,
                 "activity_type": StudyActivityType.EXERCISE.value,
             },
         )
@@ -562,7 +680,7 @@ async def submit_exercise_activity(
 
         params = AnswersGradingParams(
             prompt=questions.model_dump_json(),
-            creation_prompt=study_activity.prompt,
+            creation_prompt=study_activity.prompt,  # type: ignore
             context_document=formatted_chunks,
         )
 
