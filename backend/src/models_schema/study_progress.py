@@ -51,9 +51,13 @@ class Criterion(BaseModel):
 
     @model_validator(mode="after")
     def validate_datetime(self):
-        if self.attribute in ("created_at", "submitted_at") and self.value is not None:
+        if (
+            self.attribute
+            in (CriterionAttribute.CREATED_AT, CriterionAttribute.SUBMITTED_AT)
+            and self.value is not None
+        ):
             try:
-                parsed_date = datetime.strptime(self.value, "%d%m%Y")  # type: ignore
+                parsed_date = datetime.strptime(self.value, "%d%m%Y").date()  # type: ignore
                 self.value = parsed_date
             except (TypeError, ValueError):
                 raise ExceptionRequest_400(
