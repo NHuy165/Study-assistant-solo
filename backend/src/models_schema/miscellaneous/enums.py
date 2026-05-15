@@ -42,7 +42,8 @@ class ExerciseItemContentType(str, Enum):
 
 
 class AggregateTarget(str, Enum):
-    COUNT = "COUNT"
+    COUNT_ACTIVITY = "COUNT_ACTIVITY"
+    COUNT_ITEM = "COUNT_ITEM"
     SCORE = "SCORE"
 
 
