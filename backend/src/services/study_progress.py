@@ -6,6 +6,7 @@ from sqlmodel.sql.expression import Select
 
 from backend.src.core.dependencies import Interaction, User
 from backend.src.models_schema.activity.exercise_item import ExerciseItem
+from backend.src.models_schema.activity.review_item import ReviewItem
 from backend.src.models_schema.activity.study_activity import StudyActivity
 from backend.src.models_schema.miscellaneous.enums import (
     AggregateTarget,
@@ -62,7 +63,18 @@ async def get_study_progress(
 ) -> list[tuple]:
 
     group_cols = process_group_bys(criteria)
-    if target == AggregateTarget.COUNT:
+    if target == AggregateTarget.COUNT_ITEM:
+        query = (
+            select(
+                func.count(col(ExerciseItem.id)) + func.count(col(ReviewItem.id)),
+                *group_cols,
+            )
+            .select_from(StudyActivity)
+            .outerjoin(ExerciseItem)
+            .outerjoin(ReviewItem)
+            .group_by(*group_cols)
+        )
+    elif target == AggregateTarget.COUNT_ACTIVITY:
         query = select(func.count(col(StudyActivity.id)), *group_cols).group_by(
             *group_cols
         )
