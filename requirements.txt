@@ -18,6 +18,7 @@ debugpy
 
 # AI and RAG
 google-genai
+google-api-core
 ollama
 ollama
 pypdf
