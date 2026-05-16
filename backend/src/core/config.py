@@ -7,18 +7,33 @@ ENV_PATH = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
-    # Private info
+    # ----- PRIVATE INFO ----- #
+
+    # === Database === #
     POSTGRES_URL: PostgresDsn
-    API_KEY_GEMINI: str
+
+    # === Auth === #
     PRIVATE_KEY: str
 
-    # Technical config
+    # === API === #
 
-    # Auth
+    # Gemini
+    API_KEYS_GEMINI: str
+
+    # Cloudflare
+    CLOUDFLARE_ACCOUNT_ID: str
+    CLOUDFLARE_API_TOKEN: str
+
+    # Github
+    GITHUB_API_TOKEN: str
+
+    # ----- TECHNICAL CONFIGURATIONS ----- #
+
+    # === Auth === #
     JWT_ALGORITHM: str
     TOKEN_EXPIRY_HOURS: int
 
-    # Models
+    # === Models === #
     MODEL_IN_USE_EMBED: str
     MODEL_IN_USE_CAPTION_IMAGE: str
     MODEL_IN_USE_GENERATE_CHAT: str
@@ -26,16 +41,23 @@ class Settings(BaseSettings):
     MODEL_IN_USE_GENERATE_MATERIAL: str
     MODEL_IN_USE_GRADE_ANSWERS: str
 
+    # ** Google ** #
     EMBED_MODEL_GOOGLE: str
     VISION_MODEL_GOOGLE: str
     ANSWER_MODEL_GOOGLE: str
+    N_RETRIES: int
 
+    # ** Ollama ** #
     OLLAMA_HOST: str
     EMBED_MODEL_OLLAMA: str
     VISION_MODEL_OLLAMA: str
     ANSWER_MODEL_OLLAMA: str
 
-    # RAG
+    # ** Cloudflare ** #
+    EMBED_MODEL_CLOUDFLARE: str
+    VISION_MODEL_CLOUDFLARE: str
+
+    # === RAG === #
     DEFAULT_CHUNK_SIZE: int
     DEFAULT_CHUNK_OVERLAP: int
     DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA: int
@@ -44,8 +66,16 @@ class Settings(BaseSettings):
     N_PAST_CONVERSATIONS: int
     N_CHUNKS_WINDOW: int
 
-    # STUDY ACTIVITY
+    # === Application Related === #
+
+    # ** Study Activity ** #
     DEFAULT_EXERCISE_TOTAL_SCORE: float
+
+    # ----- CONFIG ----- #
+
+    @property
+    def gemini_keys_list(self) -> list[str]:
+        return [key.strip() for key in self.API_KEYS_GEMINI.split(",") if key.strip()]
 
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
