@@ -67,9 +67,13 @@ class Criterion(BaseModel):
 
     @model_validator(mode="after")
     def validate_bool_type(self):
-        if self.attribute == "is_submitted" and self.operator not in ("NE", "EQ"):
+        if self.attribute == "is_submitted" and self.operator not in (
+            "NE",
+            "EQ",
+            "GROUP_BY",
+        ):
             raise ExceptionRequest_400(
-                custom_message="Đặc trưng is_submitted chỉ có thể nhận so sánh bằng (EQ) hoặc khác (NE)."
+                custom_message="Đặc trưng is_submitted chỉ có thể nhận so sánh bằng (EQ), khác (NE) hoặc nhóm (GROUP_BY)."
             )
         return self
 
