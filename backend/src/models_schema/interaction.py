@@ -58,6 +58,8 @@ class Interaction(InteractionBase, table=True):
         default_factory=lambda: datetime.now(timezone.utc),
     )
 
+    is_deleted: bool = False
+
     user: "User" = Relationship(back_populates="interactions")
     documents: list["Document"] = Relationship(
         back_populates="interaction",
@@ -73,5 +75,4 @@ class Interaction(InteractionBase, table=True):
     )
     study_activities: list["StudyActivity"] = Relationship(
         back_populates="interaction",
-        cascade_delete=True,
-    )
+    )  # Uses soft delete

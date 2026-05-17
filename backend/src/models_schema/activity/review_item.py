@@ -49,8 +49,10 @@ class ReviewItem(ReviewItemBase, table=True):
     id: Annotated[int | None, Field(primary_key=True, nullable=False)] = None
     study_activity_id: Annotated[
         int | None,
-        Field(foreign_key="study_activity.id", nullable=False, ondelete="CASCADE"),
+        Field(foreign_key="study_activity.id", nullable=False),
     ] = None
+
+    is_deleted: bool = False
 
     study_activity: "StudyActivity" = Relationship(back_populates="review_items")
     contents: list["ReviewItemContent"] = Relationship(

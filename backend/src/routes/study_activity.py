@@ -141,11 +141,22 @@ async def read_study_activity_complete(
     """
     Đọc thông tin chi tiết của một tài liệu.
     """
-    return await study_activity.read_study_activity_complete(
+    unvalidated = await study_activity.read_study_activity_complete(
         user,
         session,
         study_activity_id,
     )
+
+    if unvalidated.is_submitted:
+        study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+            unvalidated, context={"show_answers": True}
+        )
+    else:
+        study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+            unvalidated
+        )
+
+    return study_activity_output_complete
 
 
 # ----- UPDATE ----- #
