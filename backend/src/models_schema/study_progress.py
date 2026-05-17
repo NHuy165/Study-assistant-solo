@@ -13,7 +13,7 @@ from backend.src.services.study_activity import StudyActivityFormat, StudyActivi
 
 class Criterion(BaseModel):
     attribute: CriterionAttribute
-    value: int | str | datetime | None
+    value: bool | int | str | datetime | None
     operator: OperatorType
 
     @model_validator(mode="after")
@@ -67,14 +67,19 @@ class Criterion(BaseModel):
 
     @model_validator(mode="after")
     def validate_bool_type(self):
-        if self.attribute == "is_submitted" and self.operator not in (
-            "NE",
-            "EQ",
-            "GROUP_BY",
-        ):
-            raise ExceptionRequest_400(
-                custom_message="Đặc trưng is_submitted chỉ có thể nhận so sánh bằng (EQ), khác (NE) hoặc nhóm (GROUP_BY)."
-            )
+        if self.attribute == "is_submitted":
+            if self.operator not in (
+                "NE",
+                "EQ",
+                "GROUP_BY",
+            ):
+                raise ExceptionRequest_400(
+                    custom_message="Đặc trưng is_submitted chỉ có thể nhận so sánh bằng (EQ), khác (NE) hoặc nhóm (GROUP_BY)."
+                )
+            if self.value not in (True, False, None):
+                raise ExceptionRequest_400(
+                    custom_message="Đặc trưng is_submitted chỉ có thể nhận các giá trị true, false hoặc null."
+                )
         return self
 
     @model_validator(mode="after")
