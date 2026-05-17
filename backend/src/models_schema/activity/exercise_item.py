@@ -52,12 +52,14 @@ class ExerciseItem(ExerciseItemBase, table=True):
     id: Annotated[int | None, Field(primary_key=True, nullable=False)] = None
     study_activity_id: Annotated[
         int | None,
-        Field(foreign_key="study_activity.id", nullable=False, ondelete="CASCADE"),
+        Field(foreign_key="study_activity.id", nullable=False),
     ] = None
 
     user_score: float = 0
     attempt: str | None = None
     explanation: str | None = None  # Only for open-ended questions
+
+    is_deleted: bool = False
 
     study_activity: "StudyActivity" = Relationship(back_populates="exercise_items")
     contents: list["ExerciseItemContent"] = Relationship(

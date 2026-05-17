@@ -1,7 +1,7 @@
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import Date, cast, col, func, select
+from sqlmodel import Date, and_, cast, col, func, or_, select
 from sqlmodel.sql.expression import Select
 
 from backend.src.core.dependencies import Interaction, User
@@ -81,6 +81,7 @@ async def get_study_progress(
 ) -> list[tuple]:
 
     group_cols = process_group_bys(criteria)
+
     if target == AggregateTarget.COUNT_ITEM:
         query = (
             select(
@@ -88,14 +89,39 @@ async def get_study_progress(
                 *group_cols,
             )
             .select_from(StudyActivity)
-            .outerjoin(ExerciseItem)
+            .outerjoin(
+                ExerciseItem,
+                and_(
+                    ExerciseItem.study_activity_id == StudyActivity.id,
+                    or_(
+                        ExerciseItem.is_deleted == False,
+                        StudyActivity.is_submitted == True,
+                    ),
+                ),
+            )
             .outerjoin(ReviewItem)
+            .where(
+                or_(
+                    StudyActivity.is_deleted == False,
+                    StudyActivity.activity_type == StudyActivityType.REVIEW,
+                    StudyActivity.is_submitted == True,
+                ),
+            )
             .group_by(*group_cols)
         )
     elif target == AggregateTarget.COUNT_ACTIVITY:
-        query = select(func.count(col(StudyActivity.id)), *group_cols).group_by(
-            *group_cols
+        query = (
+            select(func.count(col(StudyActivity.id)), *group_cols)
+            .where(
+                or_(
+                    StudyActivity.is_deleted == False,
+                    StudyActivity.activity_type == StudyActivityType.REVIEW,
+                    StudyActivity.is_submitted == True,
+                )
+            )
+            .group_by(*group_cols)
         )
+
     else:
         query = (
             select(
@@ -107,7 +133,7 @@ async def get_study_progress(
             .join(ExerciseItem)
             .where(
                 StudyActivity.activity_type == StudyActivityType.EXERCISE,
-                StudyActivity.is_submitted,
+                StudyActivity.is_submitted == True,
             )
             .group_by(*group_cols)
         )
