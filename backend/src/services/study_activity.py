@@ -762,6 +762,41 @@ async def submit_exercise_activity(
 # ----- DELETE ----- #
 
 
+async def delete_flashcard(
+    user: User,
+    session: AsyncSession,
+    flashcard_id: int,
+) -> None:
+    query = (
+        select(ReviewItem)
+        .join(StudyActivity)
+        .join(Interaction)
+        .where(
+            ReviewItem.id == flashcard_id,
+            ReviewItem.is_deleted == False,
+            StudyActivity.activity_format == StudyActivityFormat.FLASHCARDS,
+            Interaction.user_id == user.id,
+        )
+    )
+
+    flashcard = (await session.execute(query)).scalars().first()
+
+    if flashcard is None:
+        raise ExceptionNotFound_404(
+            "ReviewItem",
+            {
+                "id": flashcard_id,
+                "user_id": user.id,
+                "activity_format": StudyActivityFormat.FLASHCARDS.value,
+                "is_deleted": False,
+            },
+        )
+
+    flashcard.is_deleted = True
+
+    await session.commit()
+
+
 async def delete_study_activity(
     user: User,
     session: AsyncSession,

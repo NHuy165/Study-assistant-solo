@@ -266,6 +266,25 @@ async def submit_exercise_activity(
 
 
 @router.delete(
+    "/flashcards/{flashcard_id}",
+    status_code=204,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def delete_flashcard(user: UserDep, session: SessionDep, flashcard_id: int):
+    """
+    Xóa một flashcard.
+    """
+    return await study_activity.delete_flashcard(
+        user,
+        session,
+        flashcard_id,
+    )
+
+
+@router.delete(
     "/{study_activity_id}",
     status_code=204,
     responses={
