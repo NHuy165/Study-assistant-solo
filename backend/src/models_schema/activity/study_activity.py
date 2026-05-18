@@ -89,10 +89,13 @@ class StudyActivity(StudyActivityBase, table=True):
     is_submitted: bool = False  # Exercise only
     is_deleted: bool = False
 
-    created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True)),
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+            default_factory=lambda: datetime.now(timezone.utc),
+        ),
+    ]
     submitted_at: Annotated[
         datetime | None, Field(sa_column=Column(DateTime(timezone=True)))
     ] = None

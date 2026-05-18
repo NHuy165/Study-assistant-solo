@@ -53,10 +53,13 @@ class Interaction(InteractionBase, table=True):
     id: Annotated[int | None, Field(primary_key=True, nullable=False)] = None
     user_id: Annotated[int | None, Field(foreign_key="user.id", nullable=False)] = None
 
-    created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True)),
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+            default_factory=lambda: datetime.now(timezone.utc),
+        ),
+    ]
 
     is_deleted: bool = False
 

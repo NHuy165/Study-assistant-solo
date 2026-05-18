@@ -55,9 +55,12 @@ class User(UserBase, table=True):
 
     hashed_password: str
 
-    created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True)),
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+            default_factory=lambda: datetime.now(timezone.utc),
+        ),
+    ]
 
     interactions: list["Interaction"] = Relationship(back_populates="user")

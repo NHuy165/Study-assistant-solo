@@ -53,10 +53,13 @@ class Document(DocumentBase, table=True):
         Field(foreign_key="interaction.id", nullable=False, ondelete="CASCADE"),
     ] = None
 
-    created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True)),
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+            default_factory=lambda: datetime.now(timezone.utc),
+        ),
+    ]
     type: DocumentType
 
     interaction: "Interaction" = Relationship(back_populates="documents")
