@@ -11,7 +11,7 @@ from backend.src.exceptions.core import ExceptionRequest_400
 from fastapi import UploadFile
 from google import genai
 from google.api_core import exceptions
-from google.genai import Client
+from google.genai import Client, errors
 
 # ----- MODEL CONFIGURATIONS ----- #
 
@@ -98,26 +98,28 @@ class GoogleAPI(API):
             try:
                 return await func()
 
-            except exceptions.ResourceExhausted:
-                # 429: out of tokens
-                keys_manager.rotate()
-                attempt_exhausted_tokens += 1
+            except errors.APIError as e:
+                if e.code == 429:
+                    # 429: out of tokens
+                    keys_manager.rotate()
+                    attempt_exhausted_tokens += 1
 
-                if attempt_exhausted_tokens >= len(keys_manager.keys):
-                    break
+                    if attempt_exhausted_tokens >= len(keys_manager.keys):
+                        break
 
-                continue
+                    continue
+                elif e.code in (503, 504):
+                    # 503 or 504: server is busy
+                    wait_time = (attempt_traffic + 1) * 2
+                    await asyncio.sleep(wait_time)
+                    attempt_traffic += 1
 
-            except (exceptions.ServiceUnavailable, exceptions.DeadlineExceeded):
-                # 503 or 504: server is busy
-                wait_time = (attempt_traffic + 1) * 2
-                await asyncio.sleep(wait_time)
-                attempt_traffic += 1
+                    if attempt_traffic >= settings.N_RETRIES:
+                        break
 
-                if attempt_traffic >= settings.N_RETRIES:
-                    break
-
-                continue
+                    continue
+                else:
+                    raise Exception(e.message)
 
         raise ExceptionRequest_400(
             "Gemini failed after multiple retries and key rotations. Please come back again later."
