@@ -1,3 +1,4 @@
+from datetime import datetime, timedelta, timezone
 from typing import Annotated
 
 import jwt
@@ -50,6 +51,22 @@ async def get_current_user(
     # User not found failure
     if user is None:
         raise ExceptionAuthentication_401()
+
+    now = datetime.now(timezone.utc)
+
+    if user.last_logged_in_at is None:
+        user.login_streak = 1
+        user.longest_login_streak = 1
+    else:
+        if now.date() - user.last_logged_in_at.date() == timedelta(days=1):
+            user.login_streak += 1
+            if user.login_streak > user.longest_login_streak:
+                user.longest_login_streak = user.login_streak
+
+        elif now.date() - user.last_logged_in_at.date() > timedelta(days=1):
+            user.login_streak = 1
+
+    user.last_logged_in_at = now
 
     return user
 

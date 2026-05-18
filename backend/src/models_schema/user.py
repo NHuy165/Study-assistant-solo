@@ -30,6 +30,10 @@ class UserInput(UserBase):
 class UserOutput(UserBase):
     id: int
     created_at: datetime
+    last_logged_in_at: datetime | None
+
+    login_streak: int
+    longest_login_streak: int
 
 
 # ----- UPDATE ----- #
@@ -54,6 +58,8 @@ class User(UserBase, table=True):
     id: Annotated[int | None, Field(primary_key=True, nullable=False)] = None
 
     hashed_password: str
+    login_streak: int = 0
+    longest_login_streak: int = 0
 
     created_at: Annotated[
         datetime,
@@ -62,5 +68,11 @@ class User(UserBase, table=True):
             default_factory=lambda: datetime.now(timezone.utc),
         ),
     ]
+    last_logged_in_at: Annotated[
+        datetime | None,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+        ),
+    ] = None
 
     interactions: list["Interaction"] = Relationship(back_populates="user")
