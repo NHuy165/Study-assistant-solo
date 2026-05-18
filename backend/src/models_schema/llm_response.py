@@ -43,10 +43,13 @@ class LLMResponse(LLMResponseBase, table=True):
 
     answer: str
 
-    created_at: datetime = Field(
-        sa_column=Column(DateTime(timezone=True)),
-        default_factory=lambda: datetime.now(timezone.utc),
-    )
+    created_at: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+            default_factory=lambda: datetime.now(timezone.utc),
+        ),
+    ]
 
     # type: flashcard, quiz...
 
