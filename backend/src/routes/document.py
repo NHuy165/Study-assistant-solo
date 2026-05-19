@@ -23,6 +23,7 @@ router = APIRouter()
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
+        503: Responses.RESPONSE_503_SERVICE_UNAVAILABLE,
     },
 )
 async def save_document(

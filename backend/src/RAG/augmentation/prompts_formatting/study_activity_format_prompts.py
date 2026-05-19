@@ -15,8 +15,8 @@ Additional information:
 + Material breakdown: Multiple choice questions, each question has 4 answers and only 1 answer is correct
 + The "activity_items" key is a JSON array containing the main questions of the multiple choice exercise.
 + "question": Contains the question itself.
-+ "answers": Do not include letter prefixes (like 'A', 'B', 'C'...). Just the answer text.
-+ "correct": Contains the index of the correct answer, 0-indexed.
++ "answers": Do not include letter prefixes (like 'A', 'B', 'C', 'D'). Just the answer text.
++ "correct": Contains the index of the correct answer, 0-indexed (possible values: 0, 1, 2, 3).
 + The default number of activity_items is 10. This can be changed according to the user's explicit request.
 """
 

@@ -720,10 +720,7 @@ async def submit_exercise_activity(
 
         for exercise_item in study_activity.exercise_items:
             assert exercise_item.id is not None
-            graded_result = results_map.get(exercise_item.id)
-
-            if graded_result is None:
-                raise Exception("Something went wrong with the model exercise grading.")
+            graded_result = results_map[exercise_item.id]
 
             exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
             session.add(exercise_item)
