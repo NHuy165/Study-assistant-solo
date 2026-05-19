@@ -142,12 +142,12 @@ async def delete_interaction(
 
     # Hard deletes the other things
     query_delete_document = delete(Document).where(
-        col(Document.interaction_id == interaction_id)
+        col(Document.interaction_id) == interaction_id
     )
     query_delete_llmresponse = delete(LLMResponse).where(
-        col(LLMResponse.interaction_id == interaction_id)
+        col(LLMResponse.interaction_id) == interaction_id
     )
-    query_delete_note = delete(Note).where(col(Note.interaction_id == interaction_id))
+    query_delete_note = delete(Note).where(col(Note.interaction_id) == interaction_id)
 
     await session.execute(query_delete_document)
     await session.execute(query_delete_llmresponse)
