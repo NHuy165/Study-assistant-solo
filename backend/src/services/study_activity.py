@@ -15,13 +15,13 @@ from backend.src.models_schema.activity.exercise_item import (
     ExerciseItemUpdate,
 )
 from backend.src.models_schema.activity.exercise_item_content import ExerciseItemContent
-from backend.src.models_schema.activity.json_validation import (
-    FlashcardsJsonSchema,
-    GapFillJsonSchema,
-    MCQJsonSchema,
-    OpenEndedCreationJsonSchema,
-    OpenEndedGradingInitiationJsonSchema,
-    OpenEndedGradingResultJsonSchema,
+from backend.src.models_schema.activity.json_schema import (
+    FlashcardsSchema,
+    GapFillSchema,
+    MCQSchema,
+    OpenEndedCreationSchema,
+    OpenEndedGradingInitiationSchema,
+    OpenEndedGradingResultItemSchema,
     OpenEndedGradingResultSchema,
     StudyActivityValidationBase,
 )
@@ -58,11 +58,11 @@ from backend.src.RAG.augmentation.formatters.chunks.core import chunks_formatter
 from backend.src.RAG.augmentation.formatters.conversations.core import (
     conversations_formatter,
 )
-from backend.src.RAG.augmentation.prompts_formatting.instruction_schemas import (
-    flashcards_schema,
-    gap_fill_schema,
-    multiple_choice_questions_schema,
-    open_ended_schema,
+from backend.src.RAG.augmentation.prompts_formatting.study_activity_format_prompts import (
+    MCQ_format_prompt,
+    flashcards_format_prompt,
+    gap_fill_format_prompt,
+    open_ended_format_prompt,
 )
 from backend.src.RAG.retrieval.core import retrieval
 from backend.src.RAG.retrieval.prompt_rewrite import rewrite_prompt
@@ -70,17 +70,17 @@ from backend.src.services.llm_response import read_llm_responses
 
 # ----- CREATE ----- #
 
-schema_map: dict[
+format_schema_map: dict[
     StudyActivityFormat,
     tuple[str, type[StudyActivityValidationBase]],
 ] = {
     StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (
-        multiple_choice_questions_schema,
-        MCQJsonSchema,
+        MCQ_format_prompt,
+        MCQSchema,
     ),
-    StudyActivityFormat.FLASHCARDS: (flashcards_schema, FlashcardsJsonSchema),
-    StudyActivityFormat.GAP_FILL: (gap_fill_schema, GapFillJsonSchema),
-    StudyActivityFormat.OPEN_ENDED: (open_ended_schema, OpenEndedCreationJsonSchema),
+    StudyActivityFormat.FLASHCARDS: (flashcards_format_prompt, FlashcardsSchema),
+    StudyActivityFormat.GAP_FILL: (gap_fill_format_prompt, GapFillSchema),
+    StudyActivityFormat.OPEN_ENDED: (open_ended_format_prompt, OpenEndedCreationSchema),
 }
 
 
@@ -89,7 +89,7 @@ async def save_multiple_choice_questions(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, MCQJsonSchema)
+    assert isinstance(activity_data, MCQSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -125,7 +125,7 @@ async def save_open_ended(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, OpenEndedCreationJsonSchema)
+    assert isinstance(activity_data, OpenEndedCreationSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -148,7 +148,7 @@ async def save_gap_fill(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, GapFillJsonSchema)
+    assert isinstance(activity_data, GapFillSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -195,7 +195,7 @@ async def save_flashcards(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, FlashcardsJsonSchema)
+    assert isinstance(activity_data, FlashcardsSchema)
 
     n_items = len(activity_data.activity_items)
     if n_items == 0:
@@ -262,7 +262,9 @@ async def create_study_activity(
     formatted_chunks = chunks_formatter(document_chunks)
 
     # Augmentation
-    json_schema, response_validator = schema_map[study_activity_input.activity_format]
+    json_schema, response_validator = format_schema_map[
+        study_activity_input.activity_format
+    ]
 
     params = StudyActivityParams(
         prompt=study_activity_input.prompt,
@@ -291,7 +293,7 @@ async def create_study_activity(
         name=validated_activity.name,
         description=validated_activity.description,
         interaction=interaction,
-    )
+    )  # type: ignore
 
     session.add(study_activity)
 
@@ -340,7 +342,7 @@ async def create_flashcards_activity(
         name=flashcards_activity_input.name,
         description=flashcards_activity_input.description,
         interaction=interaction,
-    )
+    )  # type: ignore
 
     session.add(flashcards_activity)
     await session.commit()
@@ -677,7 +679,7 @@ async def submit_exercise_activity(
     # Grades if not yet graded
     if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
         # === Preparing the json input === #
-        questions = OpenEndedGradingInitiationJsonSchema.model_validate(
+        questions = OpenEndedGradingInitiationSchema.model_validate(
             {
                 "questions_answers": [
                     item.model_dump() for item in study_activity.exercise_items
@@ -707,12 +709,12 @@ async def submit_exercise_activity(
         # === Grading === #
         graded_results = await GlobalAPI.grade_answers(final_prompt)
 
-        validated_graded_results = OpenEndedGradingResultJsonSchema.model_validate_json(
+        validated_graded_results = OpenEndedGradingResultSchema.model_validate_json(
             graded_results
         )
 
         # === Updates the results === #
-        results_map: dict[int, OpenEndedGradingResultSchema] = {
+        results_map: dict[int, OpenEndedGradingResultItemSchema] = {
             res.id: res for res in validated_graded_results.grading_results
         }
 
