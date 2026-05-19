@@ -18,6 +18,7 @@ router = APIRouter()
     response_model=LLMResponseOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
+        503: Responses.RESPONSE_503_SERVICE_UNAVAILABLE,
     },
 )
 async def create_llm_response(

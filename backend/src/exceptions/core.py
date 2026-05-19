@@ -3,7 +3,7 @@ from enum import Enum
 from fastapi import status
 from pydantic import BaseModel
 
-status.HTTP_500_INTERNAL_SERVER_ERROR
+status.HTTP_503_SERVICE_UNAVAILABLE
 # ----- SCHEMAS ----- #
 
 
@@ -26,6 +26,9 @@ class ExceptionType(str, Enum):
 
     # 500
     INTERNAL_ERROR = "INTERNAL_ERROR"
+
+    # 503
+    EXTERNAL_SERVICE = "EXTERNAL_SERVICE"
 
 
 class ExceptionCustom(Exception):
@@ -91,6 +94,11 @@ class Responses:
         "description": "Internal server error.",
     }
 
+    RESPONSE_503_SERVICE_UNAVAILABLE = {
+        "model": ExceptionResponse,
+        "description": "External service unavailable.",
+    }
+
 
 # ----- SPECIFIC ERRORS ----- #
 
@@ -149,4 +157,28 @@ class ExceptionTakenInfo_409(ExceptionCustom):
             status_code=409,
             exception_type=ExceptionType.TAKEN_INFO,
             message=f"Another {obj} with this {info} already exists.",
+        )
+
+
+# === 500 === #
+
+
+class ExceptionInternalError_500(ExceptionCustom):
+    def __init__(self, custom_message: str):
+        super().__init__(
+            status_code=500,
+            exception_type=ExceptionType.INTERNAL_ERROR,
+            message=custom_message,
+        )
+
+
+# === 503 === #
+
+
+class ExceptionExternalService_503(ExceptionCustom):
+    def __init__(self, custom_message: str):
+        super().__init__(
+            status_code=503,
+            exception_type=ExceptionType.EXTERNAL_SERVICE,
+            message=custom_message,
         )

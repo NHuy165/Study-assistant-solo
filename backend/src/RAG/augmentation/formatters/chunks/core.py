@@ -25,10 +25,7 @@ def stitched_content_formatter(
     """
     document = head_chunk.document
 
-    formatter_class = FORMATTERS.get(document.type)
-
-    if formatter_class is None:
-        raise Exception("Unknown document type")
+    formatter_class = FORMATTERS[document.type]
 
     return formatter_class.format(index, head_chunk, page_end, stitched_content)
 
