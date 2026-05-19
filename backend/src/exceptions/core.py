@@ -3,7 +3,6 @@ from enum import Enum
 from fastapi import status
 from pydantic import BaseModel
 
-status.HTTP_503_SERVICE_UNAVAILABLE
 # ----- SCHEMAS ----- #
 
 
@@ -26,6 +25,9 @@ class ExceptionType(str, Enum):
 
     # 500
     INTERNAL_ERROR = "INTERNAL_ERROR"
+
+    # 502
+    LLM_ERROR = "LLM_ERROR"
 
     # 503
     EXTERNAL_SERVICE = "EXTERNAL_SERVICE"
@@ -92,6 +94,11 @@ class Responses:
     RESPONSE_500_INTERNAL_SERVER_ERROR = {
         "model": ExceptionResponse,
         "description": "Internal server error.",
+    }
+
+    RESPONSE_502_BAD_GATEWAY = {
+        "model": ExceptionResponse,
+        "description": "External LLM failed to fulfill a task.",
     }
 
     RESPONSE_503_SERVICE_UNAVAILABLE = {
@@ -168,6 +175,18 @@ class ExceptionInternalError_500(ExceptionCustom):
         super().__init__(
             status_code=500,
             exception_type=ExceptionType.INTERNAL_ERROR,
+            message=custom_message,
+        )
+
+
+# === 502 === #
+
+
+class ExceptionLLMError_502(ExceptionCustom):
+    def __init__(self, custom_message: str):
+        super().__init__(
+            status_code=502,
+            exception_type=ExceptionType.LLM_ERROR,
             message=custom_message,
         )
 

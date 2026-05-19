@@ -71,6 +71,17 @@ class StudyActivityUpdate(SQLModel):
     description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
+class OpenEndedGradingInitiationItemSchema(SQLModel):
+    id: int
+    max_score: float
+    question: str
+    attempt: str | None
+
+
+class OpenEndedGradingInitiationSchema(SQLModel):
+    questions_answers: list[OpenEndedGradingInitiationItemSchema]
+
+
 # ----- TABLE MODEL ----- #
 
 
