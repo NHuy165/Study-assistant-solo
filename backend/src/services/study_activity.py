@@ -291,6 +291,21 @@ async def create_study_activity(
                 generated_activity
             )
 
+            if (
+                validated_activity.name == "$!SUBJECT!$"
+                and validated_activity.description == "$!SUBJECT!$"
+            ):
+                raise ExceptionRequest_400(
+                    "User prompt contents doesn't match specified subject type."
+                )
+            if (
+                validated_activity.name == "$!FORMAT!$"
+                and validated_activity.description == "$!FORMAT!$"
+            ):
+                raise ExceptionRequest_400(
+                    "User prompt contents doesn't match specified activity format."
+                )
+
             break
         except (ExceptionLLMError_502, ValidationError) as e:
             i_retry += 1
