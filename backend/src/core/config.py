@@ -45,7 +45,7 @@ class Settings(BaseSettings):
     EMBED_MODEL_GOOGLE: str
     VISION_MODEL_GOOGLE: str
     ANSWER_MODEL_GOOGLE: str
-    N_RETRIES: int
+    N_API_CALL_RETRIES: int
 
     # ** Ollama ** #
     OLLAMA_HOST: str
@@ -70,6 +70,7 @@ class Settings(BaseSettings):
 
     # ** Study Activity ** #
     DEFAULT_EXERCISE_TOTAL_SCORE: float
+    N_GENERATION_RETRIES: int
 
     # ----- CONFIG ----- #
 

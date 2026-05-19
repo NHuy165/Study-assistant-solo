@@ -1,5 +1,7 @@
+import json
 from datetime import datetime, timezone
 
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import col, delete, select
@@ -7,6 +9,7 @@ from sqlmodel import col, delete, select
 from backend.src.core.ai_api import ExceptionRequest_400, GlobalAPI
 from backend.src.core.config import settings
 from backend.src.exceptions.core import (
+    ExceptionLLMError_502,
     ExceptionNotFound_404,
     ExceptionSubmittedExercise_409,
 )
@@ -20,7 +23,6 @@ from backend.src.models_schema.activity.json_schema import (
     GapFillSchema,
     MCQSchema,
     OpenEndedCreationSchema,
-    OpenEndedGradingInitiationSchema,
     OpenEndedGradingResultItemSchema,
     OpenEndedGradingResultSchema,
     StudyActivityValidationBase,
@@ -33,6 +35,7 @@ from backend.src.models_schema.activity.review_item import (
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
 from backend.src.models_schema.activity.study_activity import (
     FlashcardsActivityInput,
+    OpenEndedGradingInitiationSchema,
     StudyActivity,
     StudyActivityInput,
     StudyActivityOutputComplete,
@@ -277,11 +280,28 @@ async def create_study_activity(
 
     final_prompt = study_activity_augmentation(params)
 
-    # Generation
-    generated_activity = await GlobalAPI.generate_material(final_prompt)
+    i_retry = 0
+    while True:
+        try:
+            # Generation
+            generated_activity = await GlobalAPI.generate_material(final_prompt)
 
-    # Validates content from model
-    validated_activity = response_validator.model_validate_json(generated_activity)
+            # Validates content from model
+            validated_activity = response_validator.model_validate_json(
+                generated_activity
+            )
+
+            break
+        except (ExceptionLLMError_502, ValidationError) as e:
+            i_retry += 1
+            if i_retry >= settings.N_GENERATION_RETRIES:
+                if isinstance(e, ExceptionLLMError_502):
+                    raise
+                else:
+                    raise ExceptionLLMError_502(
+                        f"Incorrect content format. Details: {e}"
+                    )
+            continue
 
     # === Saves response === #
 
@@ -625,7 +645,13 @@ async def answer_exercise_item(
 
     session.add(exercise_item)
     await session.commit()
-    await session.refresh(exercise_item, attribute_names=["contents"])
+
+    query = (
+        select(ExerciseItem)
+        .where(ExerciseItem.id == exercise_item_id)
+        .options(selectinload(ExerciseItem.contents))  # type: ignore
+    )
+    exercise_item = (await session.execute(query)).scalar_one()
 
     return exercise_item
 
@@ -707,15 +733,33 @@ async def submit_exercise_activity(
         final_prompt = answers_grading_augmentation(params)
 
         # === Grading === #
-        graded_results = await GlobalAPI.grade_answers(final_prompt)
+        i_retry = 0
 
-        validated_graded_results = OpenEndedGradingResultSchema.model_validate_json(
-            graded_results
-        )
+        while True:
+            try:
+                grading_results = await GlobalAPI.grade_answers(final_prompt)
+                grading_results_python: dict = json.loads(grading_results)
+                grading_results_python.update({"grading_input": questions.model_dump()})
+
+                validated_grading_results = OpenEndedGradingResultSchema.model_validate(
+                    grading_results_python
+                )
+                break
+
+            except (ExceptionLLMError_502, ValidationError) as e:
+                i_retry += 1
+                if i_retry >= settings.N_GENERATION_RETRIES:
+                    if isinstance(e, ExceptionLLMError_502):
+                        raise
+                    else:
+                        raise ExceptionLLMError_502(
+                            f"Incorrect content format. Details: {e}"
+                        )
+                continue
 
         # === Updates the results === #
         results_map: dict[int, OpenEndedGradingResultItemSchema] = {
-            res.id: res for res in validated_graded_results.grading_results
+            res.id: res for res in validated_grading_results.grading_results
         }
 
         for exercise_item in study_activity.exercise_items:

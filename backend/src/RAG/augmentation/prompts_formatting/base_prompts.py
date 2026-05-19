@@ -162,7 +162,7 @@ You are acting as a backend data generator, NOT a conversational chatbot, your a
     ]
 }}
     + "grading_results": Contains the graded results of the questions and answers. The results provided HAVE TO FOLLOW the same questions order as the input and have the EXACT SAME number of items. Each result takes the form of a dictionary.
-    + "id": (int) The identifier of the pair of question and answer that you graded.
+    + "id": (int) The identifier of the pair of question and answer that you graded. This MUST MATCH the ids of the input questions.
     + "user_score": (float) The score the student receives based on their answer. This value cannot be lower than 0 and cannot be higher than the max_score of the question.
     + "explanation": (str) An explanation regarding why the student deserves their score. The full correct answer is also provided here.
 
