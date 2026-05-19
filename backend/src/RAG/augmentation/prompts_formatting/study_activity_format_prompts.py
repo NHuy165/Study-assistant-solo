@@ -1,4 +1,4 @@
-multiple_choice_questions_schema = """
+MCQ_format_prompt = """
 {
     "name": "string",
     "description": "string",
@@ -20,7 +20,7 @@ Additional information:
 + The default number of activity_items is 10. This can be changed according to the user's explicit request.
 """
 
-flashcards_schema = """
+flashcards_format_prompt = """
 {
     "name": "string",
     "description": "string",
@@ -39,7 +39,7 @@ Additional information:
 + The default number of flashcards is 10. This can be changed according to the user's explicit request.
 """
 
-gap_fill_schema = """
+gap_fill_format_prompt = """
 {
     "name": "string (A concise name of this set of clozes)",
     "description": "string (A description of the contents of the clozes and what knowledge they cover)",
@@ -61,7 +61,7 @@ Additional information:
 + The default number of texts is 10. This can be changed according to the user's explicit request.
 """
 
-open_ended_schema = """
+open_ended_format_prompt = """
 {
     "name": "string",
     "description": "string",
