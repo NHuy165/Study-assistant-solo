@@ -4,7 +4,7 @@ from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.ai_api import GlobalAPI
-from backend.src.exceptions.core import ExceptionRequest_400
+from backend.src.exceptions.core import ExceptionRequestValidation_400
 from backend.src.models_schema.document import Document
 from backend.src.models_schema.document_chunk import DocumentChunk
 from backend.src.models_schema.miscellaneous.enums import DocumentType
@@ -52,7 +52,7 @@ class TextExtractor(DocumentExtractor):
         try:
             contents = text_bytes.decode("utf-8")
         except UnicodeDecodeError:
-            raise ExceptionRequest_400(
+            raise ExceptionRequestValidation_400(
                 "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
             )
 

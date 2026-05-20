@@ -2,7 +2,10 @@ from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
-from backend.src.exceptions.core import ExceptionNotFound_404, ExceptionRequest_400
+from backend.src.exceptions.core import (
+    ExceptionNotFound_404,
+    ExceptionRequestValidation_400,
+)
 from backend.src.models_schema.document import Document, DocumentInput, DocumentUpdate
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.miscellaneous.enums import DocumentType
@@ -38,7 +41,7 @@ async def save_document(
             break
 
     if selected_type is None or selected_extractor is None:
-        raise ExceptionRequest_400(
+        raise ExceptionRequestValidation_400(
             "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
         )
 
@@ -57,7 +60,7 @@ async def save_document(
         interaction=interaction,
         page_starts_at=page_starts_at,
         type=doc_type,
-    )
+    )  # type: ignore
 
     session.add(document)
     await session.commit()
