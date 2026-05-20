@@ -8,7 +8,8 @@ from pydantic import BaseModel
 
 class ExceptionType(str, Enum):
     # 400
-    REQUEST = "REQUEST"
+    BAD_REQUEST = "BAD_REQUEST"
+    REQUEST_VALIDATION = "REQUEST_VALIDATION"
 
     # 401
     AUTHENTICATION = "AUTHENTICATION"
@@ -116,8 +117,19 @@ class ExceptionRequest_400(ExceptionCustom):
     def __init__(self, custom_message: str | None = None):
         super().__init__(
             status_code=400,
-            exception_type=ExceptionType.REQUEST,
+            exception_type=ExceptionType.BAD_REQUEST,
             message=custom_message if custom_message is not None else "Request error.",
+        )
+
+
+class ExceptionRequestValidation_400(ExceptionCustom):
+    def __init__(self, custom_message: str | None = None):
+        super().__init__(
+            status_code=400,
+            exception_type=ExceptionType.REQUEST_VALIDATION,
+            message=custom_message
+            if custom_message is not None
+            else "Request validation error.",
         )
 
 
