@@ -1,10 +1,11 @@
 from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Annotated
 
-from pydantic import BeforeValidator
+from pydantic import BeforeValidator, model_validator
 from sqlalchemy import CheckConstraint
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
+from backend.src.exceptions.core import ExceptionRequestValidation_400
 from backend.src.models_schema.miscellaneous.enums import (
     StudyActivityFormat,
     StudyActivityType,
@@ -38,6 +39,32 @@ class StudyActivityBase(SQLModel):
 
 class StudyActivityInput(StudyActivityBase):
     prompt: str
+
+    @model_validator(mode="after")
+    def validate_type_format(self):
+        if (
+            self.activity_type == StudyActivityType.EXERCISE
+            and self.activity_format
+            not in (
+                StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+                StudyActivityFormat.OPEN_ENDED,
+            )
+        ):
+            raise ExceptionRequestValidation_400(
+                f"Exercise activity type does not support format: {self.activity_format.value}."
+            )
+        elif (
+            self.activity_type == StudyActivityType.REVIEW
+            and self.activity_format
+            not in (
+                StudyActivityFormat.FLASHCARDS,
+                StudyActivityFormat.GAP_FILL,
+            )
+        ):
+            raise ExceptionRequestValidation_400(
+                f"Review activity type does not support format: {self.activity_format.value}."
+            )
+        return self
 
 
 class FlashcardsActivityInput(SQLModel):
@@ -119,31 +146,42 @@ class StudyActivity(StudyActivityBase, table=True):
         back_populates="study_activity"
     )  # Uses soft delete
 
-    __table_args__ = (
-        CheckConstraint(
-            """
-            (activity_type = 'EXERCISE' AND activity_format IN ('MULTIPLE_CHOICE_QUESTIONS', 'OPEN_ENDED'))
-            OR
-            (activity_type = 'REVIEW' AND activity_format IN ('FLASHCARDS', 'GAP_FILL'))
-            """,
-            name="CK_activity_type_activity_format",
-        ),
-        CheckConstraint(
-            """
-            (activity_type = 'EXERCISE')
-            OR
-            (activity_type = 'REVIEW' AND is_submitted = false)
-            """,
-            name="CK_activity_type_is_submitted",
-        ),
-        CheckConstraint(
-            """
-            (activity_format = 'FLASHCARDS')
-            OR
-            (activity_format <> 'FLASHCARDS' AND prompt IS NOT NULL)
-            """
-        ),
-    )
+    @model_validator(mode="after")
+    def validate_type_format(self):
+        if (
+            self.activity_type == StudyActivityType.EXERCISE
+            and self.activity_format
+            not in (
+                StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+                StudyActivityFormat.OPEN_ENDED,
+            )
+        ):
+            raise ExceptionRequestValidation_400(
+                f"Exercise activity type does not support format: {self.activity_format.value}."
+            )
+        elif (
+            self.activity_type == StudyActivityType.REVIEW
+            and self.activity_format
+            not in (
+                StudyActivityFormat.FLASHCARDS,
+                StudyActivityFormat.GAP_FILL,
+            )
+        ):
+            raise ExceptionRequestValidation_400(
+                f"Review activity type does not support format: {self.activity_format.value}."
+            )
+        return self
+
+    @model_validator(mode="after")
+    def validate_prompt_exists(self):
+        if (
+            self.activity_format != StudyActivityFormat.FLASHCARDS
+            and self.prompt is None
+        ):
+            raise ExceptionRequestValidation_400(
+                "Prompt cannot be null for this format type."
+            )
+        return self
 
     @property
     def items(self) -> list[ExerciseItem] | list[ReviewItem]:
