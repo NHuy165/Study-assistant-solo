@@ -48,6 +48,9 @@ async def create_llm_response(
     )
     formatted_chunks = chunks_formatter(document_chunks)
 
+    # Temporary close
+    await session.commit()
+
     # Augmentation
     augmentation_params = AnswerGenerationParams(
         prompt=llm_response_input.prompt,
@@ -64,7 +67,7 @@ async def create_llm_response(
         prompt=llm_response_input.prompt,
         answer=answer,
         interaction=interaction,
-    )
+    )  # type: ignore
 
     session.add(llm_response)
     await session.commit()

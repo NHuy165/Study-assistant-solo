@@ -264,6 +264,9 @@ async def create_study_activity(
     )
     formatted_chunks = chunks_formatter(document_chunks)
 
+    # Temporary close
+    await session.commit()
+
     # Augmentation
     json_schema, response_validator = format_schema_map[
         study_activity_input.activity_format
@@ -737,6 +740,9 @@ async def submit_exercise_activity(
             raw_prompt=prompt,
             embedded_prompt=embedded_prompt,
         )
+        # Temporary close
+        await session.commit()
+
         formatted_chunks = chunks_formatter(document_chunks)
 
         params = AnswersGradingParams(
@@ -772,27 +778,6 @@ async def submit_exercise_activity(
                         )
                 continue
 
-        # === Updates the results === #
-        results_map: dict[int, OpenEndedGradingResultItemSchema] = {
-            res.id: res for res in validated_grading_results.grading_results
-        }
-
-        for exercise_item in study_activity.exercise_items:
-            assert exercise_item.id is not None
-            graded_result = results_map[exercise_item.id]
-
-            exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
-            session.add(exercise_item)
-
-        await session.commit()
-
-    # Updates
-    await session.refresh(study_activity)
-    study_activity.is_submitted = True
-    study_activity.submitted_at = datetime.now(timezone.utc)
-    session.add(study_activity)
-    await session.commit()
-
     # Refetchs
     query_refetch = (
         select(StudyActivity)
@@ -808,11 +793,32 @@ async def submit_exercise_activity(
             ),
         )
     )
-    study_activity_refetch = (await session.execute(query_refetch)).scalars().first()
+    study_activity = (await session.execute(query_refetch)).scalars().first()
+
+    assert study_activity is not None
+
+    # Updates
+    study_activity.is_submitted = True
+    study_activity.submitted_at = datetime.now(timezone.utc)
+
+    # Updates item grading if open_ended
+    if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
+        results_map: dict[int, OpenEndedGradingResultItemSchema] = {
+            res.id: res for res in validated_grading_results.grading_results
+        }
+
+        for exercise_item in study_activity.exercise_items:
+            assert exercise_item.id is not None
+            graded_result = results_map[exercise_item.id]
+
+            exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
+            session.add(exercise_item)
 
     study_activity_output_complete = StudyActivityOutputComplete.model_validate(
-        study_activity_refetch, context={"show_answers": True}
+        study_activity, context={"show_answers": True}
     )
+
+    await session.commit()
 
     return study_activity_output_complete
 
