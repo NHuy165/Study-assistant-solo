@@ -78,14 +78,17 @@ async def get_interaction_id(
     user: UserDep, session: SessionDep, interaction_id: Annotated[int, Path()]
 ) -> Interaction:
     query = select(Interaction).where(
-        Interaction.user_id == user.id, Interaction.id == interaction_id
+        Interaction.user_id == user.id,
+        Interaction.id == interaction_id,
+        Interaction.is_deleted == False,
     )
 
     interaction = (await session.execute(query)).scalars().first()
 
     if interaction is None:
         raise ExceptionNotFound_404(
-            "Interaction", {"user_id": user.id, "id": interaction_id}
+            "Interaction",
+            {"user_id": user.id, "id": interaction_id, "is_deleted": False},
         )
 
     return interaction
