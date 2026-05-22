@@ -294,22 +294,29 @@ async def create_study_activity(
                 generated_activity
             )
 
+            # Catches errors
+            cancellation_keywords = {
+                "$!SUBJECT!$": "User's prompt contents doesn't match specified subject type.",
+                "$!FORMAT!$": "User's prompt contents doesn't match specified activity format.",
+                "$!SCOPE!$": "User's prompt contains irrelevant information.",
+                "$!KNOWLEDGE!$": "User's prompt contains information that is too advanced.",
+            }
+
             if (
-                validated_activity.name == "$!SUBJECT!$"
-                and validated_activity.description == "$!SUBJECT!$"
+                validated_activity.name in cancellation_keywords.keys()
+                and validated_activity.description in cancellation_keywords.keys()
             ):
-                raise ExceptionRequest_400(
-                    "User prompt contents doesn't match specified subject type."
-                )
-            if (
-                validated_activity.name == "$!FORMAT!$"
-                and validated_activity.description == "$!FORMAT!$"
-            ):
-                raise ExceptionRequest_400(
-                    "User prompt contents doesn't match specified activity format."
-                )
+                if validated_activity.name != validated_activity.description:
+                    raise ExceptionLLMError_502(
+                        "Incorrect error format returned by the LLM."
+                    )
+                else:
+                    raise ExceptionRequest_400(
+                        cancellation_keywords[validated_activity.name]
+                    )
 
             break
+
         except (ExceptionLLMError_502, ValidationError) as e:
             i_retry += 1
             if i_retry >= settings.N_GENERATION_RETRIES:
