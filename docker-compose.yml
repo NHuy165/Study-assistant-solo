@@ -7,35 +7,21 @@ services:
       POSTGRES_PASSWORD: Q6L0N2H0LQS5016SQL5888
       POSTGRES_DB: group_project_sample
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
-
-  db-init:
-    image: postgres:16
-    depends_on:
-      db:
-        condition: service_started
-    environment:
-      PGPASSWORD: Q6L0N2H0LQS5016SQL5888
-    entrypoint: ["/bin/sh"]
-    command:
-      - "-c"
-      - |
-        echo "Waiting for Postgres database to be ready..."
-        while ! pg_isready -h db -U postgres; do sleep 1; done
-        
-        echo "Database active. Enabling pg_trgm extension..."
-        psql -h db -U postgres -d group_project_sample -c "CREATE EXTENSION IF NOT EXISTS pg_trgm;"
-        
-        echo "pg_trgm extension enabled successfully! Exiting."
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d group_project_sample']
+      interval: 2s
+      timeout: 5s
+      retries: 10
 
   # Backend Service
   api:
     build: .
     ports:
-      - "8000:8000"
-      - "5678:5678"
+      - '8000:8000'
+      - '5678:5678'
     env_file:
       - .env
     environment:
@@ -43,19 +29,34 @@ services:
       OLLAMA_HOST: http://ollama:11434
     depends_on:
       db:
-        condition: service_started
+        condition: service_healthy
       ollama:
         condition: service_started
       ollama-init:
         condition: service_completed_successfully
     volumes:
       - ./backend:/code/backend
-    command: ["python", "-m", "debugpy", "--listen", "0.0.0.0:5678", "-m", "fastapi", "run", "backend/src/main.py", "--port", "8000", "--host", "0.0.0.0"]
+    command:
+      [
+        'python',
+        '-m',
+        'debugpy',
+        '--listen',
+        '0.0.0.0:5678',
+        '-m',
+        'fastapi',
+        'run',
+        'backend/src/main.py',
+        '--port',
+        '8000',
+        '--host',
+        '0.0.0.0',
+      ]
 
   ollama:
     image: ollama/ollama
     ports:
-      - "11434:11434"
+      - '11434:11434'
     volumes:
       - ollama_data:/root/.ollama
     deploy:
@@ -72,24 +73,24 @@ services:
       - ollama
     environment:
       - OLLAMA_HOST=http://ollama:11434
-    entrypoint: ["/bin/sh"]
+    entrypoint: ['/bin/sh']
     command:
-      - "-c"
+      - '-c'
       - |
         echo "Waiting for Ollama server to be active..."
         while ! ollama list > /dev/null 2>&1; do sleep 1; done
-        
+
         echo "Server active. Starting model pulls..."
-        
+
         echo "Pulling nomic-embed-text..."
         until ollama pull nomic-embed-text; do echo "Network drop. Retrying nomic..."; sleep 2; done
-        
+
         echo "Pulling llama3.1..."
         until ollama pull llama3.1; do echo "Network drop. Retrying llama3.1..."; sleep 2; done
-        
+
         echo "Pulling llama3.2-vision..."
         until ollama pull llama3.2-vision; do echo "Network drop. Retrying vision..."; sleep 2; done
-        
+
         echo "All models pulled successfully! Exiting init container."
 
 volumes:

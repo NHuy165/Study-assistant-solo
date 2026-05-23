@@ -11,9 +11,9 @@ engine = create_async_engine(str(settings.POSTGRES_URL), echo=True)
 
 async def create_database_and_tables():
     async with engine.begin() as conn:
-        # Tạo extension
-        q = text("CREATE EXTENSION IF NOT EXISTS vector;")
-        await conn.execute(q)
+        # Creating extensions
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
 
         # Tables setup
         await conn.run_sync(SQLModel.metadata.create_all)
