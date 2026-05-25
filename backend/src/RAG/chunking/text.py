@@ -1,3 +1,4 @@
+import asyncio
 from abc import abstractmethod
 
 from fastapi import UploadFile
@@ -61,19 +62,35 @@ class TextExtractor(DocumentExtractor):
 
         split_chunks = smart_splitter.split_text(contents)
 
+        # Staging data
+        prepared_chunks = []
+        chunk_metadata = []
+
         for chunk_index, chunk_text in enumerate(split_chunks):
             embedding_content = (
                 f"Source: {DocumentType.TEXT.value} file {document.name}:\n"
                 + chunk_text
             )
 
-            prepared_chunk = DocumentChunk(
-                content_original=chunk_text,
-                content_embedded=await GlobalAPI.embed(embedding_content),
-                document_chunk_index=chunk_index,
-                document=document,
+            prepared_chunks.append(GlobalAPI.embed(embedding_content))
+            chunk_metadata.append(
+                {
+                    "content": chunk_text,
+                    "index": chunk_index,
+                }
             )
 
-            session.add(prepared_chunk)
+        if prepared_chunks:
+            # Mass awaiting
+            vectors = await asyncio.gather(*prepared_chunks)
+
+            for metadata, vector in zip(chunk_metadata, vectors):
+                embedded_chunk = DocumentChunk(
+                    content_original=metadata["content"],
+                    content_embedded=vector,
+                    document_chunk_index=metadata["index"],
+                    document=document,
+                )
+                session.add(embedded_chunk)
 
         await session.commit()
