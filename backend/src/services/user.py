@@ -27,6 +27,7 @@ async def check_email_exists(session: AsyncSession, email: EmailStr):
 
 async def register_user(session: AsyncSession, user_input: UserInput) -> User:
     await check_email_exists(session, user_input.email)
+    await session.commit()
 
     user = User.model_validate(
         user_input.model_dump(),

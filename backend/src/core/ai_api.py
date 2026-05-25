@@ -126,6 +126,17 @@ class GoogleAPI(API):
                         e.message if e.message else "Google API error"
                     )
 
+            except httpx.RequestError:
+                # Network, connection issues
+                wait_time = (attempt_traffic + 1) * 2
+                await asyncio.sleep(wait_time)
+                attempt_traffic += 1
+
+                if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                    break
+
+                continue
+
         raise ExceptionExternalService_503(
             "Gemini failed after multiple retries and key rotations. Please come back again later."
         )
