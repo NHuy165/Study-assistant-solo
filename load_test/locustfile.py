@@ -1,9 +1,13 @@
+from pathlib import Path
+
 import requests
 from locust import HttpUser, between, events, tag, task
 from locust.exception import StopUser
 
 from backend.src.core.config import settings
 from load_test.common.auth import register_login
+
+test_file_path = Path(__file__).resolve().parent / "data" / "test_file.pdf"
 
 
 @events.test_start.add_listener
@@ -65,4 +69,15 @@ class AppUser(HttpUser):
             json={"prompt": "Hãy giảng cho tôi về cách cộng trừ nhân chia phân số."},
             name="/api/llm-response/{interaction_id}/chat",
         )
+        raise StopUser()
+
+    @tag("save_document")
+    @task
+    def save_document(self):
+        with open(test_file_path, "rb") as f:
+            self.client.post(
+                f"/api/document/{self.interaction_id}/upload",
+                files={"file": ("test_file.pdf", f, "application/pdf")},
+                name="/api/document/{interaction_id}/upload",
+            )
         raise StopUser()
