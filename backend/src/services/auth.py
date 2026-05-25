@@ -27,8 +27,10 @@ async def login_for_token(
     session: AsyncSession, email: EmailStr, password: str
 ) -> Token:
     user = await authenticate_user(session, email, password)
-
     data = {"sub": str(user.id)}
+
+    await session.commit()
+
     token_str = create_token(data)
 
     return Token(access_token=token_str, token_type="bearer")

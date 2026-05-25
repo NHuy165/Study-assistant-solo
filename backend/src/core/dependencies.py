@@ -18,7 +18,7 @@ from backend.src.models_schema.auth import TokenData
 from backend.src.models_schema.interaction import Interaction
 from backend.src.models_schema.user import User
 
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/login")
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
