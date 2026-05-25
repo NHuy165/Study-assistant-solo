@@ -3,10 +3,11 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import (
-    CORSMiddleware,  # Tuấn sửa, thêm CORS do khác địa port giữa frontend và backend
+    CORSMiddleware,
 )
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from backend.src.core.config import settings
 from backend.src.core.database import create_database_and_tables, dispose
 from backend.src.exceptions.core import ExceptionCustom, Responses
 from backend.src.exceptions.handlers import (
@@ -17,6 +18,7 @@ from backend.src.exceptions.handlers import (
 )
 from backend.src.routes import (
     auth,
+    dev_tools,
     document,
     interaction,
     llm_response,
@@ -76,48 +78,55 @@ app.add_exception_handler(Exception, generic_exceptions_handler)
 
 app.include_router(
     auth.router,
-    prefix="",
+    prefix="/api",
     tags=["auth"],
 )
 
 app.include_router(
     document.router,
-    prefix="/document",
+    prefix="/api/document",
     tags=["document"],
 )
 
 app.include_router(
     interaction.router,
-    prefix="/interaction",
+    prefix="/api/interaction",
     tags=["interaction"],
 )
 
 app.include_router(
     llm_response.router,
-    prefix="/llm-response",
+    prefix="/api/llm-response",
     tags=["llm-response"],
 )
 
 app.include_router(
     note.router,
-    prefix="/note",
+    prefix="/api/note",
     tags=["note"],
 )
 
 app.include_router(
     user.router,
-    prefix="/user",
+    prefix="/api/user",
     tags=["user"],
 )
 
 app.include_router(
     study_activity.router,
-    prefix="/study-activity",
+    prefix="/api/study-activity",
     tags=["study-activity"],
 )
 
 app.include_router(
     study_progress.router,
-    prefix="/study-progress",
+    prefix="/api/study-progress",
     tags=["study-progress"],
 )
+
+if settings.DEV_MODE:
+    app.include_router(
+        dev_tools.router,
+        prefix="/api/dev",
+        tags=["dev"],
+    )
