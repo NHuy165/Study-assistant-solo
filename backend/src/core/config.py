@@ -7,10 +7,17 @@ ENV_PATH = Path(__file__).resolve().parent.parent.parent.parent / ".env"
 
 
 class Settings(BaseSettings):
-    # ----- PRIVATE INFO ----- #
+    # ----- CORE ----- #
+
+    # === Developer mode === #
+    DEV_MODE: bool
+
+    # === Backend URL === #
+    BACKEND_URL: str
 
     # === Database === #
     POSTGRES_URL: PostgresDsn
+    POSTGRES_URL_TEST: PostgresDsn
 
     # === Auth === #
     PRIVATE_KEY: str

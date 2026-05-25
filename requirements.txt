@@ -13,7 +13,8 @@ python-dotenv
 # Testing
 pytest
 pytest_asyncio
-debugpy
+pytest
+locust
 
 # AI and RAG
 google-genai

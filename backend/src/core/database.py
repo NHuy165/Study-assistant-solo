@@ -1,12 +1,12 @@
-from typing import Annotated
-
-from fastapi import Depends, FastAPI
 from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
 from sqlmodel import SQLModel, text
 
 from backend.src.core.config import settings
 
-engine = create_async_engine(str(settings.POSTGRES_URL), echo=True)
+if settings.DEV_MODE:
+    engine = create_async_engine(str(settings.POSTGRES_URL_TEST), echo=True)
+else:
+    engine = create_async_engine(str(settings.POSTGRES_URL), echo=True)
 
 
 async def create_database_and_tables():
@@ -21,6 +21,11 @@ async def create_database_and_tables():
 
 async def dispose():
     await engine.dispose()
+
+
+async def reset_database():
+    async with engine.begin() as conn:
+        await conn.run_sync(SQLModel.metadata.drop_all)
 
 
 async def get_async_session():

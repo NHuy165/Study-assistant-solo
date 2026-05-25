@@ -26,6 +26,7 @@ services:
       - .env
     environment:
       POSTGRES_URL: postgresql+asyncpg://postgres:Q6L0N2H0LQS5016SQL5888@db:5432/group_project_sample
+      POSTGRES_URL_TEST: postgresql+asyncpg://postgres:Q6L0N2H0LQS5016SQL5888@db:5432/group_project_sample
       OLLAMA_HOST: http://ollama:11434
     depends_on:
       db:
