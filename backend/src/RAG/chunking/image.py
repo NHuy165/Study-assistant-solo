@@ -48,4 +48,3 @@ class ImageExtractor(DocumentExtractor):
         )
 
         session.add(prepared_chunk)
-        await session.commit()

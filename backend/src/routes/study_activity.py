@@ -259,11 +259,17 @@ async def submit_exercise_activity(
     """
     Nộp tài liệu dạng Exercise.
     """
-    return await study_activity.submit_exercise_activity(
+    unvalidated = await study_activity.submit_exercise_activity(
         user,
         session,
         study_activity_id,
     )
+
+    study_activity_output_complete = StudyActivityOutputComplete.model_validate(
+        unvalidated, context={"show_answers": True}
+    )
+
+    return study_activity_output_complete
 
 
 # ----- DELETE ----- #

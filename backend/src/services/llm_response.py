@@ -1,3 +1,5 @@
+import asyncio
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
@@ -33,23 +35,32 @@ async def create_llm_response(
     past_conversations = await read_llm_responses(
         session, interaction, settings.N_PAST_CONVERSATIONS
     )
+
+    await session.commit()  # Temporary close
+
+    # Formats conversations
     formatted_past_conversations = conversations_formatter(past_conversations)
 
-    # Retrieval (using the rewritten prompt)
+    # Rewrites prompt
     rewritten_prompt = await rewrite_prompt(
         llm_response_input.prompt, formatted_past_conversations
     )
     embedded_prompt = await GlobalAPI.embed(rewritten_prompt)
+
+    await session.refresh(interaction)
+
+    # Chunks retrieval
     document_chunks = await retrieval(
         session=session,
         interaction=interaction,
         raw_prompt=rewritten_prompt,
         embedded_prompt=embedded_prompt,
     )
+
+    # Formats chunks
     formatted_chunks = chunks_formatter(document_chunks)
 
-    # Temporary close
-    await session.commit()
+    await session.commit()  # Temporary close
 
     # Augmentation
     augmentation_params = AnswerGenerationParams(

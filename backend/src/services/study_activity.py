@@ -4,7 +4,7 @@ from datetime import datetime, timezone
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlmodel import col, delete, select
+from sqlmodel import col, delete, select, update
 
 from backend.src.core.ai_api import ExceptionRequest_400, GlobalAPI
 from backend.src.core.config import settings
@@ -87,144 +87,131 @@ format_schema_map: dict[
 }
 
 
-async def save_multiple_choice_questions(
-    session: AsyncSession,
+def save_multiple_choice_questions(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
     assert isinstance(activity_data, MCQSchema)
 
-    n_items = len(activity_data.activity_items)
-    if n_items == 0:
-        return
+    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / len(
+        activity_data.activity_items
+    )
 
-    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / n_items
+    # Begins saving
+    exercise_items = []
+    for item in activity_data.activity_items:
+        # Saves item contents
+        exercise_item_contents = [
+            ExerciseItemContent(
+                content=answer,
+                type=ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                is_correct=(i_answer == item.correct),
+            )
+            for i_answer, answer in enumerate(item.answers)
+        ]
 
-    for i_item in range(n_items):
-        # Saving the item
+        # Saves item
         exercise_item = ExerciseItem(
             max_score=question_score,
-            question=activity_data.activity_items[i_item].question,
-            study_activity=study_activity,
+            question=item.question,
+            contents=exercise_item_contents,
         )
-        session.add(exercise_item)
 
-        # Saving the contents of the item
-        n_contents = len(activity_data.activity_items[i_item].answers)
-        for i_content in range(n_contents):
-            exercise_item_content = ExerciseItemContent(
-                content=activity_data.activity_items[i_item].answers[i_content],
-                type=ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
-                is_correct=True
-                if i_content == activity_data.activity_items[i_item].correct
-                else False,
-                exercise_item=exercise_item,
-            )
-            session.add(exercise_item_content)
+        exercise_items.append(exercise_item)
+
+    study_activity.exercise_items = exercise_items
 
 
-async def save_open_ended(
-    session: AsyncSession,
+def save_open_ended(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
     assert isinstance(activity_data, OpenEndedCreationSchema)
 
-    n_items = len(activity_data.activity_items)
-    if n_items == 0:
-        return
+    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / len(
+        activity_data.activity_items
+    )
 
-    question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / n_items
-
-    for i_item in range(n_items):
-        # Saving the item
+    # Begins saving
+    exercise_items = []
+    for item in activity_data.activity_items:
+        # Saves item
         exercise_item = ExerciseItem(
             max_score=question_score,
-            question=activity_data.activity_items[i_item].question,
-            study_activity=study_activity,
+            question=item.question,
         )
-        session.add(exercise_item)
+
+        exercise_items.append(exercise_item)
+
+    study_activity.exercise_items = exercise_items
 
 
-async def save_gap_fill(
-    session: AsyncSession,
+def save_gap_fill(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
     assert isinstance(activity_data, GapFillSchema)
 
-    n_items = len(activity_data.activity_items)
-    if n_items == 0:
-        return
-
-    for i_item in range(n_items):
-        # Saving the item
-        review_item = ReviewItem(
-            study_activity=study_activity,
-        )
-        session.add(review_item)
-
-        # Saving the contents of the item
-        text_content = ReviewItemContent(
-            content=activity_data.activity_items[i_item].text,
+    # Begins saving
+    review_items = []
+    for item in activity_data.activity_items:
+        # Saves item contents
+        review_item_text = ReviewItemContent(
+            content=item.text,
             type=ReviewItemContentType.GAP_FILL_TEXT,
-            review_item=review_item,
         )
-        session.add(text_content)
-
-        n_correct_contents = len(activity_data.activity_items[i_item].correct)
-        for i_correct_content in range(n_correct_contents):
-            review_item_content = ReviewItemContent(
-                content=activity_data.activity_items[i_item].correct[i_correct_content],
+        review_item_corrects = [
+            ReviewItemContent(
+                content=correct,
                 type=ReviewItemContentType.GAP_FILL_CORRECT,
-                review_item=review_item,
             )
-            session.add(review_item_content)
-
-        n_distractors_contents = len(activity_data.activity_items[i_item].distractors)
-        for i_distractor_content in range(n_distractors_contents):
-            review_item_content = ReviewItemContent(
-                content=activity_data.activity_items[i_item].distractors[
-                    i_distractor_content
-                ],
+            for correct in item.corrects
+        ]
+        review_item_distractors = [
+            ReviewItemContent(
+                content=distractor,
                 type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-                review_item=review_item,
             )
-            session.add(review_item_content)
+            for distractor in item.distractors
+        ]
+        review_item_contents = (
+            [review_item_text] + review_item_corrects + review_item_distractors
+        )
+
+        # Saves item
+        review_item = ReviewItem(contents=review_item_contents)
+
+        review_items.append(review_item)
+
+    study_activity.review_items = review_items
 
 
-async def save_flashcards(
-    session: AsyncSession,
+def save_flashcards(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
     assert isinstance(activity_data, FlashcardsSchema)
 
-    n_items = len(activity_data.activity_items)
-    if n_items == 0:
-        return
-
-    for i_item in range(n_items):
-        # Saving the item
-        review_item = ReviewItem(
-            study_activity=study_activity,
-        )
-        session.add(review_item)
-
-        # Saving the contents of the item
-        front_content = ReviewItemContent(
-            content=activity_data.activity_items[i_item].front,
+    # Begins saving
+    review_items = []
+    for item in activity_data.activity_items:
+        # Saves item contents
+        review_item_front = ReviewItemContent(
+            content=item.front,
             type=ReviewItemContentType.FLASHCARDS_FRONT,
-            review_item=review_item,
         )
-        session.add(front_content)
-
-        back_content = ReviewItemContent(
-            content=activity_data.activity_items[i_item].back,
+        review_item_back = ReviewItemContent(
+            content=item.back,
             type=ReviewItemContentType.FLASHCARDS_BACK,
-            review_item=review_item,
         )
-        session.add(back_content)
+        review_item_contents = [review_item_front, review_item_back]
+
+        # Saves item
+        review_item = ReviewItem(contents=review_item_contents)
+
+        review_items.append(review_item)
+
+    study_activity.review_items = review_items
 
 
 save_mapper = {
@@ -343,8 +330,9 @@ async def create_study_activity(
     session.add(study_activity)
 
     saver = save_mapper[study_activity_input.activity_format]
-    await saver(
-        session=session, activity_data=validated_activity, study_activity=study_activity
+    saver(
+        activity_data=validated_activity,
+        study_activity=study_activity,
     )
 
     await session.commit()  # Commits EVERYTHING
@@ -401,7 +389,7 @@ async def add_flashcards(
     session: AsyncSession,
     flashcard_inputs: list[FlashcardInput],
     flashcards_activity_id: int,
-) -> StudyActivityOutputComplete:
+) -> StudyActivity:
     query = (
         select(StudyActivity)
         .join(Interaction)
@@ -425,25 +413,30 @@ async def add_flashcards(
             },
         )
 
-    for inp in flashcard_inputs:
-        flashcard = ReviewItem(study_activity=flashcards_activity)
-        session.add(flashcard)
-
-        front = ReviewItemContent(
-            content=inp.front,
+    flashcards = []
+    for flashcard_input in flashcard_inputs:
+        # Saves item contents
+        flashcard_front = ReviewItemContent(
+            content=flashcard_input.front,
             type=ReviewItemContentType.FLASHCARDS_FRONT,
-            review_item=flashcard,
         )
-        back = ReviewItemContent(
-            content=inp.back,
+        flashcard_back = ReviewItemContent(
+            content=flashcard_input.back,
             type=ReviewItemContentType.FLASHCARDS_BACK,
-            review_item=flashcard,
+        )
+        flashcard_contents = [flashcard_front, flashcard_back]
+
+        # Saves item
+        flashcard = ReviewItem(
+            contents=flashcard_contents,
+            study_activity=flashcards_activity,
         )
 
-        session.add(front)
-        session.add(back)
+        flashcards.append(flashcard)
 
+    session.add_all(flashcards)
     await session.commit()
+
     # Refetches
     query = (
         select(StudyActivity)
@@ -455,9 +448,8 @@ async def add_flashcards(
         )
     )
 
-    result = (await session.execute(query)).scalars().first()
-
-    flashcards_activity = StudyActivityOutputComplete.model_validate(result)
+    flashcards_activity = (await session.execute(query)).scalars().first()
+    assert flashcards_activity is not None
 
     return flashcards_activity
 
@@ -685,7 +677,7 @@ async def submit_exercise_activity(
     user: User,
     session: AsyncSession,
     study_activity_id: int,
-) -> StudyActivityOutputComplete:
+) -> StudyActivity:
 
     # Fetches study activity
     query = (
@@ -727,9 +719,23 @@ async def submit_exercise_activity(
     if study_activity.is_submitted:
         raise ExceptionSubmittedExercise_409()
 
+    # Refetch query for refetching later
+    query_refetch = (
+        select(StudyActivity)
+        .where(StudyActivity.id == study_activity_id)
+        .options(
+            selectinload(
+                StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
+            ).selectinload(
+                ExerciseItem.contents  # type: ignore
+            ),
+        )
+    )
+
     # Grades if not yet graded
     if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
         # === Preparing the json input === #
+        # Fetches questions and answers from the activity
         questions = OpenEndedGradingInitiationSchema.model_validate(
             {
                 "questions_answers": [
@@ -739,22 +745,30 @@ async def submit_exercise_activity(
         )
 
         # === Preparing the context document === #
-        prompt = "\n".join(item.question for item in study_activity.exercise_items)
-        embedded_prompt = await GlobalAPI.embed(prompt)
+
+        # Fetches just the questions for retrieval
+        prompt_for_retrieval = "\n".join(
+            item.question for item in study_activity.exercise_items
+        )
+
+        # Embeds and retrieves relevant information (document chunks)
+        embedded_prompt = await GlobalAPI.embed(prompt_for_retrieval)
         document_chunks = await retrieval(
             session=session,
             interaction=interaction,
-            raw_prompt=prompt,
+            raw_prompt=prompt_for_retrieval,
             embedded_prompt=embedded_prompt,
         )
-        # Temporary close
-        await session.commit()
+
+        orginal_prompt = study_activity.prompt
 
         formatted_chunks = chunks_formatter(document_chunks)
 
+        await session.commit()  # Temporary close
+
         params = AnswersGradingParams(
             prompt=questions.model_dump_json(),
-            creation_prompt=study_activity.prompt,  # type: ignore
+            creation_prompt=orginal_prompt,  # type: ignore
             context_document=formatted_chunks,
         )
 
@@ -764,6 +778,7 @@ async def submit_exercise_activity(
         i_retry = 0
 
         while True:
+            # API call
             try:
                 grading_results = await GlobalAPI.grade_answers(final_prompt)
                 grading_results_python: dict = json.loads(grading_results)
@@ -785,31 +800,12 @@ async def submit_exercise_activity(
                         )
                 continue
 
-    # Refetchs
-    query_refetch = (
-        select(StudyActivity)
-        .where(StudyActivity.id == study_activity_id)
-        .options(
-            selectinload(
-                StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
-            ).selectinload(ReviewItem.contents),  # type: ignore
-            selectinload(
-                StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
-            ).selectinload(
-                ExerciseItem.contents  # type: ignore
-            ),
-        )
-    )
-    study_activity = (await session.execute(query_refetch)).scalars().first()
+        # Refetchs
+        study_activity = (await session.execute(query_refetch)).scalars().first()
 
-    assert study_activity is not None
+        assert study_activity is not None
 
-    # Updates
-    study_activity.is_submitted = True
-    study_activity.submitted_at = datetime.now(timezone.utc)
-
-    # Updates item grading if open_ended
-    if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
+        # Grades exercise items
         results_map: dict[int, OpenEndedGradingResultItemSchema] = {
             res.id: res for res in validated_grading_results.grading_results
         }
@@ -821,13 +817,17 @@ async def submit_exercise_activity(
             exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
             session.add(exercise_item)
 
-    study_activity_output_complete = StudyActivityOutputComplete.model_validate(
-        study_activity, context={"show_answers": True}
-    )
+    # Updates
+    study_activity.is_submitted = True
+    study_activity.submitted_at = datetime.now(timezone.utc)
 
     await session.commit()
 
-    return study_activity_output_complete
+    study_activity = (await session.execute(query_refetch)).scalars().first()
+
+    assert study_activity is not None
+
+    return study_activity
 
 
 # ----- DELETE ----- #
@@ -868,6 +868,42 @@ async def delete_flashcard(
     await session.commit()
 
 
+async def soft_delete_items(session: AsyncSession, study_activity_id: int):
+    query_exercise = (
+        update(ExerciseItem)
+        .where(col(ExerciseItem.study_activity_id) == study_activity_id)
+        .values(is_deleted=True)
+    )
+
+    query_review = (
+        update(ReviewItem)
+        .where(col(ReviewItem.study_activity_id) == study_activity_id)
+        .values(is_deleted=True)
+    )
+
+    await session.execute(query_exercise)
+    await session.execute(query_review)
+
+
+async def hard_delete_items_contents(session: AsyncSession, study_activity_id: int):
+    subquery_review = select(ReviewItem.id).where(
+        ReviewItem.study_activity_id == study_activity_id
+    )
+    query_review = delete(ReviewItemContent).where(
+        col(ReviewItemContent.review_item_id).in_(subquery_review)
+    )
+
+    subquery_exercise = select(ExerciseItem.id).where(
+        ExerciseItem.study_activity_id == study_activity_id
+    )
+    query_exercise = delete(ExerciseItemContent).where(
+        col(ExerciseItemContent.exercise_item_id).in_(subquery_exercise)
+    )
+
+    await session.execute(query_review)
+    await session.execute(query_exercise)
+
+
 async def delete_study_activity(
     user: User,
     session: AsyncSession,
@@ -880,14 +916,6 @@ async def delete_study_activity(
             StudyActivity.id == study_activity_id,
             Interaction.user_id == user.id,
             StudyActivity.is_deleted == False,
-        )
-        .options(
-            selectinload(
-                StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
-            ),
-            selectinload(
-                StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
-            ),
         )
     )
 
@@ -903,26 +931,13 @@ async def delete_study_activity(
             },
         )
 
-    for item in study_activity.items:
-        item.is_deleted = True
+    # Soft deletes the associated items
+    await soft_delete_items(session, study_activity_id)
 
-    subquery_review = select(ReviewItem.id).where(
-        ReviewItem.study_activity_id == study_activity_id
-    )
-    subquery_exercise = select(ExerciseItem.id).where(
-        ExerciseItem.study_activity_id == study_activity_id
-    )
+    # Hard deletes the item contents
+    await hard_delete_items_contents(session, study_activity_id)
 
-    query_delete_review_contents = delete(ReviewItemContent).where(
-        col(ReviewItemContent.review_item_id).in_(subquery_review)
-    )
-    query_delete_exercise_contents = delete(ExerciseItemContent).where(
-        col(ExerciseItemContent.exercise_item_id).in_(subquery_exercise)
-    )
-
-    await session.execute(query_delete_review_contents)
-    await session.execute(query_delete_exercise_contents)
-
+    # Soft deletes the activity
     study_activity.is_deleted = True
 
     await session.commit()

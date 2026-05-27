@@ -10,6 +10,7 @@ from backend.src.core.config import settings
 from backend.src.exceptions.core import (
     ExceptionExternalService_503,
     ExceptionInternalError_500,
+    ExceptionLLMError_502,
     ExceptionRequest_400,
 )
 from fastapi import UploadFile
@@ -70,9 +71,16 @@ class API(ABC):
     @abstractmethod
     async def embed(cls, content: str) -> list[float]:
         """
-        Embeds text into a 768-D vector.
+        Embeds text into a vector.
         """
         pass
+
+    @classmethod
+    @abstractmethod
+    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
+        """
+        Embeds a list of texts into a list of vectors.
+        """
 
     @classmethod
     @abstractmethod
@@ -144,6 +152,8 @@ class GoogleAPI(API):
     @classmethod
     async def embed(cls, content: str) -> list[float]:
         async def call_api() -> list[float]:
+
+            # API call
             response = await keys_manager.client.aio.models.embed_content(
                 model=settings.EMBED_MODEL_GOOGLE,
                 contents=content,
@@ -153,11 +163,36 @@ class GoogleAPI(API):
                 ),
             )
 
-            # Let this throw an internal error if wrong
+            # Valiation
             assert response.embeddings is not None
             assert isinstance(response.embeddings[0].values, list)
 
             return response.embeddings[0].values
+
+        return await cls.wrapper(call_api)
+
+    @classmethod
+    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
+        async def call_api() -> list[list[float]]:
+
+            # API call
+            response = await keys_manager.client.aio.models.embed_content(
+                model=settings.EMBED_MODEL_GOOGLE,
+                contents=contents,
+                # Content is truncated from 3072-D to 768-D
+                config=genai.types.EmbedContentConfig(
+                    output_dimensionality=settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA,
+                ),
+            )
+
+            # Validation
+            assert response.embeddings is not None
+
+            embeddings = [e.values for e in response.embeddings if e.values]
+            if len(embeddings) != len(contents):
+                raise ExceptionLLMError_502("Embedding failed.")
+
+            return embeddings
 
         return await cls.wrapper(call_api)
 
@@ -252,6 +287,8 @@ class OllamaAPI(API):
     @classmethod
     async def embed(cls, content: str) -> list[float]:
         async def call_api() -> list[float]:
+
+            # API call
             response = await OLLAMA_CLIENT.embeddings(
                 model=settings.EMBED_MODEL_OLLAMA,
                 prompt=content,
@@ -259,13 +296,40 @@ class OllamaAPI(API):
 
             embeddings = response.get("embedding")
 
-            # Let this throw an internal error if wrong
+            # Validation
             assert embeddings is not None
             assert isinstance(embeddings, list)
 
             if len(embeddings) > settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA:
                 embeddings = embeddings[
                     : settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA
+                ]
+
+            return embeddings
+
+        return await cls.wrapper(call_api)
+
+    @classmethod
+    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
+        async def call_api() -> list[list[float]]:
+
+            # API call
+            response = await OLLAMA_CLIENT.embed(
+                model=settings.EMBED_MODEL_OLLAMA,
+                input=contents,
+            )
+
+            embeddings = response.get("embeddings")
+
+            # Validation
+            assert embeddings is not None
+            assert isinstance(embeddings, list)
+            assert isinstance(embeddings[0], list)
+
+            if len(embeddings[0]) > settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA:
+                embeddings = [
+                    vector[: settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA]
+                    for vector in embeddings
                 ]
 
             return embeddings
@@ -373,6 +437,7 @@ class CloudFlareAPI(API):
         async def call_api() -> list[float]:
             json_data = {"text": [content]}
 
+            # API call
             async with httpx.AsyncClient() as client:
                 response = await client.post(
                     CLOUDFLARE_URL_EMBED, headers=CLOUDFLARE_HEADERS, json=json_data
@@ -382,6 +447,7 @@ class CloudFlareAPI(API):
 
                 response_data = response.json()
 
+            # Validation
             assert response_data.get("result") is not None
 
             result_data = response_data.get("result", {}).get("data")
@@ -391,6 +457,31 @@ class CloudFlareAPI(API):
             assert isinstance(result_data[0], list)
 
             return result_data[0]
+
+        return await cls.wrapper(call_api)
+
+    @classmethod
+    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
+        async def call_api() -> list[list[float]]:
+            json_data = {"text": contents}
+
+            # API call
+            async with httpx.AsyncClient() as client:
+                response = await client.post(
+                    CLOUDFLARE_URL_EMBED, headers=CLOUDFLARE_HEADERS, json=json_data
+                )
+
+                response.raise_for_status()
+                response_data = response.json()
+
+            # Validates the result
+            assert response_data.get("result") is not None
+            result_data = response_data.get("result", {}).get("data")
+
+            assert result_data is not None
+            assert isinstance(result_data, list)
+
+            return result_data
 
         return await cls.wrapper(call_api)
 
@@ -450,10 +541,18 @@ class GlobalAPI:
         "GOOGLE": GoogleAPI,
         "OLLAMA": OllamaAPI,
     }
+    mass_embed_supported = ["GOOGLE", "OLLAMA", "CLOUDFLARE"]
 
     @classmethod
     async def embed(cls, content: str) -> list[float]:
         return await cls.models[settings.MODEL_IN_USE_EMBED].embed(content)
+
+    @classmethod
+    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
+        if settings.MODEL_IN_USE_GENERATE_CHAT not in cls.mass_embed_supported:
+            raise Exception("Current model does not support mass embedding.")
+
+        return await cls.models[settings.MODEL_IN_USE_EMBED].mass_embed(contents)
 
     @classmethod
     async def caption_image(cls, file: UploadFile) -> str:

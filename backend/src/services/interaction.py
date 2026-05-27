@@ -1,6 +1,6 @@
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlmodel import and_, col, delete, select
+from sqlmodel import and_, col, delete, select, update
 
 from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.activity.exercise_item import ExerciseItem
@@ -86,45 +86,43 @@ async def update_interaction(
 # ----- DELETE ----- #
 
 
-async def delete_interaction(
-    user: User, session: AsyncSession, interaction_id: int
-) -> None:
+async def soft_delete_study_activities(session: AsyncSession, interaction_id: int):
     query = (
-        select(Interaction)
-        .where(Interaction.user_id == user.id, Interaction.id == interaction_id)
-        .options(
-            selectinload(
-                Interaction.study_activities.and_(StudyActivity.is_deleted == False)  # type: ignore
-            ).selectinload(
-                StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
-            ),
-            selectinload(
-                Interaction.study_activities.and_(StudyActivity.is_deleted == False)  # type: ignore
-            ).selectinload(
-                StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
-            ),
-        )
+        update(StudyActivity)
+        .where(col(StudyActivity.interaction_id) == interaction_id)
+        .values(is_deleted=True)
     )
-    interaction = (await session.execute(query)).scalars().first()
+    await session.execute(query)
 
-    if interaction is None:
-        raise ExceptionNotFound_404(
-            "Interaction", {"user_id": user.id, "id": interaction_id}
-        )
 
-    # Soft deletes study activities
-    for activity in interaction.study_activities:
-        activity.is_deleted = True
-        for item in activity.items:
-            item.is_deleted = True
+async def soft_delete_items(session: AsyncSession, interaction_id: int):
+    subquery_activity = select(StudyActivity.id).where(
+        StudyActivity.interaction_id == interaction_id
+    )
 
-    # Hard deletes the item contents
+    query_exercise = (
+        update(ExerciseItem)
+        .where(col(ExerciseItem.study_activity_id).in_(subquery_activity))
+        .values(is_deleted=True)
+    )
+
+    query_review = (
+        update(ReviewItem)
+        .where(col(ReviewItem.study_activity_id).in_(subquery_activity))
+        .values(is_deleted=True)
+    )
+
+    await session.execute(query_exercise)
+    await session.execute(query_review)
+
+
+async def hard_delete_items_contents(session: AsyncSession, interaction_id: int):
     subquery_review = (
         select(ReviewItem.id)
         .join(StudyActivity)
         .where(StudyActivity.interaction_id == interaction_id)
     )
-    query_delete_review_contents = delete(ReviewItemContent).where(
+    query_review = delete(ReviewItemContent).where(
         col(ReviewItemContent.review_item_id).in_(subquery_review)
     )
 
@@ -133,26 +131,66 @@ async def delete_interaction(
         .join(StudyActivity)
         .where(StudyActivity.interaction_id == interaction_id)
     )
-    query_delete_exercise_contents = delete(ExerciseItemContent).where(
+    query_exercise = delete(ExerciseItemContent).where(
         col(ExerciseItemContent.exercise_item_id).in_(subquery_exercise)
     )
 
-    await session.execute(query_delete_review_contents)
-    await session.execute(query_delete_exercise_contents)
+    await session.execute(query_review)
+    await session.execute(query_exercise)
+
+
+async def hard_delete_documents(session: AsyncSession, interaction_id: int):
+    query = delete(Document).where(col(Document.interaction_id) == interaction_id)
+    await session.execute(query)
+
+
+async def hard_delete_llm_responses(session: AsyncSession, interaction_id: int):
+    query = delete(LLMResponse).where(col(LLMResponse.interaction_id) == interaction_id)
+    await session.execute(query)
+
+
+async def hard_delete_notes(session: AsyncSession, interaction_id: int):
+    query = delete(Note).where(col(Note.interaction_id) == interaction_id)
+    await session.execute(query)
+
+
+async def delete_interaction(
+    user: User, session: AsyncSession, interaction_id: int
+) -> None:
+
+    # Fetches interaction
+    query = select(Interaction).where(
+        Interaction.user_id == user.id,
+        Interaction.id == interaction_id,
+        Interaction.is_deleted == False,
+    )
+    interaction = (await session.execute(query)).scalars().first()
+
+    if interaction is None:
+        raise ExceptionNotFound_404(
+            "Interaction",
+            {
+                "user_id": user.id,
+                "id": interaction_id,
+                "is_deleted": False,
+            },
+        )
+
+    # Soft deletes study activities
+    await soft_delete_study_activities(session, interaction_id)
+
+    # Soft deletes the associated items
+    await soft_delete_items(session, interaction_id)
+
+    # Hard deletes the item contents
+    await hard_delete_items_contents(session, interaction_id)
 
     # Hard deletes the other things
-    query_delete_document = delete(Document).where(
-        col(Document.interaction_id) == interaction_id
-    )
-    query_delete_llmresponse = delete(LLMResponse).where(
-        col(LLMResponse.interaction_id) == interaction_id
-    )
-    query_delete_note = delete(Note).where(col(Note.interaction_id) == interaction_id)
+    await hard_delete_documents(session, interaction_id)
+    await hard_delete_llm_responses(session, interaction_id)
+    await hard_delete_notes(session, interaction_id)
 
-    await session.execute(query_delete_document)
-    await session.execute(query_delete_llmresponse)
-    await session.execute(query_delete_note)
-
+    # Soft deletes the interaction
     interaction.is_deleted = True
 
     await session.commit()

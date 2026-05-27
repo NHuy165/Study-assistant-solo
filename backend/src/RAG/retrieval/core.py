@@ -1,3 +1,4 @@
+import asyncio
 from typing import Iterable
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,7 +26,7 @@ async def retrieval(
     keyword_chunks = await keyword_search(session, interaction, raw_prompt)
 
     # Merge
-    core_chunks = RRF(vector_chunks, keyword_chunks)
+    core_chunks = await asyncio.to_thread(RRF, vector_chunks, keyword_chunks)
 
     # Get adjacent chunks
     final_chunks = await neighbouring_chunks(session, core_chunks)
