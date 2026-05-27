@@ -31,7 +31,7 @@ class FlashcardItemSchema(BaseModel):
 
 class GapFillItemSchema(BaseModel):
     text: str
-    correct: list[str]
+    corrects: list[str]
     distractors: list[str]
 
     @model_validator(mode="after")
@@ -39,7 +39,7 @@ class GapFillItemSchema(BaseModel):
         blank_count = self.text.count("$!BLANK!$")
         if blank_count == 0:
             raise ExceptionLLMError_502("Text had no blank.")
-        elif len(self.correct) != blank_count:
+        elif len(self.corrects) != blank_count:
             raise ExceptionLLMError_502(
                 "The number of correct answers doesn't match the number of blanks."
             )

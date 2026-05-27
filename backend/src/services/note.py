@@ -1,5 +1,6 @@
+from sqlalchemy import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, delete, select
 
 from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.interaction import Interaction
@@ -83,17 +84,14 @@ async def delete_note(
     session: AsyncSession,
     note_id: int,
 ) -> None:
-    query = (
-        select(Note)
-        .join(Interaction)
-        .where(
-            Note.id == note_id,
-            Interaction.user_id == user.id,
-        )
-    )
-    note = (await session.execute(query)).scalars().first()
+    subquery_interaction = select(Interaction.id).where(Interaction.user_id == user.id)
 
-    if note is None:
+    query = delete(Note).where(
+        col(Note.id) == note_id, col(Note.interaction_id).in_(subquery_interaction)
+    )
+    result = await session.execute(query)
+
+    if result.rowcount == 0:  # type: ignore
         raise ExceptionNotFound_404(
             "Note",
             {
@@ -102,5 +100,4 @@ async def delete_note(
             },
         )
 
-    await session.delete(note)
     await session.commit()

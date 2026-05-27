@@ -7,6 +7,8 @@ from backend.src.core.config import settings
 
 password_hasher = PasswordHash.recommended()
 
+DUMMY_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$G2cBxzF8vfN1DcBl8MKqhA$MeuvTNFv+5KpsyY6cxegwP1P2UbrWLq6Xyaq/S+h8v0"
+
 
 def get_hashed_password(password: str):
     return password_hasher.hash(password)
@@ -30,3 +32,6 @@ def create_token(data: dict) -> str:
     )
 
     return token
+
+
+print(get_hashed_password("DUMMY_PASSWORD"))

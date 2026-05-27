@@ -1,6 +1,6 @@
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import select
+from sqlmodel import col, delete, select
 
 from backend.src.exceptions.core import (
     ExceptionNotFound_404,
@@ -25,6 +25,7 @@ async def save_document(
     document_input: DocumentInput,
 ) -> Document:
 
+    # Verifies document type and picks extractor
     EXTRACTORS: dict[DocumentType, type[DocumentExtractor]] = {
         DocumentType.PDF: PdfExtractor,
         DocumentType.IMAGE: ImageExtractor,
@@ -45,11 +46,13 @@ async def save_document(
             "Invalid file format.\nAllowed formats are:\n- PDF\n- JPEG, PNGM, WEBP\n- Text files\nPlease recheck file extension and file contents."
         )
 
+    # Name check
     if document_input.name is None:
         name = file.filename if file.filename else ""
     else:
         name = document_input.name
 
+    # Page start check
     page_starts_at = document_input.page_starts_at
     if selected_type not in (DocumentType.PDF):
         page_starts_at = 0
@@ -63,8 +66,6 @@ async def save_document(
     )  # type: ignore
 
     session.add(document)
-    await session.commit()
-    await session.refresh(document)
 
     # Saves document contents
     await selected_extractor.extract(
@@ -73,6 +74,7 @@ async def save_document(
         document=document,
     )
 
+    await session.commit()
     await session.refresh(document)
 
     return document
@@ -141,17 +143,15 @@ async def delete_document(
     session: AsyncSession,
     document_id: int,
 ) -> None:
-    query = (
-        select(Document)
-        .join(Interaction)
-        .where(
-            Document.id == document_id,
-            Interaction.user_id == user.id,
-        )
-    )
-    document = (await session.execute(query)).scalars().first()
+    subquery_interaction = select(Interaction.id).where(Interaction.user_id == user.id)
 
-    if document is None:
+    query = delete(Document).where(
+        col(Document.id) == document_id,
+        col(Document.interaction_id).in_(subquery_interaction),
+    )
+    result = await session.execute(query)
+
+    if result.rowcount == 0:  # type: ignore
         raise ExceptionNotFound_404(
             "Document",
             {
@@ -160,5 +160,4 @@ async def delete_document(
             },
         )
 
-    await session.delete(document)
     await session.commit()

@@ -14,7 +14,6 @@ from backend.src.RAG.chunking.base import DocumentExtractor, smart_splitter
 
 class TextExtractor(DocumentExtractor):
     @classmethod
-    @abstractmethod
     def verify(cls, file: UploadFile) -> bool:
         # === Content type === #
         if file.content_type is None:
@@ -44,7 +43,6 @@ class TextExtractor(DocumentExtractor):
             return False
 
     @classmethod
-    @abstractmethod
     async def extract(
         cls, session: AsyncSession, file: UploadFile, document: Document
     ) -> None:
@@ -60,37 +58,42 @@ class TextExtractor(DocumentExtractor):
         if len(contents.strip()) == 0:
             return
 
-        split_chunks = smart_splitter.split_text(contents)
+        def process():
+            # Staging data
+            prepared_chunks: list[str] = []
+            chunk_metadata = []
 
-        # Staging data
-        prepared_chunks = []
-        chunk_metadata = []
+            split_chunks = smart_splitter.split_text(contents)
 
-        for chunk_index, chunk_text in enumerate(split_chunks):
-            embedding_content = (
-                f"Source: {DocumentType.TEXT.value} file {document.name}:\n"
-                + chunk_text
-            )
+            for chunk_index, chunk_text in enumerate(split_chunks):
+                embedding_content = (
+                    f"Source: {DocumentType.TEXT.value} file {document.name}:\n"
+                    + chunk_text
+                )
 
-            prepared_chunks.append(GlobalAPI.embed(embedding_content))
-            chunk_metadata.append(
-                {
-                    "content": chunk_text,
-                    "index": chunk_index,
-                }
-            )
+                prepared_chunks.append(embedding_content)
+                chunk_metadata.append(
+                    {
+                        "content": chunk_text,
+                        "index": chunk_index,
+                    }
+                )
+            return prepared_chunks, chunk_metadata
+
+        prepared_chunks, chunk_metadata = await asyncio.to_thread(process)
 
         if prepared_chunks:
             # Mass awaiting
-            vectors = await asyncio.gather(*prepared_chunks)
+            vectors = await GlobalAPI.mass_embed(prepared_chunks)
 
-            for metadata, vector in zip(chunk_metadata, vectors):
-                embedded_chunk = DocumentChunk(
+            embedded_chunks = [
+                DocumentChunk(
                     content_original=metadata["content"],
                     content_embedded=vector,
                     document_chunk_index=metadata["index"],
                     document=document,
                 )
-                session.add(embedded_chunk)
+                for metadata, vector in zip(chunk_metadata, vectors)
+            ]
 
-        await session.commit()
+            session.add_all(embedded_chunks)

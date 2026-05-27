@@ -7,6 +7,8 @@ from backend.src.exceptions.core import ExceptionAuthentication_401
 from backend.src.models_schema.auth import Token
 from backend.src.models_schema.user import User
 
+DUMMY_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$G2cBxzF8vfN1DcBl8MKqhA$MeuvTNFv+5KpsyY6cxegwP1P2UbrWLq6Xyaq/S+h8v0"
+
 
 async def authenticate_user(
     session: AsyncSession, email: EmailStr, password: str
@@ -14,7 +16,11 @@ async def authenticate_user(
     query = select(User).where(User.email == email)
     user = (await session.execute(query)).scalars().first()
 
+    await session.close()
+
     if user is None:
+        # Mimics password check delay
+        verify_password("WRONG PASSWORD", DUMMY_PASSWORD_HASH)
         raise ExceptionAuthentication_401()
 
     if not verify_password(password, user.hashed_password):
@@ -28,8 +34,6 @@ async def login_for_token(
 ) -> Token:
     user = await authenticate_user(session, email, password)
     data = {"sub": str(user.id)}
-
-    await session.commit()
 
     token_str = create_token(data)
 

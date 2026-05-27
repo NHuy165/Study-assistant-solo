@@ -23,6 +23,7 @@ router = APIRouter()
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
         404: Responses.RESPONSE_404_NOT_FOUND,
+        502: Responses.RESPONSE_502_BAD_GATEWAY,
         503: Responses.RESPONSE_503_SERVICE_UNAVAILABLE,
     },
 )
