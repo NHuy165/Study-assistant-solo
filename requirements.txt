@@ -10,12 +10,6 @@ pyjwt
 pwdlib[argon2]
 python-dotenv
 
-# Testing
-pytest
-pytest_asyncio
-pytest
-locust
-
 # AI and RAG
 google-genai
 google-api-core
