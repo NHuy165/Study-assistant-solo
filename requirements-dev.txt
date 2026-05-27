@@ -1,0 +1,6 @@
+pytest
+pytest_asyncio
+
+debugpy
+
+locust
