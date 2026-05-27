@@ -4,9 +4,21 @@ from sqlmodel import SQLModel, text
 from backend.src.core.config import settings
 
 if settings.DEV_MODE:
-    engine = create_async_engine(str(settings.POSTGRES_URL_TEST), echo=True)
+    engine = create_async_engine(
+        str(settings.POSTGRES_URL_TEST),
+        echo=True,
+        pool_size=20,
+        max_overflow=60,
+        pool_timeout=30.0,
+    )
 else:
-    engine = create_async_engine(str(settings.POSTGRES_URL), echo=True)
+    engine = create_async_engine(
+        str(settings.POSTGRES_URL),
+        echo=True,
+        pool_size=20,
+        max_overflow=60,
+        pool_timeout=30.0,
+    )
 
 
 async def create_database_and_tables():
