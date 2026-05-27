@@ -81,3 +81,18 @@ class AppUser(HttpUser):
                 name="/api/document/{interaction_id}/upload",
             )
         raise StopUser()
+
+    @tag("create_study_activity")
+    @task
+    def create_study_activity(self):
+        self.client.post(
+            f"/api/study-activity/{self.interaction_id}/create",
+            json={
+                "prompt": "Hãy làm cho mình một bài tập ôn 10 câu nhé.",
+                "activity_type": "EXERCISE",
+                "activity_format": "MULTIPLE_CHOICE_QUESTIONS",
+                "subject_type": "MATHS",
+            },
+            name="/api/study-activity/{interaction_id}/create",
+        )
+        raise StopUser()
