@@ -13,7 +13,7 @@ class Settings(BaseSettings):
     DEV_MODE: bool
 
     # === Backend URL === #
-    BACKEND_URL: str
+    BACKEND_URL: str | None = None
 
     # === Database === #
     POSTGRES_URL: PostgresDsn
@@ -30,9 +30,6 @@ class Settings(BaseSettings):
     # Cloudflare
     CLOUDFLARE_ACCOUNT_ID: str
     CLOUDFLARE_API_TOKEN: str
-
-    # Github
-    GITHUB_API_TOKEN: str
 
     # ----- TECHNICAL CONFIGURATIONS ----- #
 
