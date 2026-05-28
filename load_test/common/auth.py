@@ -11,7 +11,7 @@ def register_login(client: HttpSession) -> None | str:
     password = f"{unique}-password"
 
     response = client.post(
-        "/api/user/register",
+        "/user/register",
         json={"username": username, "password": password, "email": email},
     )
 
@@ -20,7 +20,7 @@ def register_login(client: HttpSession) -> None | str:
         raise StopUser()
 
     response2 = client.post(
-        "/api/login",
+        "/login",
         data={"username": email, "password": password},
     )
 

@@ -4,8 +4,8 @@ import requests
 from locust import HttpUser, between, events, tag, task
 from locust.exception import StopUser
 
-from backend.src.core.config import settings
 from load_test.common.auth import register_login
+from load_test.config import settings
 
 test_file_path = Path(__file__).resolve().parent / "data" / "test_file.pdf"
 
@@ -13,7 +13,7 @@ test_file_path = Path(__file__).resolve().parent / "data" / "test_file.pdf"
 @events.test_start.add_listener
 def on_test_start(environment, **kwargs):
     try:
-        response = requests.post(f"{settings.BACKEND_URL}/api/dev/wipe-db")
+        response = requests.post(f"{settings.BACKEND_URL}/dev/wipe-db")
 
         if response.status_code == 200:
             print("Database wiped. Tests are starting.")
@@ -36,7 +36,7 @@ class AppUser(HttpUser):
 
         # Creates interaction
         response = self.client.post(
-            "/api/interaction/create",
+            "/interaction/create",
             json={
                 "name": "interaction-name",
                 "description": "interaction-description",
@@ -52,22 +52,22 @@ class AppUser(HttpUser):
     @task
     def create_note(self):
         self.client.post(
-            f"/api/note/{self.interaction_id}/upload",
+            f"/note/{self.interaction_id}/upload",
             json={
                 "name": "note-name",
                 "description": "note-description",
                 "content": "note-content",
             },
-            name="/api/note/{interaction_id}/upload",
+            name="/note/{interaction_id}/upload",
         )
 
     @tag("create_llm_response")
     @task
     def create_llm_response(self):
         self.client.post(
-            f"/api/llm-response/{self.interaction_id}/chat",
+            f"/llm-response/{self.interaction_id}/chat",
             json={"prompt": "Hãy giảng cho tôi về cách cộng trừ nhân chia phân số."},
-            name="/api/llm-response/{interaction_id}/chat",
+            name="/llm-response/{interaction_id}/chat",
         )
         raise StopUser()
 
@@ -76,9 +76,9 @@ class AppUser(HttpUser):
     def save_document(self):
         with open(test_file_path, "rb") as f:
             self.client.post(
-                f"/api/document/{self.interaction_id}/upload",
+                f"/document/{self.interaction_id}/upload",
                 files={"file": ("test_file.pdf", f, "application/pdf")},
-                name="/api/document/{interaction_id}/upload",
+                name="/document/{interaction_id}/upload",
             )
         raise StopUser()
 
@@ -86,13 +86,13 @@ class AppUser(HttpUser):
     @task
     def create_study_activity(self):
         self.client.post(
-            f"/api/study-activity/{self.interaction_id}/create",
+            f"/study-activity/{self.interaction_id}/create",
             json={
                 "prompt": "Hãy làm cho mình một bài tập ôn 10 câu nhé.",
                 "activity_type": "EXERCISE",
                 "activity_format": "MULTIPLE_CHOICE_QUESTIONS",
                 "subject_type": "MATHS",
             },
-            name="/api/study-activity/{interaction_id}/create",
+            name="/study-activity/{interaction_id}/create",
         )
         raise StopUser()
