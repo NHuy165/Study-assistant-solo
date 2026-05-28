@@ -338,25 +338,25 @@ async def create_study_activity(
     await session.commit()  # Commits EVERYTHING
 
     # === Refetch with all contents === #
-    await session.refresh(study_activity)
+    # await session.refresh(study_activity)
 
-    query = select(StudyActivity).where(StudyActivity.id == study_activity.id)
+    # query = select(StudyActivity).where(StudyActivity.id == study_activity.id)
 
-    if study_activity_input.activity_type == StudyActivityType.EXERCISE:
-        query = query.options(
-            selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
-                ExerciseItem.contents  # type: ignore
-            )
-        )
+    # if study_activity_input.activity_type == StudyActivityType.EXERCISE:
+    #     query = query.options(
+    #         selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
+    #             ExerciseItem.contents  # type: ignore
+    #         )
+    #     )
 
-    else:
-        query = query.options(
-            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
-        )
+    # else:
+    #     query = query.options(
+    #         selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
+    #     )
 
-    study_activity = (await session.execute(query)).scalars().first()
+    # study_activity = (await session.execute(query)).scalars().first()
 
-    assert study_activity is not None
+    # assert study_activity is not None
 
     return study_activity
 
@@ -379,7 +379,7 @@ async def create_flashcards_activity(
 
     session.add(flashcards_activity)
     await session.commit()
-    await session.refresh(flashcards_activity)
+    # await session.refresh(flashcards_activity)
 
     return flashcards_activity
 
@@ -398,6 +398,9 @@ async def add_flashcards(
             StudyActivity.activity_format == StudyActivityFormat.FLASHCARDS,
             StudyActivity.is_deleted == False,
             Interaction.user_id == user.id,
+        )
+        .options(
+            selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
         )
     )
     flashcards_activity = (await session.execute(query)).scalars().first()
@@ -438,18 +441,18 @@ async def add_flashcards(
     await session.commit()
 
     # Refetches
-    query = (
-        select(StudyActivity)
-        .where(StudyActivity.id == flashcards_activity_id)
-        .options(
-            selectinload(
-                StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
-            ).selectinload(ReviewItem.contents)  # type: ignore
-        )
-    )
+    # query = (
+    #     select(StudyActivity)
+    #     .where(StudyActivity.id == flashcards_activity_id)
+    #     .options(
+    #         selectinload(
+    #             StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
+    #         ).selectinload(ReviewItem.contents)  # type: ignore
+    #     )
+    # )
 
-    flashcards_activity = (await session.execute(query)).scalars().first()
-    assert flashcards_activity is not None
+    # flashcards_activity = (await session.execute(query)).scalars().first()
+    # assert flashcards_activity is not None
 
     return flashcards_activity
 
@@ -547,7 +550,7 @@ async def update_study_activity(
 
     session.add(study_activity)
     await session.commit()
-    await session.refresh(study_activity)
+    # await session.refresh(study_activity)
 
     return study_activity
 
@@ -591,7 +594,7 @@ async def update_flashcard(
             face.content = flashcard_update.front
 
     await session.commit()
-    await session.refresh(flashcard, attribute_names=["contents"])
+    # await session.refresh(flashcard, attribute_names=["contents"])
 
     return flashcard
 
@@ -602,6 +605,7 @@ async def answer_exercise_item(
     exercise_item_id: int,
     exercise_item_update: ExerciseItemUpdate,
 ) -> ExerciseItem:  # type: ignore
+    # Gets the item
     query = (
         select(ExerciseItem, StudyActivity)
         .join(StudyActivity)
@@ -631,16 +635,19 @@ async def answer_exercise_item(
     assert isinstance(exercise_item, ExerciseItem)
     assert isinstance(study_activity, StudyActivity)
 
+    # Checks for submission status
     if study_activity.is_submitted:
         raise ExceptionSubmittedExercise_409()
 
+    # If MCQ, grades the answer immediately
     if study_activity.activity_format == StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS:
+        # Validates integer type
         if not isinstance(exercise_item_update.attempt, int):
             raise ExceptionRequest_400(
                 custom_message="Answers to multiple choice questions need to be an integer pointing to the id of the correct answer."
             )
 
-        # MCQ questions get graded right as they're answered, just not shown
+        # Grades and updates score, this score isn't shown until the exercise is submitted
         for content in exercise_item.contents:
             if exercise_item_update.attempt == content.id:
                 if content.is_correct:
@@ -648,6 +655,8 @@ async def answer_exercise_item(
                 else:
                     exercise_item.user_score = 0
                 break
+
+        # Validates valid answer id
         else:
             raise ExceptionRequest_400(
                 custom_message="Answer did not match the id of any of the answers of the current question."
@@ -658,17 +667,10 @@ async def answer_exercise_item(
                 custom_message="Answer needs to be of type string."
             )
 
+    # Updates answer
     exercise_item.attempt = str(exercise_item_update.attempt)
 
-    session.add(exercise_item)
     await session.commit()
-
-    query = (
-        select(ExerciseItem)
-        .where(ExerciseItem.id == exercise_item_id)
-        .options(selectinload(ExerciseItem.contents))  # type: ignore
-    )
-    exercise_item = (await session.execute(query)).scalar_one()
 
     return exercise_item
 
@@ -716,23 +718,24 @@ async def submit_exercise_activity(
     assert isinstance(study_activity, StudyActivity)
     assert isinstance(interaction, Interaction)
 
+    # Checks for submission status
     if study_activity.is_submitted:
         raise ExceptionSubmittedExercise_409()
 
     # Refetch query for refetching later
-    query_refetch = (
-        select(StudyActivity)
-        .where(StudyActivity.id == study_activity_id)
-        .options(
-            selectinload(
-                StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
-            ).selectinload(
-                ExerciseItem.contents  # type: ignore
-            ),
-        )
-    )
+    # query_refetch = (
+    #     select(StudyActivity)
+    #     .where(StudyActivity.id == study_activity_id)
+    #     .options(
+    #         selectinload(
+    #             StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
+    #         ).selectinload(
+    #             ExerciseItem.contents  # type: ignore
+    #         ),
+    #     )
+    # )
 
-    # Grades if not yet graded
+    # Grades if exercise is open ended
     if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
         # === Preparing the json input === #
         # Fetches questions and answers from the activity
@@ -760,15 +763,13 @@ async def submit_exercise_activity(
             embedded_prompt=embedded_prompt,
         )
 
-        orginal_prompt = study_activity.prompt
+        await session.commit()  # Temporary close
 
         formatted_chunks = chunks_formatter(document_chunks)
 
-        await session.commit()  # Temporary close
-
         params = AnswersGradingParams(
             prompt=questions.model_dump_json(),
-            creation_prompt=orginal_prompt,  # type: ignore
+            creation_prompt=study_activity.prompt,  # type: ignore
             context_document=formatted_chunks,
         )
 
@@ -801,9 +802,9 @@ async def submit_exercise_activity(
                 continue
 
         # Refetchs
-        study_activity = (await session.execute(query_refetch)).scalars().first()
+        # study_activity = (await session.execute(query_refetch)).scalars().first()
 
-        assert study_activity is not None
+        # assert study_activity is not None
 
         # Grades exercise items
         results_map: dict[int, OpenEndedGradingResultItemSchema] = {
@@ -814,6 +815,7 @@ async def submit_exercise_activity(
             assert exercise_item.id is not None
             graded_result = results_map[exercise_item.id]
 
+            # Updates score and explanation
             exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
             session.add(exercise_item)
 
@@ -823,9 +825,9 @@ async def submit_exercise_activity(
 
     await session.commit()
 
-    study_activity = (await session.execute(query_refetch)).scalars().first()
+    # study_activity = (await session.execute(query_refetch)).scalars().first()
 
-    assert study_activity is not None
+    # assert study_activity is not None
 
     return study_activity
 

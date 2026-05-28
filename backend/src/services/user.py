@@ -36,7 +36,7 @@ async def register_user(session: AsyncSession, user_input: UserInput) -> User:
 
     session.add(user)
     await session.commit()
-    await session.refresh(user)
+    # await session.refresh(user)
 
     return user
 
@@ -65,8 +65,7 @@ async def update_user(
     user.sqlmodel_update(update_contents)
 
     await session.commit()
-    await session.refresh(user)
-
+    # await session.refresh(user)
     return user
 
 

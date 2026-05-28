@@ -1,4 +1,3 @@
-from sqlalchemy import CursorResult
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, delete, select
 
@@ -22,7 +21,7 @@ async def create_note(
 
     session.add(note)
     await session.commit()
-    await session.refresh(note)
+    # await session.refresh(note)
 
     return note
 
@@ -71,7 +70,7 @@ async def update_note(
     note.sqlmodel_update(update_data)
 
     await session.commit()
-    await session.refresh(note)
+    # await session.refresh(note)
 
     return note
 

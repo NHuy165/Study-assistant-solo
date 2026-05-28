@@ -1,5 +1,3 @@
-import asyncio
-
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
@@ -47,8 +45,6 @@ async def create_llm_response(
     )
     embedded_prompt = await GlobalAPI.embed(rewritten_prompt)
 
-    await session.refresh(interaction)
-
     # Chunks retrieval
     document_chunks = await retrieval(
         session=session,
@@ -82,7 +78,7 @@ async def create_llm_response(
 
     session.add(llm_response)
     await session.commit()
-    await session.refresh(llm_response)
+    # await session.refresh(llm_response)
 
     return llm_response
 

@@ -85,6 +85,8 @@ async def get_interaction_id(
 
     interaction = (await session.execute(query)).scalars().first()
 
+    await session.commit()
+
     if interaction is None:
         raise ExceptionNotFound_404(
             "Interaction",
