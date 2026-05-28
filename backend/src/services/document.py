@@ -62,7 +62,7 @@ async def save_document(
         name=name,
         interaction=interaction,
         page_starts_at=page_starts_at,
-        type=doc_type,
+        type=selected_type,
     )  # type: ignore
 
     session.add(document)
@@ -75,7 +75,7 @@ async def save_document(
     )
 
     await session.commit()
-    await session.refresh(document)
+    # await session.refresh(document)
 
     return document
 
@@ -130,7 +130,7 @@ async def update_document(
     document.sqlmodel_update(update_data)
 
     await session.commit()
-    await session.refresh(document)
+    # await session.refresh(document)
 
     return document
 

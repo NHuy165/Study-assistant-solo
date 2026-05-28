@@ -1,6 +1,5 @@
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlalchemy.orm import selectinload
-from sqlmodel import and_, col, delete, select, update
+from sqlmodel import col, delete, select, update
 
 from backend.src.exceptions.core import ExceptionNotFound_404
 from backend.src.models_schema.activity.exercise_item import ExerciseItem
@@ -30,7 +29,7 @@ async def create_interaction(
 
     session.add(interaction)
     await session.commit()
-    await session.refresh(interaction)
+    # await session.refresh(interaction)
 
     return interaction
 
@@ -78,7 +77,7 @@ async def update_interaction(
     interaction.sqlmodel_update(update_data)
 
     await session.commit()
-    await session.refresh(interaction)
+    # await session.refresh(interaction)
 
     return interaction
 

@@ -1,4 +1,4 @@
-from sqlalchemy.ext.asyncio import AsyncSession, create_async_engine
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 from sqlmodel import SQLModel, text
 
 from backend.src.core.config import settings
@@ -41,6 +41,9 @@ async def reset_database():
         await conn.run_sync(SQLModel.metadata.create_all)
 
 
+SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
+
+
 async def get_async_session():
-    async with AsyncSession(engine) as session:
+    async with SessionLocal() as session:
         yield session
