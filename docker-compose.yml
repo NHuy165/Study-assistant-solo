@@ -23,7 +23,7 @@ services:
       - '8000:8000'
       - '5678:5678'
     env_file:
-      - .env
+      - ./backend/.env
     environment:
       POSTGRES_URL: postgresql+asyncpg://postgres:Q6L0N2H0LQS5016SQL5888@db:5432/group_project_sample
       POSTGRES_URL_TEST: postgresql+asyncpg://postgres:Q6L0N2H0LQS5016SQL5888@db:5432/group_project_sample
