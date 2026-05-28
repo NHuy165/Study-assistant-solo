@@ -12,9 +12,6 @@ class Settings(BaseSettings):
     # === Developer mode === #
     DEV_MODE: bool
 
-    # === Backend URL === #
-    BACKEND_URL: str | None = None
-
     # === Database === #
     POSTGRES_URL: PostgresDsn
     POSTGRES_URL_TEST: PostgresDsn
