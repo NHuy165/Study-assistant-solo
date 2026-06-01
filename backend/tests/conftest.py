@@ -1,7 +1,8 @@
 import pytest
 from httpx import ASGITransport, AsyncClient
+from sqlalchemy import NullPool
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
-from sqlmodel import SQLModel
+from sqlmodel import SQLModel, text
 
 from backend.src.core.config import settings
 from backend.src.core.database import get_async_session
@@ -11,10 +12,7 @@ from backend.src.main import FastAPI, app
 
 engine = create_async_engine(
     str(settings.POSTGRES_URL_TEST),
-    echo=True,
-    pool_size=20,
-    max_overflow=60,
-    pool_timeout=30.0,
+    poolclass=NullPool,
 )
 
 SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
@@ -24,6 +22,8 @@ SessionLocal = async_sessionmaker(engine, expire_on_commit=False)
 async def session_fixture():
     # Setup
     async with engine.begin() as conn:
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS vector;"))
+        await conn.execute(text("CREATE EXTENSION IF NOT EXISTS pg_trgm;"))
         await conn.run_sync(SQLModel.metadata.create_all)
 
     # Yield session
@@ -50,3 +50,10 @@ async def client_fixture(app: FastAPI):
 
     async with AsyncClient(transport=transport, base_url="http://test") as ac:
         yield ac
+
+
+# Imports other fixtures
+
+pytest_plugins = [
+    "backend.tests.fixtures.auth",
+]
