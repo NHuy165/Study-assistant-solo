@@ -15,7 +15,13 @@ router = APIRouter()
 # ----- CREATE ----- #
 
 
-@router.post("/register", response_model=UserOutput)
+@router.post(
+    "/register",
+    response_model=UserOutput,
+    responses={
+        409: Responses.RESPONSE_409_CONFLICT,
+    },
+)
 async def register_user(session: SessionDep, user_input: UserInput):
     """
     Creates a user account.
