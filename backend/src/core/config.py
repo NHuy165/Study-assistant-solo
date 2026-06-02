@@ -80,6 +80,12 @@ class Settings(BaseSettings):
     DEFAULT_N_LLM_RESPONSES_FETCHED: int
     DEFAULT_N_STUDY_ACTIVITIES_FETCHED: int
 
+    # ----- CONFIG ----- #
+
+    @property
+    def gemini_keys_list(self) -> list[str]:
+        return [key.strip() for key in self.API_KEYS_GEMINI.split(",") if key.strip()]
+
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,
         env_file_encoding="utf-8",
