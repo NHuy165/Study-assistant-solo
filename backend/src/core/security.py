@@ -32,6 +32,3 @@ def create_token(data: dict) -> str:
     )
 
     return token
-
-
-print(get_hashed_password("DUMMY_PASSWORD"))
