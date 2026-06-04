@@ -80,6 +80,11 @@ class Settings(BaseSettings):
     DEFAULT_N_LLM_RESPONSES_FETCHED: int
     DEFAULT_N_STUDY_ACTIVITIES_FETCHED: int
 
+    # ** Study Assessment ** #
+    DEFAULT_N_DOCUMENTS_FETCHED: int
+    DEFAULT_N_LLM_RESPONSES_FETCHED: int
+    DEFAULT_N_STUDY_ACTIVITIES_FETCHED: int
+
     # ----- CONFIG ----- #
 
     @property
