@@ -1,9 +1,10 @@
-from datetime import date
+from datetime import datetime
 from typing import TYPE_CHECKING, Annotated
 
 from sqlmodel import (
+    Column,
+    DateTime,
     Field,
-    Index,
     Relationship,
     SQLModel,
 )
@@ -15,7 +16,12 @@ if TYPE_CHECKING:
 
 
 class CheckInBase(SQLModel):
-    time: date
+    time: Annotated[
+        datetime,
+        Field(
+            sa_column=Column(DateTime(timezone=True)),
+        ),
+    ]
 
 
 # ----- OUTPUT ----- #
@@ -35,12 +41,3 @@ class CheckIn(CheckInBase, table=True):
     user_id: Annotated[int | None, Field(foreign_key="user.id", nullable=False)] = None
 
     user: "User" = Relationship(back_populates="check_ins")
-    
-    __table_args__ = (
-        Index(
-            "UQ_USER_DATE",
-            "user_id",
-            "time",
-            unique=True,
-        ),
-    )
