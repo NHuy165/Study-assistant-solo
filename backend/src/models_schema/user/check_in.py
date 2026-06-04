@@ -1,9 +1,7 @@
-from datetime import datetime
+from datetime import date
 from typing import TYPE_CHECKING, Annotated
 
 from sqlmodel import (
-    Column,
-    DateTime,
     Field,
     Relationship,
     SQLModel,
@@ -16,12 +14,7 @@ if TYPE_CHECKING:
 
 
 class CheckInBase(SQLModel):
-    time: Annotated[
-        datetime,
-        Field(
-            sa_column=Column(DateTime(timezone=True)),
-        ),
-    ]
+    time: date
 
 
 # ----- OUTPUT ----- #

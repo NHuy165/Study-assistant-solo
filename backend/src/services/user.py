@@ -53,16 +53,16 @@ async def check_in(user: User, session: AsyncSession) -> tuple[User, CheckIn] | 
     )
     last_check_in = (await session.execute(query)).scalars().first()
 
-    now = datetime.now(timezone.utc)
+    today = datetime.now(timezone.utc).date()
 
     # If user has never logged in or didn't log in today
-    if last_check_in is None or last_check_in.time.date() < now.date():
+    if last_check_in is None or last_check_in.time < today:
         # If user has never logged in
         if last_check_in is None:
             user.login_streak = 1
             user.longest_login_streak = 1
         else:
-            time_between = now.date() - last_check_in.time.date()
+            time_between = today - last_check_in.time
 
             # If user last logged in yesterday
             if time_between == timedelta(days=1):
@@ -75,7 +75,7 @@ async def check_in(user: User, session: AsyncSession) -> tuple[User, CheckIn] | 
                 user.login_streak = 1
 
         new_check_in = CheckIn(
-            time=now,
+            time=today,
             user=user,
         )
 
