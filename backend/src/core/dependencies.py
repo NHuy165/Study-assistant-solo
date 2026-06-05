@@ -1,8 +1,8 @@
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Annotated
 
 import jwt
-from fastapi import Depends, Path
+from fastapi import Depends, Path, Query
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
 from sqlalchemy.exc import IntegrityError
@@ -24,9 +24,14 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/api/login")
 
 SessionDep = Annotated[AsyncSession, Depends(get_async_session)]
 
+def day_overwrite(overwritten_day: Annotated[date | None, Query()] = None) -> date | None:
+    return overwritten_day if settings.DEV_MODE else None
+
+
+DayOverwriteDep = Annotated[date, Depends(day_overwrite)]
 
 async def get_current_user(
-    session: SessionDep, token: Annotated[str, Depends(oauth2_scheme)]
+    session: SessionDep, token: Annotated[str, Depends(oauth2_scheme)], day_overwrite: DayOverwriteDep
 ):
     # No token failure
     if token is None:
@@ -66,7 +71,7 @@ async def get_current_user(
     assert isinstance(user, User)
     assert isinstance(last_check_in, CheckIn | None)
 
-    today = datetime.now(timezone.utc).date()
+    today = day_overwrite if day_overwrite else datetime.now(timezone.utc).date()
 
     # If user has never logged in or didn't log in today
     if last_check_in is None or last_check_in.time < today:
