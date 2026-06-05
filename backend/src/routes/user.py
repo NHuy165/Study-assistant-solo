@@ -2,7 +2,6 @@ from fastapi import APIRouter, status
 
 from backend.src.core.dependencies import SessionDep, UserDep
 from backend.src.exceptions.core import Responses
-from backend.src.models_schema.user.check_in import CheckInOutput
 from backend.src.models_schema.user.user import (
     UserInput,
     UserOutput,
@@ -29,15 +28,6 @@ async def register_user(session: SessionDep, user_input: UserInput):
     """
     user_output = await user_service.register_user(session, user_input)
     return user_output
-
-
-@router.post("/check-in", response_model=tuple[UserOutput, CheckInOutput] | None)
-async def check_in(user: UserDep, session: SessionDep):
-    """
-    Checks in as the current account. This can only be done once a day, subsequent attempts have no effect.
-    """
-    check_in = await user_service.check_in(user, session)
-    return check_in
 
 
 # ----- READ ----- #

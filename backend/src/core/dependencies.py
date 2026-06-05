@@ -5,6 +5,7 @@ import jwt
 from fastapi import Depends, Path
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
+from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
@@ -48,11 +49,55 @@ async def get_current_user(
         raise ExceptionAuthentication_401()
 
     # Fetches user
-    query = select(User).where(User.id == validated_contents.sub)
-    user = (await session.execute(query)).scalars().first()
-
-    if user is None:
+    query = (
+        select(User, CheckIn)
+        .select_from(User)
+        .outerjoin(CheckIn)
+        .where(User.id == validated_contents.sub)
+        .order_by(col(CheckIn.time).desc())
+        .limit(1)
+    )
+    row = (await session.execute(query)).first()
+    if row is None:
         raise ExceptionAuthentication_401()
+
+    # Updates login status
+    user, last_check_in = row
+    assert isinstance(user, User)
+    assert isinstance(last_check_in, CheckIn | None)
+
+    today = datetime.now(timezone.utc).date()
+
+    # If user has never logged in or didn't log in today
+    if last_check_in is None or last_check_in.time < today:
+        # If user has never logged in
+        if last_check_in is None:
+            user.login_streak = 1
+            user.longest_login_streak = 1
+        else:
+            time_between = today - last_check_in.time
+
+            # If user last logged in yesterday
+            if time_between == timedelta(days=1):
+                user.login_streak += 1
+                if user.login_streak > user.longest_login_streak:
+                    user.longest_login_streak = user.login_streak
+
+            # If user didn't log in yesterday
+            elif time_between > timedelta(days=1):
+                user.login_streak = 1
+
+        new_check_in = CheckIn(
+            time=today,
+            user=user,
+        )
+
+        # Check in with race condition check
+        session.add(new_check_in)
+        try:
+            await session.commit()
+        except IntegrityError:
+            await session.rollback()
 
     return user
 
