@@ -19,11 +19,7 @@ if TYPE_CHECKING:
 class DocumentBase(SQLModel):
     name: str
     page_starts_at: int = 1
-<<<<<<< HEAD:backend/src/models_schema/document/document.py
     subject_type: SubjectType | None
-=======
-    subject_type: SubjectType
->>>>>>> 6fc7a4e (feat(BE): Thêm loại môn học cho document.):backend/src/models_schema/document.py
 
 
 # ----- INPUT ----- #
@@ -49,9 +45,6 @@ class DocumentOutput(DocumentBase):
 class DocumentUpdate(DocumentBase):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
     page_starts_at: Annotated[int | None, BeforeValidator(beva_forbid_none)] = None
-    subject_type: Annotated[SubjectType | None, BeforeValidator(beva_forbid_none)] = (
-        None
-    )
 
 
 # ----- TABLE MODEL ----- #
