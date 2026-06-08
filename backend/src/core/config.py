@@ -41,12 +41,13 @@ class Settings(BaseSettings):
     MODEL_IN_USE_REWRITE_PROMPT: str
     MODEL_IN_USE_GENERATE_MATERIAL: str
     MODEL_IN_USE_GRADE_ANSWERS: str
+    MODEL_IN_USE_GENERATE_DOCUMENT_ANALYSIS: str
+    MODEL_IN_USE_GENERATE_STUDY_ASSESSMENT: str
 
     # ** Google ** #
     EMBED_MODEL_GOOGLE: str
     VISION_MODEL_GOOGLE: str
     ANSWER_MODEL_GOOGLE: str
-    N_API_CALL_RETRIES: int
 
     # ** Ollama ** #
     OLLAMA_HOST: str
@@ -63,21 +64,21 @@ class Settings(BaseSettings):
     DEFAULT_CHUNK_OVERLAP: int
     DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA: int
     DEFAULT_EMBED_DIMENSIONALITY_CLOUDFLARE: int
-    N_CHUNKS_RETRIEVED: int
-    N_PAST_CONVERSATIONS: int
-    N_CHUNKS_WINDOW: int
+    DEFAULT_N_CHUNKS_RETRIEVED: int
+    DEFAULT_N_PAST_CONVERSATIONS: int
+    DEFAULT_N_CHUNKS_WINDOW: int
+    DEFAULT_N_API_CALL_RETRIES: int
 
     # === Application Related === #
 
     # ** Study Activity ** #
     DEFAULT_EXERCISE_TOTAL_SCORE: float
-    N_GENERATION_RETRIES: int
+    DEFAULT_N_GENERATION_RETRIES: int
 
-    # ----- CONFIG ----- #
-
-    @property
-    def gemini_keys_list(self) -> list[str]:
-        return [key.strip() for key in self.API_KEYS_GEMINI.split(",") if key.strip()]
+    # ** Study Assessment ** #
+    DEFAULT_N_DOCUMENTS_FETCHED: int
+    DEFAULT_N_LLM_RESPONSES_FETCHED: int
+    DEFAULT_N_STUDY_ACTIVITIES_FETCHED: int
 
     model_config = SettingsConfigDict(
         env_file=ENV_PATH,

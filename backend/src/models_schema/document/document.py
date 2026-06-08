@@ -1,15 +1,17 @@
 from datetime import datetime, timezone
-from typing import TYPE_CHECKING, Annotated
+from typing import TYPE_CHECKING, Annotated, Optional
 
 from pydantic import BeforeValidator
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
-from backend.src.models_schema.miscellaneous.enums import DocumentType
+from backend.src.models_schema.miscellaneous.enums import DocumentType, SubjectType
 from backend.src.models_schema.miscellaneous.utils import beva_forbid_none
 
 if TYPE_CHECKING:
-    from backend.src.models_schema.document_chunk import DocumentChunk
-    from backend.src.models_schema.interaction import Interaction
+    from backend.src.models_schema.document.document_analysis import DocumentAnalysis
+    from backend.src.models_schema.document.document_chunk import DocumentChunk
+    from backend.src.models_schema.interaction.interaction import Interaction
+
 
 # ----- BASE ----- #
 
@@ -17,6 +19,7 @@ if TYPE_CHECKING:
 class DocumentBase(SQLModel):
     name: str
     page_starts_at: int = 1
+    subject_type: SubjectType | None
 
 
 # ----- INPUT ----- #
@@ -24,6 +27,7 @@ class DocumentBase(SQLModel):
 
 class DocumentInput(DocumentBase):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    subject_type: SubjectType | None = None
 
 
 # ----- OUTPUT ----- #
@@ -61,8 +65,12 @@ class Document(DocumentBase, table=True):
         ),
     ]
     type: DocumentType
+    text: Annotated[str | None, Field(nullable=False)]
 
     interaction: "Interaction" = Relationship(back_populates="documents")
     document_chunks: list["DocumentChunk"] = Relationship(
+        back_populates="document", cascade_delete=True
+    )
+    document_analysis: Optional["DocumentAnalysis"] = Relationship(
         back_populates="document", cascade_delete=True
     )

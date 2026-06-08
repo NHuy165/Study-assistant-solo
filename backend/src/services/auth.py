@@ -4,8 +4,8 @@ from sqlmodel import select
 
 from backend.src.core.security import create_token, verify_password
 from backend.src.exceptions.core import ExceptionAuthentication_401
-from backend.src.models_schema.auth import Token
-from backend.src.models_schema.user import User
+from backend.src.models_schema.auth.auth import Token
+from backend.src.models_schema.user.user import User
 
 DUMMY_PASSWORD_HASH = "$argon2id$v=19$m=65536,t=3,p=4$G2cBxzF8vfN1DcBl8MKqhA$MeuvTNFv+5KpsyY6cxegwP1P2UbrWLq6Xyaq/S+h8v0"
 

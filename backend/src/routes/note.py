@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 
 from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
-from backend.src.models_schema.note import NoteInput, NoteOutput, NoteUpdate
+from backend.src.models_schema.note.note import NoteInput, NoteOutput, NoteUpdate
 from backend.src.services import note
 
 router = APIRouter()

@@ -2,7 +2,6 @@ from datetime import datetime, timezone
 from typing import TYPE_CHECKING, Annotated
 
 from pydantic import BeforeValidator, model_validator
-from sqlalchemy import CheckConstraint
 from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 
 from backend.src.exceptions.core import ExceptionRequestValidation_400
@@ -22,7 +21,7 @@ if TYPE_CHECKING:
         ReviewItem,
         ReviewItemOutput,
     )
-    from backend.src.models_schema.interaction import Interaction
+    from backend.src.models_schema.interaction.interaction import Interaction
 
 # ----- BASE ---- #
 
@@ -39,31 +38,19 @@ class StudyActivityBase(SQLModel):
 
 class StudyActivityInput(StudyActivityBase):
     prompt: str
+    activity_type: StudyActivityType | None = None
+    document_id: int | None = None
 
     @model_validator(mode="after")
-    def validate_type_format(self):
-        if (
-            self.activity_type == StudyActivityType.EXERCISE
-            and self.activity_format
-            not in (
-                StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
-                StudyActivityFormat.OPEN_ENDED,
-            )
+    def automatic_activity_type(self):
+        if self.activity_format in (
+            StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+            StudyActivityFormat.OPEN_ENDED,
         ):
-            raise ExceptionRequestValidation_400(
-                f"Exercise activity type does not support format: {self.activity_format.value}."
-            )
-        elif (
-            self.activity_type == StudyActivityType.REVIEW
-            and self.activity_format
-            not in (
-                StudyActivityFormat.FLASHCARDS,
-                StudyActivityFormat.GAP_FILL,
-            )
-        ):
-            raise ExceptionRequestValidation_400(
-                f"Review activity type does not support format: {self.activity_format.value}."
-            )
+            self.activity_type = StudyActivityType.EXERCISE
+        else:
+            self.activity_type = StudyActivityType.REVIEW
+
         return self
 
 
@@ -96,17 +83,6 @@ class StudyActivityOutputComplete(StudyActivityOutput):
 class StudyActivityUpdate(SQLModel):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
     description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
-
-
-class OpenEndedGradingInitiationItemSchema(SQLModel):
-    id: int
-    max_score: float
-    question: str
-    attempt: str | None
-
-
-class OpenEndedGradingInitiationSchema(SQLModel):
-    questions_answers: list[OpenEndedGradingInitiationItemSchema]
 
 
 # ----- TABLE MODEL ----- #

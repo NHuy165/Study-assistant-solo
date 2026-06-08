@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from pydantic import EmailStr
 
 from backend.src.exceptions.core import ExceptionResponse, ExceptionType
-from backend.src.models_schema.user import UserInput, UserPasswordChange
+from backend.src.models_schema.user.user import UserInput, UserPasswordChange
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
     validate_contents,

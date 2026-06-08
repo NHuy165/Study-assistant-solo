@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 
-from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.models_schema.document.document_chunk import DocumentChunk
 
 
 class ContentFormatter(ABC):

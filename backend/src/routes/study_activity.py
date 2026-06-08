@@ -6,9 +6,6 @@ from backend.src.models_schema.activity.exercise_item import (
     ExerciseItemOutput,
     ExerciseItemUpdate,
 )
-from backend.src.models_schema.activity.exercise_item_content import (
-    ExerciseItemContentBase,
-)
 from backend.src.models_schema.activity.review_item import (
     FlashcardInput,
     FlashcardUpdate,
@@ -48,6 +45,7 @@ async def create_study_activity(
     Tạo một dạng tài liệu tùy vào các yêu cầu trong request.
     """
     return await study_activity.create_study_activity(
+        user,
         session,
         interaction,
         study_activity_input,

@@ -5,7 +5,9 @@ import pytest
 from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from backend.src.models_schema.interaction import Interaction, InteractionInput
+from backend.src.models_schema.interaction.interaction import (
+    InteractionInput,
+)
 
 
 @pytest.fixture(name="create_interaction_custom")
@@ -14,6 +16,10 @@ async def create_interaction_custom_fixture(
     client: AsyncClient,
     login_user_test: None,
 ) -> Callable[[str], CoroutineType[Any, Any, int]]:
+    """
+    Returns a function that creates an interaction with a custom name.
+    """
+
     async def create_interaction_custom(interaction_name: str) -> int:
         interaction_input = InteractionInput(
             name=interaction_name, description=f"{interaction_name}-description"
@@ -37,5 +43,9 @@ async def create_interaction_custom_fixture(
 async def create_interaction_test_fixture(
     create_interaction_custom: Callable[[str], CoroutineType[Any, Any, int]],
 ) -> int:
+    """
+    Automatically creates an interaction with the name "test".
+    """
+
     interaction_id = await create_interaction_custom("test")
     return interaction_id

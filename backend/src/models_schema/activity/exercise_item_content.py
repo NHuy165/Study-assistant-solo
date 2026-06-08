@@ -12,7 +12,7 @@ if TYPE_CHECKING:
 
 
 class ExerciseItemContentBase(SQLModel):
-    content: str
+    content: str | None
     type: ExerciseItemContentType
 
 
@@ -25,8 +25,12 @@ class ExerciseItemContentOutput(ExerciseItemContentBase):
 
     @model_validator(mode="after")
     def scrub_answers(self, info: ValidationInfo) -> Self:
-        if not info.context or info.context.get("show_answers") is not True:
-            self.is_correct = None
+        if not info.context or not info.context.get("show_answers"):
+            if self.type == ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE:
+                self.is_correct = None
+            elif self.type == ExerciseItemContentType.OPEN_ENDED_CORRECT:
+                self.content = None
+
         return self
 
 
