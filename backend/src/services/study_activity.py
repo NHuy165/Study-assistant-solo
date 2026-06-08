@@ -1,5 +1,6 @@
 import json
 from datetime import datetime, timezone
+from typing import Callable
 
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -18,13 +19,22 @@ from backend.src.models_schema.activity.exercise_item import (
     ExerciseItemUpdate,
 )
 from backend.src.models_schema.activity.exercise_item_content import ExerciseItemContent
-from backend.src.models_schema.activity.json_schema import (
+from backend.src.models_schema.activity.llm_request_json_schema import (
+    ForGradingSchema,
+    MCQForGradingSchema,
+    OpenEndedForGradingSchema,
+)
+from backend.src.models_schema.activity.llm_return_json_schema import (
     FlashcardsSchema,
     GapFillSchema,
+    GradedItemSchema,
+    GradedSchema,
+    MCQGradedCrossValidation,
+    MCQGradedSchema,
     MCQSchema,
     OpenEndedCreationSchema,
-    OpenEndedGradingResultItemSchema,
-    OpenEndedGradingResultSchema,
+    OpenEndedGradedCrossValidation,
+    OpenEndedGradedSchema,
     StudyActivityValidationBase,
 )
 from backend.src.models_schema.activity.review_item import (
@@ -35,13 +45,11 @@ from backend.src.models_schema.activity.review_item import (
 from backend.src.models_schema.activity.review_item_content import ReviewItemContent
 from backend.src.models_schema.activity.study_activity import (
     FlashcardsActivityInput,
-    OpenEndedGradingInitiationSchema,
     StudyActivity,
     StudyActivityInput,
-    StudyActivityOutputComplete,
     StudyActivityUpdate,
 )
-from backend.src.models_schema.interaction import Interaction
+from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.miscellaneous.enums import (
     ExerciseItemContentType,
     ReviewItemContentType,
@@ -49,12 +57,14 @@ from backend.src.models_schema.miscellaneous.enums import (
     StudyActivityType,
 )
 from backend.src.models_schema.RAG.augmentation import (
-    AnswersGradingParams,
+    AugmentationParams,
+    GradingParams,
     StudyActivityParams,
 )
-from backend.src.models_schema.user import User
+from backend.src.models_schema.user.user import User
 from backend.src.RAG.augmentation.core.specific_augmentations import (
-    answers_grading_augmentation,
+    mcq_grading_augmentation,
+    open_ended_grading_augmentation,
     study_activity_augmentation,
 )
 from backend.src.RAG.augmentation.formatters.chunks.core import chunks_formatter
@@ -135,10 +145,20 @@ def save_open_ended(
     # Begins saving
     exercise_items = []
     for item in activity_data.activity_items:
+        # Saves item contents
+        exercise_item_content = [
+            ExerciseItemContent(
+                content=item.correct,
+                type=ExerciseItemContentType.OPEN_ENDED_CORRECT,
+                is_correct=True,
+            )
+        ]
+
         # Saves item
         exercise_item = ExerciseItem(
             max_score=question_score,
             question=item.question,
+            contents=exercise_item_content,
         )
 
         exercise_items.append(exercise_item)
@@ -223,6 +243,7 @@ save_mapper = {
 
 
 async def create_study_activity(
+    user: User,
     session: AsyncSession,
     interaction: Interaction,
     study_activity_input: StudyActivityInput,
@@ -232,7 +253,7 @@ async def create_study_activity(
 
     # Gets past conversations
     past_conversations = await read_llm_responses(
-        session, interaction, settings.N_PAST_CONVERSATIONS
+        session, interaction, settings.DEFAULT_N_PAST_CONVERSATIONS
     )
     formatted_past_conversations = conversations_formatter(past_conversations)
 
@@ -248,6 +269,7 @@ async def create_study_activity(
         interaction=interaction,
         raw_prompt=rewritten_prompt,
         embedded_prompt=embedded_prompt,
+        document_id=study_activity_input.document_id,
     )
     formatted_chunks = chunks_formatter(document_chunks)
 
@@ -262,10 +284,11 @@ async def create_study_activity(
     params = StudyActivityParams(
         prompt=study_activity_input.prompt,
         context_conversations=formatted_past_conversations,
-        context_document=formatted_chunks,
+        context_chunks=formatted_chunks,
         json_schema=json_schema,
         subject_type=study_activity_input.subject_type,
         activity_format=study_activity_input.activity_format,
+        personal_information=user.description,
     )
 
     final_prompt = study_activity_augmentation(params)
@@ -274,7 +297,9 @@ async def create_study_activity(
     while True:
         try:
             # Generation
-            generated_activity = await GlobalAPI.generate_material(final_prompt)
+            generated_activity = await GlobalAPI.generate_material(
+                final_prompt, response_validator
+            )
 
             # Validates content from model
             validated_activity = response_validator.model_validate_json(
@@ -306,7 +331,7 @@ async def create_study_activity(
 
         except (ExceptionLLMError_502, ValidationError) as e:
             i_retry += 1
-            if i_retry >= settings.N_GENERATION_RETRIES:
+            if i_retry >= settings.DEFAULT_N_GENERATION_RETRIES:
                 if isinstance(e, ExceptionLLMError_502):
                     raise
                 else:
@@ -681,7 +706,7 @@ async def submit_exercise_activity(
     study_activity_id: int,
 ) -> StudyActivity:
 
-    # Fetches study activity
+    # === Fetches and sets up the study activity === #
     query = (
         select(StudyActivity, Interaction)
         .join(Interaction)
@@ -735,91 +760,118 @@ async def submit_exercise_activity(
     #     )
     # )
 
-    # Grades if exercise is open ended
-    if study_activity.activity_format == StudyActivityFormat.OPEN_ENDED:
-        # === Preparing the json input === #
-        # Fetches questions and answers from the activity
-        questions = OpenEndedGradingInitiationSchema.model_validate(
-            {
-                "questions_answers": [
-                    item.model_dump() for item in study_activity.exercise_items
-                ]
-            }
-        )
+    # === Grading / explaining the questions and answers === #
 
-        # === Preparing the context document === #
+    # Different configurations for different exercise format type (instead of built-in categorization in the configurations).
+    GRADING_CONFIGURATIONS: dict[
+        StudyActivityFormat,
+        tuple[
+            type[ForGradingSchema],
+            Callable[[AugmentationParams], str],
+            type[GradedSchema],
+            type[GradedSchema],
+        ],
+    ] = {
+        StudyActivityFormat.OPEN_ENDED: (
+            OpenEndedForGradingSchema,
+            open_ended_grading_augmentation,
+            OpenEndedGradedSchema,
+            OpenEndedGradedCrossValidation,
+        ),
+        StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (
+            MCQForGradingSchema,
+            mcq_grading_augmentation,
+            MCQGradedSchema,
+            MCQGradedCrossValidation,
+        ),
+    }
+    (
+        exercise_work_schema,
+        grading_augmentation,
+        graded_schema,
+        cross_validation_schema,
+    ) = GRADING_CONFIGURATIONS[study_activity.activity_format]
 
-        # Fetches just the questions for retrieval
-        prompt_for_retrieval = "\n".join(
-            item.question for item in study_activity.exercise_items
-        )
+    # ++ Preparing the json input ++ #
 
-        # Embeds and retrieves relevant information (document chunks)
-        embedded_prompt = await GlobalAPI.embed(prompt_for_retrieval)
-        document_chunks = await retrieval(
-            session=session,
-            interaction=interaction,
-            raw_prompt=prompt_for_retrieval,
-            embedded_prompt=embedded_prompt,
-        )
+    # Fetches questions and answers from the activity
+    exercise_works = exercise_work_schema.model_validate(study_activity)
 
-        await session.commit()  # Temporary close
+    # ++ Preparing the context document ++ #
 
-        formatted_chunks = chunks_formatter(document_chunks)
+    # Fetches just the questions for retrieval
+    prompt_for_retrieval = "\n".join(
+        item.question for item in study_activity.exercise_items
+    )
 
-        params = AnswersGradingParams(
-            prompt=questions.model_dump_json(),
-            creation_prompt=study_activity.prompt,  # type: ignore
-            context_document=formatted_chunks,
-        )
+    # Embeds and retrieves relevant information (document chunks)
+    embedded_prompt = await GlobalAPI.embed(prompt_for_retrieval)
+    document_chunks = await retrieval(
+        session=session,
+        interaction=interaction,
+        raw_prompt=prompt_for_retrieval,
+        embedded_prompt=embedded_prompt,
+        document_id=None,
+    )
 
-        final_prompt = answers_grading_augmentation(params)
+    await session.commit()  # Temporary close
 
-        # === Grading === #
-        i_retry = 0
+    formatted_chunks = chunks_formatter(document_chunks)
 
-        while True:
-            # API call
-            try:
-                grading_results = await GlobalAPI.grade_answers(final_prompt)
-                grading_results_python: dict = json.loads(grading_results)
-                grading_results_python.update({"grading_input": questions.model_dump()})
+    params = GradingParams(
+        prompt=exercise_works.model_dump_json(),
+        creation_prompt=study_activity.prompt,  # type: ignore
+        context_chunks=formatted_chunks,
+    )
 
-                validated_grading_results = OpenEndedGradingResultSchema.model_validate(
-                    grading_results_python
-                )
-                break
+    final_prompt = grading_augmentation(params)
 
-            except (ExceptionLLMError_502, ValidationError) as e:
-                i_retry += 1
-                if i_retry >= settings.N_GENERATION_RETRIES:
-                    if isinstance(e, ExceptionLLMError_502):
-                        raise
-                    else:
-                        raise ExceptionLLMError_502(
-                            f"Incorrect content format. Details: {e}"
-                        )
-                continue
+    # ++ Grading ++ #
 
-        # Refetchs
-        # study_activity = (await session.execute(query_refetch)).scalars().first()
+    i_retry = 0
 
-        # assert study_activity is not None
+    while True:
+        # API call
+        try:
+            grading_results = await GlobalAPI.grade_answers(final_prompt, graded_schema)
+            grading_results_python: dict = json.loads(grading_results)
+            grading_results_python.update(
+                {"grading_input": exercise_works.model_dump()}
+            )
 
-        # Grades exercise items
-        results_map: dict[int, OpenEndedGradingResultItemSchema] = {
-            res.id: res for res in validated_grading_results.grading_results
-        }
+            validated_grading_results = cross_validation_schema.model_validate(
+                grading_results_python
+            )
+            break
 
-        for exercise_item in study_activity.exercise_items:
-            assert exercise_item.id is not None
-            graded_result = results_map[exercise_item.id]
+        # Catches errors, if retry limit exceeded, throws a 502
+        except (ExceptionLLMError_502, ValidationError) as e:
+            i_retry += 1
+            if i_retry >= settings.DEFAULT_N_GENERATION_RETRIES:
+                if isinstance(e, ExceptionLLMError_502):
+                    raise
+                else:
+                    raise ExceptionLLMError_502(
+                        f"Incorrect content format. Details: {e}"
+                    )
+            continue
 
-            # Updates score and explanation
-            exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
-            session.add(exercise_item)
+    # ++ Saving grading results ++ #
 
-    # Updates
+    results_map: dict[int, GradedItemSchema] = {
+        res.id: res for res in validated_grading_results.grading_results
+    }
+
+    for exercise_item in study_activity.exercise_items:
+        # No need more validation here because the validator already made sure every item is graded
+        assert exercise_item.id is not None
+        graded_result = results_map[exercise_item.id]
+
+        # Updates score and / or explanation
+        exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
+        session.add(exercise_item)
+
+    # === Updates status and returns === #
     study_activity.is_submitted = True
     study_activity.submitted_at = datetime.now(timezone.utc)
 
@@ -887,25 +939,6 @@ async def soft_delete_items(session: AsyncSession, study_activity_id: int):
     await session.execute(query_review)
 
 
-async def hard_delete_items_contents(session: AsyncSession, study_activity_id: int):
-    subquery_review = select(ReviewItem.id).where(
-        ReviewItem.study_activity_id == study_activity_id
-    )
-    query_review = delete(ReviewItemContent).where(
-        col(ReviewItemContent.review_item_id).in_(subquery_review)
-    )
-
-    subquery_exercise = select(ExerciseItem.id).where(
-        ExerciseItem.study_activity_id == study_activity_id
-    )
-    query_exercise = delete(ExerciseItemContent).where(
-        col(ExerciseItemContent.exercise_item_id).in_(subquery_exercise)
-    )
-
-    await session.execute(query_review)
-    await session.execute(query_exercise)
-
-
 async def delete_study_activity(
     user: User,
     session: AsyncSession,
@@ -935,9 +968,6 @@ async def delete_study_activity(
 
     # Soft deletes the associated items
     await soft_delete_items(session, study_activity_id)
-
-    # Hard deletes the item contents
-    await hard_delete_items_contents(session, study_activity_id)
 
     # Soft deletes the activity
     study_activity.is_deleted = True

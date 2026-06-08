@@ -1,15 +1,29 @@
 import asyncio
-from abc import abstractmethod
 
 from fastapi import UploadFile
+from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.ai_api import GlobalAPI
-from backend.src.exceptions.core import ExceptionRequestValidation_400
-from backend.src.models_schema.document import Document
-from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.core.config import settings
+from backend.src.exceptions.core import (
+    ExceptionLLMError_502,
+    ExceptionRequestValidation_400,
+)
+from backend.src.models_schema.document.document import Document
+from backend.src.models_schema.document.document_analysis import DocumentAnalysis
+from backend.src.models_schema.document.document_chunk import DocumentChunk
 from backend.src.models_schema.miscellaneous.enums import DocumentType
-from backend.src.RAG.chunking.base import DocumentExtractor, smart_splitter
+from backend.src.models_schema.RAG.augmentation import DocumentAnalysisParams
+from backend.src.models_schema.user.user import User
+from backend.src.RAG.augmentation.core.specific_augmentations import (
+    document_analysis_augmentation,
+)
+from backend.src.RAG.chunking.base import (
+    DocumentExtractor,
+    analysis_task_generator,
+    smart_splitter,
+)
 
 
 class TextExtractor(DocumentExtractor):
@@ -18,6 +32,8 @@ class TextExtractor(DocumentExtractor):
         # === Content type === #
         if file.content_type is None:
             return False
+
+        print(file.content_type)
 
         is_text = (
             file.content_type.startswith("text/")
@@ -32,11 +48,17 @@ class TextExtractor(DocumentExtractor):
         header = file.file.read(512)
         file.file.seek(0)
 
+        print(header)
+
         if not header:
             return False
 
+        if b"\x00" in header:
+            return False
+
         try:
-            header.decode("utf-8")
+            test_chunk = header[:-4] if len(header) > 4 else header
+            test_chunk.decode("utf-8")
             return True
 
         except UnicodeDecodeError:
@@ -44,8 +66,8 @@ class TextExtractor(DocumentExtractor):
 
     @classmethod
     async def extract(
-        cls, session: AsyncSession, file: UploadFile, document: Document
-    ) -> None:
+        cls, user: User, session: AsyncSession, file: UploadFile, document: Document
+    ) -> DocumentAnalysis | None:
         # Reads the file
         text_bytes = await file.read()
         try:
@@ -57,6 +79,8 @@ class TextExtractor(DocumentExtractor):
 
         if len(contents.strip()) == 0:
             return
+
+        document.text = contents
 
         def process():
             # Staging data
@@ -82,10 +106,26 @@ class TextExtractor(DocumentExtractor):
 
         prepared_chunks, chunk_metadata = await asyncio.to_thread(process)
 
+        # Runs tasks in parallel
         if prepared_chunks:
-            # Mass awaiting
-            vectors = await GlobalAPI.mass_embed(prepared_chunks)
+            # Defines tasks
+            embed_task = GlobalAPI.mass_embed(prepared_chunks)
 
+            params = DocumentAnalysisParams(
+                prompt=contents,
+                name=document.name,
+                subject_type=document.subject_type,
+                document_type=document.type,
+                personal_information=user.description,
+            )
+            final_prompt = document_analysis_augmentation(params)
+
+            analysis_task = analysis_task_generator(session, final_prompt, document)
+
+            # Calls LLM
+            vectors, document_analysis = await asyncio.gather(embed_task, analysis_task)
+
+            # Saves the vectors
             embedded_chunks = [
                 DocumentChunk(
                     content_original=metadata["content"],
@@ -97,3 +137,8 @@ class TextExtractor(DocumentExtractor):
             ]
 
             session.add_all(embedded_chunks)
+
+            # Saves the analysis
+            document.document_analysis = document_analysis
+
+            return document_analysis

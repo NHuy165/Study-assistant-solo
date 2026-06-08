@@ -7,7 +7,9 @@ from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 from backend.src.models_schema.miscellaneous.utils import beva_forbid_none
 
 if TYPE_CHECKING:
-    from backend.src.models_schema.interaction import Interaction
+    from backend.src.models_schema.interaction.interaction import Interaction
+    from backend.src.models_schema.study_progress.assessment import StudyAssessment
+    from backend.src.models_schema.user.check_in import CheckIn
 
 # ----- BASE ----- #
 
@@ -15,6 +17,7 @@ if TYPE_CHECKING:
 class UserBase(SQLModel):
     username: Annotated[str, Field(min_length=1)]
     email: EmailStr
+    description: str
 
 
 # ----- INPUT ----- #
@@ -22,6 +25,7 @@ class UserBase(SQLModel):
 
 class UserInput(UserBase):
     password: Annotated[str, Field(min_length=1)]
+    description: str = ""
 
 
 # ----- OUTPUT ----- #
@@ -30,7 +34,6 @@ class UserInput(UserBase):
 class UserOutput(UserBase):
     id: int
     created_at: datetime
-    last_logged_in_at: datetime | None
 
     login_streak: int
     longest_login_streak: int
@@ -44,6 +47,9 @@ class UserUpdate(UserBase):
         str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
     ] = None
     email: Annotated[EmailStr | None, BeforeValidator(beva_forbid_none)] = None
+    description: Annotated[
+        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
+    ] = None
 
 
 class UserPasswordChange(SQLModel):
@@ -68,11 +74,7 @@ class User(UserBase, table=True):
             default_factory=lambda: datetime.now(timezone.utc),
         ),
     ]
-    last_logged_in_at: Annotated[
-        datetime | None,
-        Field(
-            sa_column=Column(DateTime(timezone=True)),
-        ),
-    ] = None
 
     interactions: list["Interaction"] = Relationship(back_populates="user")
+    check_ins: list["CheckIn"] = Relationship(back_populates="user")
+    assessments: list["StudyAssessment"] = Relationship(back_populates="user")

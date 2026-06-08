@@ -16,6 +16,7 @@ from backend.src.exceptions.core import (
 from fastapi import UploadFile
 from google import genai
 from google.genai import Client, errors
+from pydantic import BaseModel
 
 # ----- MODEL CONFIGURATIONS ----- #
 
@@ -92,7 +93,11 @@ class API(ABC):
 
     @classmethod
     @abstractmethod
-    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+    async def generate_content(
+        cls,
+        prompt: str,
+        response_schema: type[BaseModel] | None = None,
+    ) -> str:
         """
         Generates an LLM response from a prompt.
         """
@@ -125,7 +130,7 @@ class GoogleAPI(API):
                     await asyncio.sleep(wait_time)
                     attempt_traffic += 1
 
-                    if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                    if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                         break
 
                     continue
@@ -140,7 +145,7 @@ class GoogleAPI(API):
                 await asyncio.sleep(wait_time)
                 attempt_traffic += 1
 
-                if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                     break
 
                 continue
@@ -224,11 +229,17 @@ class GoogleAPI(API):
         return await cls.wrapper(call_api)
 
     @classmethod
-    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+    async def generate_content(
+        cls,
+        prompt: str,
+        response_schema: type[BaseModel] | None = None,
+    ) -> str:
         async def call_api() -> str:
             config = genai.types.GenerateContentConfig()
-            if json_required:
+
+            if response_schema:
                 config.response_mime_type = "application/json"
+                config.response_schema = response_schema
 
             response = await keys_manager.client.aio.models.generate_content(
                 model=settings.ANSWER_MODEL_GOOGLE,
@@ -263,7 +274,7 @@ class OllamaAPI(API):
                     await asyncio.sleep(wait_time)
                     attempt_traffic += 1
 
-                    if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                    if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                         break
                     continue
                 else:
@@ -275,7 +286,7 @@ class OllamaAPI(API):
                 await asyncio.sleep(wait_time)
                 attempt_traffic += 1
 
-                if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                     break
 
                 continue
@@ -363,14 +374,18 @@ class OllamaAPI(API):
         return await cls.wrapper(call_api)
 
     @classmethod
-    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+    async def generate_content(
+        cls,
+        prompt: str,
+        response_schema: type[BaseModel] | None = None,
+    ) -> str:
         async def call_api() -> str:
-            if json_required:
+            if response_schema:
                 response = await OLLAMA_CLIENT.generate(
                     model=settings.ANSWER_MODEL_OLLAMA,
                     prompt=prompt,
                     options={"num_ctx": 8192},
-                    format="json",
+                    format=response_schema.model_json_schema(),
                 )
             else:
                 response = await OLLAMA_CLIENT.generate(
@@ -408,7 +423,7 @@ class CloudFlareAPI(API):
                     await asyncio.sleep(wait_time)
                     attempt_traffic += 1
 
-                    if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                    if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                         break
 
                     continue
@@ -423,7 +438,7 @@ class CloudFlareAPI(API):
                 await asyncio.sleep(wait_time)
                 attempt_traffic += 1
 
-                if attempt_traffic >= settings.N_API_CALL_RETRIES:
+                if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
                     break
 
                 continue
@@ -532,7 +547,11 @@ class CloudFlareAPI(API):
         return await cls.wrapper(call_api)
 
     @classmethod
-    async def generate_content(cls, prompt: str, json_required: bool = False) -> str:
+    async def generate_content(
+        cls,
+        prompt: str,
+        response_schema: type[BaseModel] | None = None,
+    ) -> str:
         raise ExceptionInternalError_500("You weren't supposed to call this")
 
 
@@ -571,13 +590,36 @@ class GlobalAPI:
         )
 
     @classmethod
-    async def generate_material(cls, prompt: str) -> str:
+    async def generate_material(
+        cls, prompt: str, response_schema: type[BaseModel]
+    ) -> str:
         return await cls.models[
             settings.MODEL_IN_USE_GENERATE_MATERIAL
-        ].generate_content(prompt, json_required=True)
+        ].generate_content(
+            prompt,
+            response_schema=response_schema,
+        )
 
     @classmethod
-    async def grade_answers(cls, prompt: str) -> str:
+    async def grade_answers(cls, prompt: str, response_schema: type[BaseModel]) -> str:
         return await cls.models[settings.MODEL_IN_USE_GRADE_ANSWERS].generate_content(
-            prompt, json_required=True
+            prompt,
+            response_schema=response_schema,
         )
+
+    @classmethod
+    async def generate_document_analysis(
+        cls, prompt: str, response_schema: type[BaseModel]
+    ) -> str:
+        return await cls.models[
+            settings.MODEL_IN_USE_GENERATE_DOCUMENT_ANALYSIS
+        ].generate_content(
+            prompt,
+            response_schema=response_schema,
+        )
+
+    @classmethod
+    async def generate_study_assessment(cls, prompt: str) -> str:
+        return await cls.models[
+            settings.MODEL_IN_USE_GENERATE_STUDY_ASSESSMENT
+        ].generate_content(prompt)

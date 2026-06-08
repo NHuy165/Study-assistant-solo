@@ -3,12 +3,13 @@ from sqlmodel import col, select
 
 from backend.src.core.ai_api import GlobalAPI
 from backend.src.core.config import settings
-from backend.src.models_schema.interaction import Interaction
-from backend.src.models_schema.llm_response import (
+from backend.src.models_schema.interaction.interaction import Interaction
+from backend.src.models_schema.llm_response.llm_response import (
     LLMResponse,
     LLMResponseInput,
 )
 from backend.src.models_schema.RAG.augmentation import AnswerGenerationParams
+from backend.src.models_schema.user.user import User
 from backend.src.RAG.augmentation.core.specific_augmentations import (
     answer_generation_augmentation,
 )
@@ -25,13 +26,14 @@ from backend.src.RAG.retrieval.prompt_rewrite import rewrite_prompt
 
 
 async def create_llm_response(
+    user: User,
     session: AsyncSession,
     llm_response_input: LLMResponseInput,
     interaction: Interaction,
 ) -> LLMResponse:
     # Gets past conversations
     past_conversations = await read_llm_responses(
-        session, interaction, settings.N_PAST_CONVERSATIONS
+        session, interaction, settings.DEFAULT_N_PAST_CONVERSATIONS
     )
 
     await session.commit()  # Temporary close
@@ -51,6 +53,7 @@ async def create_llm_response(
         interaction=interaction,
         raw_prompt=rewritten_prompt,
         embedded_prompt=embedded_prompt,
+        document_id=llm_response_input.document_id,
     )
 
     # Formats chunks
@@ -62,7 +65,8 @@ async def create_llm_response(
     augmentation_params = AnswerGenerationParams(
         prompt=llm_response_input.prompt,
         context_conversations=formatted_past_conversations,
-        context_document=formatted_chunks,
+        context_chunks=formatted_chunks,
+        personal_information=user.description,
     )
     final_prompt = answer_generation_augmentation(augmentation_params)
 

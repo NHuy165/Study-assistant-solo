@@ -1,11 +1,22 @@
+import asyncio
+
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.ai_api import GlobalAPI
-from backend.src.models_schema.document import Document
-from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.models_schema.document.document import Document
+from backend.src.models_schema.document.document_analysis import DocumentAnalysis
+from backend.src.models_schema.document.document_chunk import DocumentChunk
 from backend.src.models_schema.miscellaneous.enums import DocumentType
-from backend.src.RAG.chunking.base import DocumentExtractor
+from backend.src.models_schema.RAG.augmentation import DocumentAnalysisParams
+from backend.src.models_schema.user.user import User
+from backend.src.RAG.augmentation.core.specific_augmentations import (
+    document_analysis_augmentation,
+)
+from backend.src.RAG.chunking.base import (
+    DocumentExtractor,
+    analysis_task_generator,
+)
 
 
 class ImageExtractor(DocumentExtractor):
@@ -31,20 +42,46 @@ class ImageExtractor(DocumentExtractor):
 
     @classmethod
     async def extract(
-        cls, session: AsyncSession, file: UploadFile, document: Document
-    ) -> None:
+        cls, user: User, session: AsyncSession, file: UploadFile, document: Document
+    ) -> DocumentAnalysis:
         # Reads the image using the model
         image_description = await GlobalAPI.caption_image(file)
+
+        document.text = image_description
 
         embedding_content = (
             f"Source: {DocumentType.IMAGE.value} file {document.name}:\n"
             + image_description
         )
 
+        # Runs tasks in parallel
+
+        # Defines tasks
+        embed_task = GlobalAPI.embed(embedding_content)
+
+        params = DocumentAnalysisParams(
+            prompt=image_description,
+            name=document.name,
+            subject_type=document.subject_type,
+            document_type=document.type,
+            personal_information=user.description,
+        )
+        final_prompt = document_analysis_augmentation(params)
+
+        analysis_task = analysis_task_generator(session, final_prompt, document)
+
+        # Calls LLM
+        vector, document_analysis = await asyncio.gather(embed_task, analysis_task)
+
+        # Saves the vector
         prepared_chunk = DocumentChunk(
             content_original=f"[IMAGE DESCRIPTION]: {image_description}",
-            content_embedded=await GlobalAPI.embed(embedding_content),
+            content_embedded=vector,
             document=document,
         )
-
         session.add(prepared_chunk)
+
+        # Saves the analysis
+        document.document_analysis = document_analysis
+
+        return document_analysis

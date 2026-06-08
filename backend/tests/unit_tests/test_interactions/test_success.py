@@ -3,7 +3,7 @@ from typing import Any, Callable
 
 from httpx import AsyncClient
 
-from backend.src.models_schema.interaction import (
+from backend.src.models_schema.interaction.interaction import (
     InteractionInput,
     InteractionOutput,
     InteractionUpdate,

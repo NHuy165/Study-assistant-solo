@@ -1,8 +1,15 @@
-from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
+from datetime import datetime, timedelta
 
-from backend.src.models_schema.auth import Token
-from backend.src.models_schema.user import UserInput, UserOutput, UserPasswordChange
+import time_machine
+from freezegun import freeze_time
+from httpx import AsyncClient
+
+from backend.src.models_schema.auth.auth import Token
+from backend.src.models_schema.user.user import (
+    UserInput,
+    UserOutput,
+    UserPasswordChange,
+)
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
     validate_contents,
@@ -69,6 +76,63 @@ async def test_login_read_user(client: AsyncClient, register_user_test: None):
     )
 
 
+# ----- READ ----- #
+
+
+async def test_read_login_streak(client: AsyncClient, login_user_test: None):
+    """
+    Tests login streak record.
+    """
+    today = datetime.now().date()
+
+    # Logins today
+    response1 = await client.get(
+        "/api/user/me",
+    )
+
+    validate_status_code(response1, 200)
+    validate_model(response1, UserOutput)
+    validate_contents(
+        response1,
+        {
+            "login_streak": 1,
+            "longest_login_streak": 1,
+        },
+    )
+
+    # Logins tomorrow
+    with time_machine.travel(today + timedelta(days=1)):
+        response2 = await client.get(
+            "/api/user/me",
+        )
+
+        validate_status_code(response2, 200)
+        validate_model(response2, UserOutput)
+        validate_contents(
+            response2,
+            {
+                "login_streak": 2,
+                "longest_login_streak": 2,
+            },
+        )
+
+    # Logins 2 days after tomorrow
+    with time_machine.travel(today + timedelta(days=3)):
+        response3 = await client.get(
+            "/api/user/me",
+        )
+
+        validate_status_code(response3, 200)
+        validate_model(response3, UserOutput)
+        validate_contents(
+            response3,
+            {
+                "login_streak": 1,
+                "longest_login_streak": 2,
+            },
+        )
+
+
 # ----- UPDATE ----- #
 
 
@@ -83,12 +147,12 @@ async def test_update_user(client: AsyncClient, login_user_test: None):
 
     response = await client.patch(
         "/api/user/me",
-        json=user_update.model_dump(),
+        json=user_update.model_dump(exclude_unset=True),
     )
 
     validate_status_code(response, 200)
     validate_model(response, UserOutput)
-    validate_contents(response, user_update.model_dump())
+    validate_contents(response, user_update.model_dump(exclude_unset=True))
 
 
 async def test_change_password(client: AsyncClient, login_user_test: None):

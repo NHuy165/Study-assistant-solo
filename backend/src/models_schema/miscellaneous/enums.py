@@ -39,6 +39,7 @@ class ReviewItemContentType(str, Enum):
 
 class ExerciseItemContentType(str, Enum):
     MULTIPLE_CHOICE_QUESTIONS_CHOICE = "MULTIPLE_CHOICE_QUESTIONS_CHOICE"
+    OPEN_ENDED_CORRECT = "OPEN_ENDED_CORRECT"
 
 
 class AggregateTarget(str, Enum):

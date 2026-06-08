@@ -4,7 +4,7 @@ from pgvector.sqlalchemy import Vector
 from sqlmodel import Column, Field, Index, Relationship, SQLModel
 
 if TYPE_CHECKING:
-    from backend.src.models_schema.document import Document
+    from backend.src.models_schema.document.document import Document
 
 
 class DocumentChunk(SQLModel, table=True):

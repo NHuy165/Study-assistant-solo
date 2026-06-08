@@ -1,7 +1,7 @@
 from typing import Sequence
 
 from backend.src.core.config import settings
-from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.models_schema.document.document_chunk import DocumentChunk
 
 
 def RRF(
@@ -30,7 +30,7 @@ def RRF(
         fused_scores[chunk.id] += 1.0 / (rank + 1 + k)
 
     sorted_chunk_ids = sorted(fused_scores, key=lambda k: fused_scores[k], reverse=True)
-    top_chunk_ids = sorted_chunk_ids[: settings.N_CHUNKS_RETRIEVED]
+    top_chunk_ids = sorted_chunk_ids[: settings.DEFAULT_N_CHUNKS_RETRIEVED]
 
     core_chunks = [chunk_map[i] for i in top_chunk_ids]
 

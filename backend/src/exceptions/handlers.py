@@ -64,7 +64,7 @@ async def starlette_exceptions_handlers(request: Request, exc: StarletteHTTPExce
 async def validation_exceptions_handler(request: Request, exc: RequestValidationError):
     exception_response = ExceptionResponse(
         exception_type=ExceptionType.REQUEST_VALIDATION,
-        message="Request validation error.",
+        message=f"Request validation error. Details: {exc.errors()}",
     )
 
     return JSONResponse(

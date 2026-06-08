@@ -5,7 +5,7 @@ from fastapi.security import OAuth2PasswordRequestForm
 
 from backend.src.core.dependencies import SessionDep
 from backend.src.exceptions.core import Responses
-from backend.src.models_schema.auth import Token
+from backend.src.models_schema.auth.auth import Token
 from backend.src.services import auth
 
 router = APIRouter()

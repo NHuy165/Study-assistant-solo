@@ -5,7 +5,7 @@ from sqlalchemy.orm import selectinload
 from sqlmodel import and_, col, or_, select
 
 from backend.src.core.config import settings
-from backend.src.models_schema.document_chunk import DocumentChunk
+from backend.src.models_schema.document.document_chunk import DocumentChunk
 
 
 async def neighbouring_chunks(
@@ -26,9 +26,9 @@ async def neighbouring_chunks(
                     and_(
                         DocumentChunk.document_id == chunk.document_id,
                         DocumentChunk.document_chunk_index  # type: ignore
-                        >= chunk.document_chunk_index - settings.N_CHUNKS_WINDOW,
+                        >= chunk.document_chunk_index - settings.DEFAULT_N_CHUNKS_WINDOW,
                         DocumentChunk.document_chunk_index  # type: ignore
-                        <= chunk.document_chunk_index + settings.N_CHUNKS_WINDOW,
+                        <= chunk.document_chunk_index + settings.DEFAULT_N_CHUNKS_WINDOW,
                     )
                 )
             else:

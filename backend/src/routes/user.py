@@ -2,7 +2,7 @@ from fastapi import APIRouter, status
 
 from backend.src.core.dependencies import SessionDep, UserDep
 from backend.src.exceptions.core import Responses
-from backend.src.models_schema.user import (
+from backend.src.models_schema.user.user import (
     UserInput,
     UserOutput,
     UserPasswordChange,

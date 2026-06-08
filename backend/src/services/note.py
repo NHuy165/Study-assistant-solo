@@ -2,9 +2,9 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, delete, select
 
 from backend.src.exceptions.core import ExceptionNotFound_404
-from backend.src.models_schema.interaction import Interaction
-from backend.src.models_schema.note import Note, NoteInput, NoteUpdate
-from backend.src.models_schema.user import User
+from backend.src.models_schema.interaction.interaction import Interaction
+from backend.src.models_schema.note.note import Note, NoteInput, NoteUpdate
+from backend.src.models_schema.user.user import User
 
 # ----- CREATE ----- #
 
