@@ -41,7 +41,12 @@ class PdfExtractor(DocumentExtractor):
 
     @classmethod
     async def extract(
-        cls, user: User, session: AsyncSession, file: UploadFile, document: Document
+        cls,
+        user: User,
+        session: AsyncSession,
+        file: UploadFile,
+        document: Document,
+        subject_type_overwrite: bool,
     ) -> DocumentAnalysis | None:
 
         def process():
@@ -112,7 +117,9 @@ class PdfExtractor(DocumentExtractor):
             )
             final_prompt = document_analysis_augmentation(params)
 
-            analysis_task = analysis_task_generator(session, final_prompt, document)
+            analysis_task = analysis_task_generator(
+                session, final_prompt, document, subject_type_overwrite
+            )
 
             # Calls LLM
             vectors, document_analysis = await asyncio.gather(embed_task, analysis_task)

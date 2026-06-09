@@ -42,7 +42,12 @@ class ImageExtractor(DocumentExtractor):
 
     @classmethod
     async def extract(
-        cls, user: User, session: AsyncSession, file: UploadFile, document: Document
+        cls,
+        user: User,
+        session: AsyncSession,
+        file: UploadFile,
+        document: Document,
+        subject_type_overwrite: bool,
     ) -> DocumentAnalysis:
         # Reads the image using the model
         image_description = await GlobalAPI.caption_image(file)
@@ -68,7 +73,9 @@ class ImageExtractor(DocumentExtractor):
         )
         final_prompt = document_analysis_augmentation(params)
 
-        analysis_task = analysis_task_generator(session, final_prompt, document)
+        analysis_task = analysis_task_generator(
+            session, final_prompt, document, subject_type_overwrite
+        )
 
         # Calls LLM
         vector, document_analysis = await asyncio.gather(embed_task, analysis_task)

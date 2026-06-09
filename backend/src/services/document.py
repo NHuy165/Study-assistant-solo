@@ -82,6 +82,7 @@ async def save_document(
         session=session,
         file=file,
         document=document,
+        subject_type_overwrite=document_input.subject_type_overwrite,
     )
 
     await session.commit()
