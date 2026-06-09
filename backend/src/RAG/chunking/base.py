@@ -38,7 +38,12 @@ class DocumentExtractor(ABC):
     @classmethod
     @abstractmethod
     async def extract(
-        cls, user: User, session: AsyncSession, file: UploadFile, document: Document
+        cls,
+        user: User,
+        session: AsyncSession,
+        file: UploadFile,
+        document: Document,
+        subject_type_overwrite: bool,
     ) -> DocumentAnalysis | None:
         """
         Extracts and saves chunks.
@@ -50,14 +55,19 @@ def save_document_analysis(
     session: AsyncSession,
     analysis: str,
     document: Document,
+    subject_type_overwrite: bool,
 ) -> DocumentAnalysis:
     """
     Validates and saves the document analysis.
     """
     validated_analysis = DocumentAnalysisSchema.model_validate_json(analysis)
 
-    # Automatic subject type filling
-    if validated_analysis.subject_type_overwrite and document.subject_type is None:
+    # Automatic subject type filling, validates based on 3 criteria: user's desire to overwrite, model's decision to overwrite, and whether the input type was null
+    if (
+        subject_type_overwrite
+        and validated_analysis.subject_type_overwrite
+        and document.subject_type is None
+    ):
         document.subject_type = validated_analysis.subject_type
 
     material_recommendations = []
@@ -91,6 +101,7 @@ def analysis_task_generator(
     session: AsyncSession,
     final_prompt: str,
     document: Document,
+    subject_type_overwrite: bool,
 ) -> CoroutineType[Any, Any, DocumentAnalysis]:
     """
     Generates an "analysis_task" (a Couroutine), ready to be awaited.
@@ -104,7 +115,9 @@ def analysis_task_generator(
             )
 
             try:
-                document_analysis = save_document_analysis(session, analysis, document)
+                document_analysis = save_document_analysis(
+                    session, analysis, document, subject_type_overwrite
+                )
                 return document_analysis
             except ValidationError as e:
                 i_retry += 1
