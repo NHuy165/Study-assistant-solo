@@ -15,7 +15,15 @@ def validate_model(response: Response, model: type[Any]) -> None:
     adapter.validate_python(response.json())
 
 
-def validate_contents(response: Response, expected_contents: dict | list[dict]) -> None:
+def validate_object_contents(object: BaseModel, expected_contents: dict) -> None:
+    assert expected_contents.items() <= object.model_dump().items(), (
+        f"Expected: {expected_contents}. Received: {object.model_dump()}"
+    )
+
+
+def validate_response_contents(
+    response: Response, expected_contents: dict | list[dict]
+) -> None:
     if isinstance(expected_contents, dict):
         assert expected_contents.items() <= response.json().items(), (
             f"Expected: {expected_contents}. Received: {response.json()}"

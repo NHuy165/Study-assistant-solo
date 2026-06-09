@@ -1,19 +1,21 @@
 from datetime import datetime, timedelta
 
 import time_machine
-from freezegun import freeze_time
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.models_schema.auth.auth import Token
 from backend.src.models_schema.user.user import (
+    User,
     UserInput,
     UserOutput,
     UserPasswordChange,
 )
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
-    validate_contents,
     validate_model,
+    validate_object_contents,
+    validate_response_contents,
     validate_status_code,
 )
 
@@ -34,13 +36,13 @@ async def test_register_user(client: AsyncClient):
 
     validate_status_code(response, 200)
     validate_model(response, UserOutput)
-    validate_contents(response, user.model_dump(exclude={"password"}))
+    validate_response_contents(response, user.model_dump(exclude={"password"}))
 
 
 # ----- AUTH ----- #
 
 
-async def test_login_read_user(client: AsyncClient, register_user_test: None):
+async def test_login_read_user(client: AsyncClient, register_user_test: User):
     """
     Logs in an account and uses the token to read the account information.
     """
@@ -67,7 +69,7 @@ async def test_login_read_user(client: AsyncClient, register_user_test: None):
 
     validate_status_code(response_read_user, 200)
     validate_model(response_read_user, UserOutput)
-    validate_contents(
+    validate_response_contents(
         response_read_user,
         {
             "username": "test",
@@ -79,7 +81,11 @@ async def test_login_read_user(client: AsyncClient, register_user_test: None):
 # ----- READ ----- #
 
 
-async def test_read_login_streak(client: AsyncClient, login_user_test: None):
+async def test_read_login_streak(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+):
     """
     Tests login streak record.
     """
@@ -92,7 +98,7 @@ async def test_read_login_streak(client: AsyncClient, login_user_test: None):
 
     validate_status_code(response1, 200)
     validate_model(response1, UserOutput)
-    validate_contents(
+    validate_response_contents(
         response1,
         {
             "login_streak": 1,
@@ -108,7 +114,7 @@ async def test_read_login_streak(client: AsyncClient, login_user_test: None):
 
         validate_status_code(response2, 200)
         validate_model(response2, UserOutput)
-        validate_contents(
+        validate_response_contents(
             response2,
             {
                 "login_streak": 2,
@@ -124,7 +130,7 @@ async def test_read_login_streak(client: AsyncClient, login_user_test: None):
 
         validate_status_code(response3, 200)
         validate_model(response3, UserOutput)
-        validate_contents(
+        validate_response_contents(
             response3,
             {
                 "login_streak": 1,
@@ -136,10 +142,17 @@ async def test_read_login_streak(client: AsyncClient, login_user_test: None):
 # ----- UPDATE ----- #
 
 
-async def test_update_user(client: AsyncClient, login_user_test: None):
+async def test_update_user(
+    session: AsyncSession,
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+):
     """
     Updates user account.
     """
+    user = register_user_test
+
     user_update = UserUpdate(
         username="updated",
         email="updated@gmail.com",
@@ -152,10 +165,18 @@ async def test_update_user(client: AsyncClient, login_user_test: None):
 
     validate_status_code(response, 200)
     validate_model(response, UserOutput)
-    validate_contents(response, user_update.model_dump(exclude_unset=True))
+    validate_response_contents(response, user_update.model_dump(exclude_unset=True))
+
+    await session.refresh(user)
+
+    validate_object_contents(user, user_update.model_dump(exclude_unset=True))
 
 
-async def test_change_password(client: AsyncClient, login_user_test: None):
+async def test_change_password(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+):
     """
     Changes user password.
     """

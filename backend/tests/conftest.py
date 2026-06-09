@@ -37,7 +37,11 @@ async def session_fixture():
 
 @pytest.fixture(name="app")
 async def app_fixture(session: AsyncSession):
-    app.dependency_overrides[get_async_session] = lambda: session
+    async def override_get_async_session():
+        async with SessionLocal() as session:
+            yield session
+
+    app.dependency_overrides[get_async_session] = override_get_async_session
 
     yield app
 

@@ -8,14 +8,19 @@ from backend.src.models_schema.interaction.interaction import (
     InteractionOutput,
     InteractionUpdate,
 )
+from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
-    validate_contents,
     validate_model,
+    validate_response_contents,
     validate_status_code,
 )
 
 
-async def test_create_interaction(client: AsyncClient, login_user_test: None) -> None:
+async def test_create_interaction(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+) -> None:
     """
     Creates an interaction.
     """
@@ -28,24 +33,26 @@ async def test_create_interaction(client: AsyncClient, login_user_test: None) ->
 
     validate_status_code(response, 200)
     validate_model(response, InteractionOutput)
-    validate_contents(response, interaction_input.model_dump())
+    validate_response_contents(response, interaction_input.model_dump())
 
 
 async def test_read_all_interactions(
     client: AsyncClient,
-    create_interaction_custom: Callable[[str], CoroutineType[Any, Any, int]],
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_custom: Callable[[User, str], CoroutineType[Any, Any, int]],
 ) -> None:
     """
     Reads all interactions.
     """
-    await create_interaction_custom("interaction1")
-    await create_interaction_custom("interaction2")
+    await create_interaction_custom(register_user_test, "interaction1")
+    await create_interaction_custom(register_user_test, "interaction2")
 
     response = await client.get("/api/interaction/")
 
     validate_status_code(response, 200)
     validate_model(response, list[InteractionOutput])
-    validate_contents(
+    validate_response_contents(
         response,
         [
             {"name": "interaction1"},
@@ -56,6 +63,8 @@ async def test_read_all_interactions(
 
 async def test_update_interaction(
     client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
     create_interaction_test: int,
 ) -> None:
     """
@@ -72,11 +81,13 @@ async def test_update_interaction(
 
     validate_status_code(response, 200)
     validate_model(response, InteractionOutput)
-    validate_contents(response, interaction_update.model_dump())
+    validate_response_contents(response, interaction_update.model_dump())
 
 
 async def test_delete_interaction(
     client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
     create_interaction_test: int,
 ) -> None:
     """
