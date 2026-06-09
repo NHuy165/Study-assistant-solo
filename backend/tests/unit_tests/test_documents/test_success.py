@@ -1,7 +1,7 @@
 from pathlib import Path
 from types import CoroutineType
 from typing import Any, Callable
-from unittest.mock import patch
+from unittest.mock import AsyncMock, patch
 
 import pytest
 from httpx import AsyncClient
@@ -46,8 +46,8 @@ from backend.tests.utils.validators import (
 @patch.object(GlobalAPI, "generate_document_analysis")
 @patch.object(GlobalAPI, "mass_embed")
 async def test_create_document(
-    mock_GlobalAPI_mass_embed,
-    mock_GlobalAPI_generate_document_analysis,
+    mock_GlobalAPI_mass_embed: AsyncMock,
+    mock_GlobalAPI_generate_document_analysis: AsyncMock,
     client: AsyncClient,
     register_user_test: User,
     login_user_test: None,

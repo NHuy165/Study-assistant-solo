@@ -62,4 +62,5 @@ pytest_plugins = [
     "backend.tests.fixtures.auth",
     "backend.tests.fixtures.interactions",
     "backend.tests.fixtures.documents",
+    "backend.tests.fixtures.llm_responses",
 ]
