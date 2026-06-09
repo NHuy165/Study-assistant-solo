@@ -72,7 +72,7 @@ async def test_login_read_user(client: AsyncClient, register_user_test: User):
     validate_response_contents(
         response_read_user,
         {
-            "username": "test",
+            "username": "test-user",
             "email": "test@gmail.com",
         },
     )
@@ -151,8 +151,6 @@ async def test_update_user(
     """
     Updates user account.
     """
-    user = register_user_test
-
     user_update = UserUpdate(
         username="updated",
         email="updated@gmail.com",
@@ -167,9 +165,11 @@ async def test_update_user(
     validate_model(response, UserOutput)
     validate_response_contents(response, user_update.model_dump(exclude_unset=True))
 
-    await session.refresh(user)
+    await session.refresh(register_user_test)
 
-    validate_object_contents(user, user_update.model_dump(exclude_unset=True))
+    validate_object_contents(
+        register_user_test, user_update.model_dump(exclude_unset=True)
+    )
 
 
 async def test_change_password(

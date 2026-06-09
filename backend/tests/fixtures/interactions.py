@@ -2,13 +2,11 @@ from types import CoroutineType
 from typing import Any, Callable
 
 import pytest
-from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
 
 from backend.src.models_schema.interaction.interaction import (
     Interaction,
-    InteractionInput,
 )
 from backend.src.models_schema.user.user import User
 
@@ -16,23 +14,24 @@ from backend.src.models_schema.user.user import User
 @pytest.fixture(name="create_interaction_custom")
 async def create_interaction_custom_fixture(
     session: AsyncSession,
-) -> Callable[[User, str], CoroutineType[Any, Any, int]]:
+) -> Callable[[User, str], CoroutineType[Any, Any, Interaction]]:
     """
     Returns a function that creates an interaction with a custom name attached to a custom user.
     """
 
-    async def create_interaction_custom(user: User, interaction_name: str) -> int:
+    async def create_interaction_custom(
+        user: User, interaction_name: str
+    ) -> Interaction:
         interaction = Interaction(
-            name=interaction_name,
+            name=f"{interaction_name}-interaction",
             description=f"{interaction_name}-description",
             user=user,
         )  # type: ignore
 
         session.add(interaction)
         await session.commit()
-        assert interaction.id is not None
 
-        return interaction.id
+        return interaction
 
     return create_interaction_custom
 
@@ -40,10 +39,12 @@ async def create_interaction_custom_fixture(
 @pytest.fixture(name="create_interaction_test")
 async def create_interaction_test_fixture(
     session: AsyncSession,
-    create_interaction_custom: Callable[[User, str], CoroutineType[Any, Any, int]],
-) -> int:
+    create_interaction_custom: Callable[
+        [User, str], CoroutineType[Any, Any, Interaction]
+    ],
+) -> Interaction:
     """
-    Automatically creates an interaction with the name "test", attached to the user "test".
+    Automatically creates an interaction with the name "test-interaction", attached to the user "test-user".
     """
     user = (
         (await session.execute(select(User).where(User.email == "test@gmail.com")))
@@ -52,5 +53,5 @@ async def create_interaction_test_fixture(
     )
     assert user is not None
 
-    interaction_id = await create_interaction_custom(user, "test")
-    return interaction_id
+    interaction = await create_interaction_custom(user, "test")
+    return interaction
