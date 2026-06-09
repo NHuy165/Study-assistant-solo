@@ -6,7 +6,7 @@ from httpx import AsyncClient
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.security import get_hashed_password
-from backend.src.models_schema.user.user import User, UserInput
+from backend.src.models_schema.user.user import User
 
 # ----- REGISTER ----- #
 
@@ -21,7 +21,7 @@ async def register_user_custom_fixture(
 
     async def register_user_custom(username: str) -> User:
         user = User(
-            username=f"{username}",
+            username=f"{username}-user",
             email=f"{username}@gmail.com",
             description=f"{username}-description",
             hashed_password=get_hashed_password(f"{username}-password"),
@@ -40,7 +40,7 @@ async def register_user_test_fixture(
     register_user_custom: Callable[[str], CoroutineType[Any, Any, User]],
 ) -> User:
     """
-    Automatically registers a user with the username "test".
+    Automatically registers a user with the username "test-user".
     """
 
     return await register_user_custom("test")
@@ -77,7 +77,7 @@ async def login_user_test_fixture(
     login_user_custom: Callable[[str], CoroutineType[Any, Any, None]],
 ) -> None:
     """
-    Automatically logins a user with the username "test".
+    Automatically logins a user with the username "test-user".
     """
 
     await login_user_custom("test")

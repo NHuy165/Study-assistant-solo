@@ -58,4 +58,8 @@ async def client_fixture(app: FastAPI):
 
 # Imports other fixtures
 
-pytest_plugins = ["backend.tests.fixtures.auth", "backend.tests.fixtures.interactions"]
+pytest_plugins = [
+    "backend.tests.fixtures.auth",
+    "backend.tests.fixtures.interactions",
+    "backend.tests.fixtures.documents",
+]

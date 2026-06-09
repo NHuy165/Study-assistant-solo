@@ -2,8 +2,10 @@ from types import CoroutineType
 from typing import Any, Callable
 
 from httpx import AsyncClient
+from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.models_schema.interaction.interaction import (
+    Interaction,
     InteractionInput,
     InteractionOutput,
     InteractionUpdate,
@@ -11,6 +13,7 @@ from backend.src.models_schema.interaction.interaction import (
 from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
     validate_model,
+    validate_object_contents,
     validate_response_contents,
     validate_status_code,
 )
@@ -40,13 +43,15 @@ async def test_read_all_interactions(
     client: AsyncClient,
     register_user_test: User,
     login_user_test: None,
-    create_interaction_custom: Callable[[User, str], CoroutineType[Any, Any, int]],
+    create_interaction_custom: Callable[
+        [User, str], CoroutineType[Any, Any, Interaction]
+    ],
 ) -> None:
     """
     Reads all interactions.
     """
-    await create_interaction_custom(register_user_test, "interaction1")
-    await create_interaction_custom(register_user_test, "interaction2")
+    await create_interaction_custom(register_user_test, "test1")
+    await create_interaction_custom(register_user_test, "test2")
 
     response = await client.get("/api/interaction/")
 
@@ -55,17 +60,18 @@ async def test_read_all_interactions(
     validate_response_contents(
         response,
         [
-            {"name": "interaction1"},
-            {"name": "interaction2"},
+            {"name": "test1-interaction"},
+            {"name": "test2-interaction"},
         ],
     )
 
 
 async def test_update_interaction(
+    session: AsyncSession,
     client: AsyncClient,
     register_user_test: User,
     login_user_test: None,
-    create_interaction_test: int,
+    create_interaction_test: Interaction,
 ) -> None:
     """
     Updates an interaction.
@@ -75,32 +81,40 @@ async def test_update_interaction(
     )
 
     response = await client.patch(
-        f"/api/interaction/{create_interaction_test}",
-        json=interaction_update.model_dump(),
+        f"/api/interaction/{create_interaction_test.id}",
+        json=interaction_update.model_dump(exclude_unset=True),
     )
 
     validate_status_code(response, 200)
     validate_model(response, InteractionOutput)
-    validate_response_contents(response, interaction_update.model_dump())
+    validate_response_contents(
+        response, interaction_update.model_dump(exclude_unset=True)
+    )
+
+    await session.refresh(create_interaction_test)
+
+    validate_object_contents(
+        create_interaction_test, interaction_update.model_dump(exclude_unset=True)
+    )
 
 
 async def test_delete_interaction(
     client: AsyncClient,
     register_user_test: User,
     login_user_test: None,
-    create_interaction_test: int,
+    create_interaction_test: Interaction,
 ) -> None:
     """
     Deletes an interaction;
     """
-    response_delete = await client.delete(
-        f"/api/interaction/{create_interaction_test}",
+    response1 = await client.delete(
+        f"/api/interaction/{create_interaction_test.id}",
     )
 
-    validate_status_code(response_delete, 204)
+    validate_status_code(response1, 204)
 
-    response_delete_2 = await client.delete(
-        f"/api/interaction/{create_interaction_test}",
+    response2 = await client.delete(
+        f"/api/interaction/{create_interaction_test.id}",
     )
 
-    validate_status_code(response_delete_2, 404)
+    validate_status_code(response2, 404)
