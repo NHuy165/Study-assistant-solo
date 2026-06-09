@@ -6,18 +6,18 @@ from httpx import AsyncClient
 from pydantic import EmailStr
 
 from backend.src.exceptions.core import ExceptionResponse, ExceptionType
-from backend.src.models_schema.user.user import UserInput, UserPasswordChange
+from backend.src.models_schema.user.user import User, UserInput, UserPasswordChange
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
-    validate_contents,
     validate_model,
+    validate_response_contents,
     validate_status_code,
 )
 
 # ----- CREATE ----- #
 
 
-async def test_register_user(client: AsyncClient, register_user_test: None):
+async def test_register_user(client: AsyncClient, register_user_test: User):
     """
     Fails to register a user with overlapping email.
     """
@@ -31,7 +31,9 @@ async def test_register_user(client: AsyncClient, register_user_test: None):
 
     validate_status_code(response, 409)
     validate_model(response, ExceptionResponse)
-    validate_contents(response, {"exception_type": ExceptionType.TAKEN_INFO.value})
+    validate_response_contents(
+        response, {"exception_type": ExceptionType.TAKEN_INFO.value}
+    )
 
 
 # ----- AUTH ----- #
@@ -45,7 +47,10 @@ async def test_register_user(client: AsyncClient, register_user_test: None):
     ],
 )
 async def test_login_user(
-    client: AsyncClient, register_user_test: None, email: EmailStr, password: str
+    client: AsyncClient,
+    register_user_test: User,
+    email: EmailStr,
+    password: str,
 ):
     """
     Fails to login with incorrect credentials.
@@ -60,7 +65,9 @@ async def test_login_user(
 
     validate_status_code(response, 401)
     validate_model(response, ExceptionResponse)
-    validate_contents(response, {"exception_type": ExceptionType.AUTHENTICATION.value})
+    validate_response_contents(
+        response, {"exception_type": ExceptionType.AUTHENTICATION.value}
+    )
 
 
 # ----- UPDATE ----- #
@@ -68,6 +75,7 @@ async def test_login_user(
 
 async def test_update_user(
     client: AsyncClient,
+    register_user_test: User,
     login_user_test: None,
     register_user_custom: Callable[[str], CoroutineType[Any, Any, None]],
 ):
@@ -87,10 +95,16 @@ async def test_update_user(
 
     validate_status_code(response, 409)
     validate_model(response, ExceptionResponse)
-    validate_contents(response, {"exception_type": ExceptionType.TAKEN_INFO.value})
+    validate_response_contents(
+        response, {"exception_type": ExceptionType.TAKEN_INFO.value}
+    )
 
 
-async def test_change_password(client: AsyncClient, login_user_test: None):
+async def test_change_password(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+):
     """
     Fails to change password with incorrect incredentials.
     """
@@ -105,4 +119,6 @@ async def test_change_password(client: AsyncClient, login_user_test: None):
 
     validate_status_code(response, 401)
     validate_model(response, ExceptionResponse)
-    validate_contents(response, {"exception_type": ExceptionType.AUTHENTICATION.value})
+    validate_response_contents(
+        response, {"exception_type": ExceptionType.AUTHENTICATION.value}
+    )
