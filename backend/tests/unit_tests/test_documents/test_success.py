@@ -45,7 +45,9 @@ from backend.tests.utils.validators import (
 )
 @patch.object(GlobalAPI, "generate_document_analysis")
 @patch.object(GlobalAPI, "mass_embed")
+@patch.object(GlobalAPI, "caption_image")
 async def test_create_document(
+    mock_GlobalAPI_caption_image: AsyncMock,
     mock_GlobalAPI_mass_embed: AsyncMock,
     mock_GlobalAPI_generate_document_analysis: AsyncMock,
     client: AsyncClient,
@@ -84,6 +86,9 @@ async def test_create_document(
     mock_GlobalAPI_generate_document_analysis.return_value = (
         mock_analysis.model_dump_json()
     )
+
+    # Mock image captaining
+    mock_GlobalAPI_caption_image.return_value = "Mock image captioning"
 
     filepath = Path(__file__).resolve().parent.parent.parent / "test_data" / filename
 

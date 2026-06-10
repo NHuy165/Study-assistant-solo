@@ -5,6 +5,7 @@ import jwt
 from fastapi import Depends, Path, Query
 from fastapi.security import OAuth2PasswordBearer
 from pydantic import ValidationError
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
@@ -113,17 +114,15 @@ async def get_current_user(
             elif time_between > timedelta(days=1):
                 user.login_streak = 1
 
-        new_check_in = CheckIn(
-            time=today,
-            user=user,
+        # Inserting with race condition check
+        query_insert = (
+            insert(CheckIn)
+            .values({"time": today, "user_id": user.id})
+            .on_conflict_do_nothing(index_elements=["user_id", "time"])
         )
 
-        # Check in with race condition check
-        session.add(new_check_in)
-        try:
-            await session.commit()
-        except IntegrityError:
-            await session.rollback()
+        await session.execute(query_insert)
+        await session.commit()
 
     return user
 
