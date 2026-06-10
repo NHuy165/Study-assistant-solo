@@ -107,11 +107,11 @@ class StudyActivity(StudyActivityBase, table=True):
         datetime,
         Field(
             sa_column=Column(DateTime(timezone=True)),
-            default_factory=lambda: datetime.now(timezone.utc),
         ),
     ]
     submitted_at: Annotated[
-        datetime | None, Field(sa_column=Column(DateTime(timezone=True)))
+        datetime | None,
+        Field(sa_column=Column(DateTime(timezone=True))),
     ] = None
 
     interaction: "Interaction" = Relationship(back_populates="study_activities")

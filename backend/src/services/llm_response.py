@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, select
 
@@ -28,6 +30,7 @@ from backend.src.RAG.retrieval.prompt_rewrite import rewrite_prompt
 async def create_llm_response(
     user: User,
     session: AsyncSession,
+    current_datetime: datetime,
     llm_response_input: LLMResponseInput,
     interaction: Interaction,
 ) -> LLMResponse:
@@ -78,7 +81,8 @@ async def create_llm_response(
         prompt=llm_response_input.prompt,
         answer=answer,
         interaction=interaction,
-    )  # type: ignore
+        created_at=current_datetime,
+    )
 
     session.add(llm_response)
     await session.commit()

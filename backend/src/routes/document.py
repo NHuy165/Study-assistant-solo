@@ -2,7 +2,12 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query, UploadFile, status
 
-from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
+from backend.src.core.dependencies import (
+    DatetimeDep,
+    InteractionDep,
+    SessionDep,
+    UserDep,
+)
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.document.document import (
     DocumentInput,
@@ -10,7 +15,7 @@ from backend.src.models_schema.document.document import (
     DocumentUpdate,
 )
 from backend.src.models_schema.document.document_analysis import DocumentAnalysisOutput
-from backend.src.services import document
+from backend.src.services import document as document_service
 
 router = APIRouter()
 
@@ -31,15 +36,21 @@ router = APIRouter()
 async def save_document(
     user: UserDep,
     session: SessionDep,
+    current_datetime: DatetimeDep,
     file: UploadFile,
     document_input: Annotated[DocumentInput, Query()],
     interaction: InteractionDep,
 ):
     """
-    Embeds and saves a user-uploaded document to the database. Documents belong to an interaction.
+    Embeds and saves a user-uploaded document_service to the database. Documents belong to an interaction.
     """
-    document_output, document_analysis = await document.save_document(
-        user, session, file, interaction, document_input
+    document_output, document_analysis = await document_service.save_document(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        file=file,
+        interaction=interaction,
+        document_input=document_input,
     )
 
     return document_output, document_analysis
@@ -64,7 +75,10 @@ async def read_all_documents(
     """
     Reads all documents in an interaction.
     """
-    documents_output = await document.read_all_documents(session, interaction)
+    documents_output = await document_service.read_all_documents(
+        session=session,
+        interaction=interaction,
+    )
     return documents_output
 
 
@@ -83,9 +97,13 @@ async def read_document_complete(
     document_id: int,
 ):
     """
-    Reads a document, together with the document analysis performed by the LLM.
+    Reads a document_service, together with the document_service analysis performed by the LLM.
     """
-    result = await document.read_document_complete(session, interaction, document_id)
+    result = await document_service.read_document_complete(
+        session=session,
+        interaction=interaction,
+        document_id=document_id,
+    )
     return result
 
 
@@ -107,10 +125,13 @@ async def update_document(
     document_update: DocumentUpdate,
 ):
     """
-    Updates a document's information. Document's contents cannot be updated.
+    Updates a document_service's information. Document's contents cannot be updated.
     """
-    document_output = await document.update_document(
-        user, session, document_id, document_update
+    document_output = await document_service.update_document(
+        user=user,
+        session=session,
+        document_id=document_id,
+        document_update=document_update,
     )
     return document_output
 
@@ -132,6 +153,10 @@ async def delete_document(
     document_id: int,
 ):
     """
-    Deletes a document from an interaction.
+    Deletes a document_service from an interaction.
     """
-    await document.delete_document(user, session, document_id)
+    await document_service.delete_document(
+        user=user,
+        session=session,
+        document_id=document_id,
+    )

@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from types import CoroutineType
 from typing import Any, Callable
 
@@ -25,7 +26,8 @@ async def register_user_custom_fixture(
             email=f"{username}@gmail.com",
             description=f"{username}-description",
             hashed_password=get_hashed_password(f"{username}-password"),
-        )  # type: ignore
+            created_at=datetime.now(timezone.utc),
+        )
 
         session.add(user)
         await session.commit()

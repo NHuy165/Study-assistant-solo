@@ -28,13 +28,18 @@ async def check_email_exists(session: AsyncSession, email: EmailStr):
         raise ExceptionTakenInfo_409("user", "email")
 
 
-async def register_user(session: AsyncSession, user_input: UserInput) -> User:
+async def register_user(
+    session: AsyncSession, current_datetime: datetime, user_input: UserInput
+) -> User:
     await check_email_exists(session, user_input.email)
     await session.commit()
 
     user = User.model_validate(
         user_input.model_dump(),
-        update={"hashed_password": get_hashed_password(user_input.password)},
+        update={
+            "hashed_password": get_hashed_password(user_input.password),
+            "created_at": current_datetime,
+        },
     )
 
     session.add(user)

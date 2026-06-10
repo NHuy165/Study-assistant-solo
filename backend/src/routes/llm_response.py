@@ -2,13 +2,18 @@ from typing import Annotated
 
 from fastapi import APIRouter, Query
 
-from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
+from backend.src.core.dependencies import (
+    DatetimeDep,
+    InteractionDep,
+    SessionDep,
+    UserDep,
+)
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.llm_response.llm_response import (
     LLMResponseInput,
     LLMResponseOutput,
 )
-from backend.src.services import llm_response
+from backend.src.services import llm_response as llm_response_service
 
 router = APIRouter()
 
@@ -27,14 +32,19 @@ router = APIRouter()
 async def create_llm_response(
     user: UserDep,
     session: SessionDep,
-    llm_response_input: LLMResponseInput,
+    current_datetime: DatetimeDep,
     interaction: InteractionDep,
+    llm_response_input: LLMResponseInput,
 ):
     """
     Receives a user prompt and returns the model's answer. Conversations (prompts and answers) belong to an interaction.
     """
-    llm_response_output = await llm_response.create_llm_response(
-        user, session, llm_response_input, interaction
+    llm_response_output = await llm_response_service.create_llm_response(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        llm_response_input=llm_response_input,
+        interaction=interaction,
     )
 
     return llm_response_output
@@ -59,7 +69,9 @@ async def read_llm_responses(
     """
     Reads past conversations in an interaction.
     """
-    llm_responses_output = await llm_response.read_llm_responses(
-        session, interaction, limit
+    llm_responses_output = await llm_response_service.read_llm_responses(
+        session=session,
+        interaction=interaction,
+        limit=limit,
     )
     return llm_responses_output

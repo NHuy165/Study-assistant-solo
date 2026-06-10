@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import select
@@ -30,7 +32,10 @@ async def authenticate_user(
 
 
 async def login_for_token(
-    session: AsyncSession, email: EmailStr, password: str
+    session: AsyncSession,
+    current_datetime: datetime,
+    email: EmailStr,
+    password: str,
 ) -> Token:
     user = await authenticate_user(session, email, password)
 
@@ -38,6 +43,6 @@ async def login_for_token(
 
     data = {"sub": str(user.id)}
 
-    token_str = create_token(data)
+    token_str = create_token(data, current_datetime)
 
     return Token(access_token=token_str, token_type="bearer")

@@ -1,6 +1,6 @@
 from fastapi import APIRouter, status
 
-from backend.src.core.dependencies import SessionDep, UserDep
+from backend.src.core.dependencies import DatetimeDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.user.user import (
     UserInput,
@@ -22,11 +22,17 @@ router = APIRouter()
         409: Responses.RESPONSE_409_CONFLICT,
     },
 )
-async def register_user(session: SessionDep, user_input: UserInput):
+async def register_user(
+    session: SessionDep, current_datetime: DatetimeDep, user_input: UserInput
+):
     """
     Creates a user account.
     """
-    user_output = await user_service.register_user(session, user_input)
+    user_output = await user_service.register_user(
+        session=session,
+        current_datetime=current_datetime,
+        user_input=user_input,
+    )
     return user_output
 
 
@@ -44,7 +50,9 @@ async def read_user(user: UserDep):
     """
     Reads current user's public information.
     """
-    user_output = await user_service.read_user(user)
+    user_output = await user_service.read_user(
+        user=user,
+    )
     return user_output
 
 
@@ -64,7 +72,11 @@ async def update_user(user: UserDep, session: SessionDep, user_update: UserUpdat
     """
     Updates current user's public information.
     """
-    user_output = await user_service.update_user(user, session, user_update)
+    user_output = await user_service.update_user(
+        user=user,
+        session=session,
+        user_update=user_update,
+    )
     return user_output
 
 
@@ -81,4 +93,8 @@ async def update_password(
     """
     Updates current user's password.
     """
-    await user_service.update_password(user, session, password_change)
+    await user_service.update_password(
+        user=user,
+        session=session,
+        password_change=password_change,
+    )

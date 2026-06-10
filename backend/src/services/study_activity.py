@@ -245,6 +245,7 @@ save_mapper = {
 async def create_study_activity(
     user: User,
     session: AsyncSession,
+    current_datetime: datetime,
     interaction: Interaction,
     study_activity_input: StudyActivityInput,
 ) -> StudyActivity:
@@ -344,13 +345,14 @@ async def create_study_activity(
 
     study_activity = StudyActivity(
         prompt=study_activity_input.prompt,
-        activity_type=study_activity_input.activity_type,
+        activity_type=study_activity_input.activity_type,  # type: ignore
         activity_format=study_activity_input.activity_format,
         subject_type=study_activity_input.subject_type,
         name=validated_activity.name,
         description=validated_activity.description,
         interaction=interaction,
-    )  # type: ignore
+        created_at=current_datetime,
+    )
 
     session.add(study_activity)
 
@@ -362,33 +364,13 @@ async def create_study_activity(
 
     await session.commit()  # Commits EVERYTHING
 
-    # === Refetch with all contents === #
-    # await session.refresh(study_activity)
-
-    # query = select(StudyActivity).where(StudyActivity.id == study_activity.id)
-
-    # if study_activity_input.activity_type == StudyActivityType.EXERCISE:
-    #     query = query.options(
-    #         selectinload(StudyActivity.exercise_items).selectinload(  # type: ignore
-    #             ExerciseItem.contents  # type: ignore
-    #         )
-    #     )
-
-    # else:
-    #     query = query.options(
-    #         selectinload(StudyActivity.review_items).selectinload(ReviewItem.contents)  # type: ignore
-    #     )
-
-    # study_activity = (await session.execute(query)).scalars().first()
-
-    # assert study_activity is not None
-
     return study_activity
 
 
 async def create_flashcards_activity(
     session: AsyncSession,
     interaction: Interaction,
+    current_datetime: datetime,
     flashcards_activity_input: FlashcardsActivityInput,
 ) -> StudyActivity:
 
@@ -399,8 +381,9 @@ async def create_flashcards_activity(
         subject_type=flashcards_activity_input.subject_type,
         name=flashcards_activity_input.name,
         description=flashcards_activity_input.description,
+        created_at=current_datetime,
         interaction=interaction,
-    )  # type: ignore
+    )
 
     session.add(flashcards_activity)
     await session.commit()
@@ -464,20 +447,6 @@ async def add_flashcards(
 
     session.add_all(flashcards)
     await session.commit()
-
-    # Refetches
-    # query = (
-    #     select(StudyActivity)
-    #     .where(StudyActivity.id == flashcards_activity_id)
-    #     .options(
-    #         selectinload(
-    #             StudyActivity.review_items.and_(ReviewItem.is_deleted == False)  # type: ignore
-    #         ).selectinload(ReviewItem.contents)  # type: ignore
-    #     )
-    # )
-
-    # flashcards_activity = (await session.execute(query)).scalars().first()
-    # assert flashcards_activity is not None
 
     return flashcards_activity
 
@@ -703,6 +672,7 @@ async def answer_exercise_item(
 async def submit_exercise_activity(
     user: User,
     session: AsyncSession,
+    current_datetime: datetime,
     study_activity_id: int,
 ) -> StudyActivity:
 
@@ -746,19 +716,6 @@ async def submit_exercise_activity(
     # Checks for submission status
     if study_activity.is_submitted:
         raise ExceptionSubmittedExercise_409()
-
-    # Refetch query for refetching later
-    # query_refetch = (
-    #     select(StudyActivity)
-    #     .where(StudyActivity.id == study_activity_id)
-    #     .options(
-    #         selectinload(
-    #             StudyActivity.exercise_items.and_(ExerciseItem.is_deleted == False)  # type: ignore
-    #         ).selectinload(
-    #             ExerciseItem.contents  # type: ignore
-    #         ),
-    #     )
-    # )
 
     # === Grading / explaining the questions and answers === #
 
@@ -873,13 +830,9 @@ async def submit_exercise_activity(
 
     # === Updates status and returns === #
     study_activity.is_submitted = True
-    study_activity.submitted_at = datetime.now(timezone.utc)
+    study_activity.submitted_at = current_datetime
 
     await session.commit()
-
-    # study_activity = (await session.execute(query_refetch)).scalars().first()
-
-    # assert study_activity is not None
 
     return study_activity
 

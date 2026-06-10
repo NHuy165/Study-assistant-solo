@@ -122,9 +122,11 @@ async def create_study_assessment_prompt(user: User, session, day: date) -> str:
 
 
 async def create_study_assessment(
-    user: User, session: AsyncSession, day_overwrite: date | None
+    user: User,
+    session: AsyncSession,
+    current_datetime: datetime,
 ) -> StudyAssessment | None:
-    today = day_overwrite if day_overwrite else datetime.now(timezone.utc).date()
+    today = current_datetime.date()
 
     # Checks check ins without assessment
     query_last_check_in = (
@@ -158,7 +160,12 @@ async def create_study_assessment(
     study_assessment_texts = await asyncio.gather(*assessment_tasks)
 
     study_assessments = [
-        StudyAssessment(assessment_of=check_in.time, content=text, user=user)  # type: ignore
+        StudyAssessment(
+            assessment_of=check_in.time,
+            content=text,
+            user=user,
+            created_at=current_datetime,
+        )
         for check_in, text in zip(check_ins_without_assessment, study_assessment_texts)
     ]
 
@@ -169,6 +176,8 @@ async def create_study_assessment(
 
 
 # ----- READ ----- #
+
+# === Study progress === #
 
 
 def process_group_bys(criteria: list[Criterion]) -> list[Any]:
@@ -298,6 +307,9 @@ async def get_study_progress(
     result = [tuple(row) for row in result]
 
     return result
+
+
+# === Study assessment === #
 
 
 async def read_latest_study_assessment(

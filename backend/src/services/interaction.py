@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, delete, select, update
 
@@ -20,10 +22,15 @@ from backend.src.services.study_activity import ExerciseItemContent, ReviewItemC
 
 
 async def create_interaction(
-    user: User, session: AsyncSession, interaction_input: InteractionInput
+    user: User,
+    session: AsyncSession,
+    current_datetime: datetime,
+    interaction_input: InteractionInput,
 ) -> Interaction:
     interaction = Interaction(
-        **interaction_input.model_dump(),
+        name=interaction_input.name,
+        description=interaction_input.description,
+        created_at=current_datetime,
         user=user,
     )
 
@@ -52,26 +59,9 @@ async def read_all_interactions(user: User, session: AsyncSession) -> list[Inter
 async def update_interaction(
     user: User,
     session: AsyncSession,
-    interaction_id: int,
+    interaction: Interaction,
     interaction_update: InteractionUpdate,
 ) -> Interaction:
-    query = select(Interaction).where(
-        Interaction.user_id == user.id,
-        Interaction.id == interaction_id,
-        Interaction.is_deleted == False,
-    )
-    interaction = (await session.execute(query)).scalars().first()
-
-    if interaction is None:
-        raise ExceptionNotFound_404(
-            "Interaction",
-            {
-                "user_id": user.id,
-                "id": interaction_id,
-                "is_deleted": False,
-            },
-        )
-
     # Update logic
     update_data = interaction_update.model_dump(exclude_unset=True)
     interaction.sqlmodel_update(update_data)
