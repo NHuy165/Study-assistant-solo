@@ -4,7 +4,7 @@ from typing import Annotated
 from fastapi import APIRouter
 from sqlmodel import Field
 
-from backend.src.core.dependencies import DayOverwriteDep, SessionDep, UserDep
+from backend.src.core.dependencies import DatetimeDep, SessionDep, UserDep
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.miscellaneous.enums import AggregateTarget
 from backend.src.models_schema.study_progress.assessment import StudyAssessmentOutput
@@ -26,12 +26,12 @@ router = APIRouter()
 async def create_study_assessment(
     user: UserDep,
     session: SessionDep,
-    day_overwrite: DayOverwriteDep,
+    current_datetime: DatetimeDep,
 ):
     result = await study_progress.create_study_assessment(
-        user,
-        session,
-        day_overwrite,
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
     )
 
     return result
@@ -54,10 +54,10 @@ async def get_study_progress(
     target: AggregateTarget,
 ):
     result = await study_progress.get_study_progress(
-        user,
-        session,
-        criteria,
-        target,
+        user=user,
+        session=session,
+        criteria=criteria,
+        target=target,
     )
 
     return result
@@ -75,8 +75,8 @@ async def read_latest_study_assessment(
     session: SessionDep,
 ):
     result = await study_progress.read_latest_study_assessment(
-        user,
-        session,
+        user=user,
+        session=session,
     )
 
     return result
@@ -94,9 +94,9 @@ async def read_study_assessment_by_date(
     user: UserDep, session: SessionDep, specific_date: date
 ):
     result = await study_progress.read_study_assessment_by_date(
-        user,
-        session,
-        specific_date,
+        user=user,
+        session=session,
+        specific_date=specific_date,
     )
 
     return result

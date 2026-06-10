@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from types import CoroutineType
 from typing import Any, Callable
 
@@ -51,7 +52,8 @@ async def create_document_custom_fixture(
             text=f"{document_name}-text",
             interaction=interaction,
             document_analysis=document_analysis,
-        )  # type: ignore
+            created_at=datetime.now(timezone.utc),
+        )
 
         session.add(document)
         await session.commit()

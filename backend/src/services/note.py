@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlmodel import col, delete, select
 
@@ -11,12 +13,16 @@ from backend.src.models_schema.user.user import User
 
 async def create_note(
     session: AsyncSession,
+    current_datetime: datetime,
     interaction: Interaction,
     note_input: NoteInput,
 ) -> Note:
     note = Note(
-        **note_input.model_dump(),
+        name=note_input.name,
+        description=note_input.description,
+        content=note_input.content,
         interaction=interaction,
+        created_at=current_datetime,
     )
 
     session.add(note)

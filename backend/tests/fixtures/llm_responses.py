@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from types import CoroutineType
 from typing import Any, Callable
 
@@ -20,8 +21,11 @@ async def create_llm_response_custom_fixture(
         interaction: Interaction, prompt: str, answer: str
     ) -> LLMResponse:
         llm_response = LLMResponse(
-            prompt=prompt, answer=answer, interaction=interaction
-        )  # type: ignore
+            prompt=prompt,
+            answer=answer,
+            created_at=datetime.now(timezone.utc),
+            interaction=interaction,
+        )
 
         session.add(llm_response)
         await session.commit()

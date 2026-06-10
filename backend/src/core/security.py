@@ -18,12 +18,15 @@ def verify_password(password: str, hashed_password: str):
     return password_hasher.verify(password, hashed_password)
 
 
-def create_token(data: dict) -> str:
+def create_token(data: dict, current_datetime: datetime) -> str:
     data = data.copy()
 
-    now = datetime.now(timezone.utc)
-
-    data.update({"iat": now, "exp": now + timedelta(hours=settings.TOKEN_EXPIRY_HOURS)})
+    data.update(
+        {
+            "iat": current_datetime,
+            "exp": current_datetime + timedelta(hours=settings.TOKEN_EXPIRY_HOURS),
+        }
+    )
 
     token = jwt.encode(
         payload=data,

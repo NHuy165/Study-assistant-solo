@@ -57,7 +57,6 @@ class Interaction(InteractionBase, table=True):
         datetime,
         Field(
             sa_column=Column(DateTime(timezone=True)),
-            default_factory=lambda: datetime.now(timezone.utc),
         ),
     ]
 

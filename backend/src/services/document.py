@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from fastapi import UploadFile
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
@@ -27,6 +29,7 @@ from backend.src.RAG.chunking.text import TextExtractor
 async def save_document(
     user: User,
     session: AsyncSession,
+    current_datetime: datetime,
     file: UploadFile,
     interaction: Interaction,
     document_input: DocumentInput,
@@ -72,7 +75,8 @@ async def save_document(
         type=selected_type,
         subject_type=document_input.subject_type,
         text=None,  # Will get updated in extract function
-    )  # type: ignore
+        created_at=current_datetime,
+    )
 
     session.add(document)
 

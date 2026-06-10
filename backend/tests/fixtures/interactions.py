@@ -1,3 +1,4 @@
+from datetime import datetime, timezone
 from types import CoroutineType
 from typing import Any, Callable
 
@@ -25,8 +26,9 @@ async def create_interaction_custom_fixture(
         interaction = Interaction(
             name=f"{interaction_name}-interaction",
             description=f"{interaction_name}-description",
+            created_at=datetime.now(timezone.utc),
             user=user,
-        )  # type: ignore
+        )
 
         session.add(interaction)
         await session.commit()

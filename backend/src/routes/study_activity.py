@@ -1,6 +1,13 @@
+from datetime import datetime
+
 from fastapi import APIRouter
 
-from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
+from backend.src.core.dependencies import (
+    DatetimeDep,
+    InteractionDep,
+    SessionDep,
+    UserDep,
+)
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.activity.exercise_item import (
     ExerciseItemOutput,
@@ -38,6 +45,7 @@ router = APIRouter()
 async def create_study_activity(
     user: UserDep,
     session: SessionDep,
+    current_datetime: DatetimeDep,
     interaction: InteractionDep,
     study_activity_input: StudyActivityInput,
 ):
@@ -45,10 +53,11 @@ async def create_study_activity(
     Tạo một dạng tài liệu tùy vào các yêu cầu trong request.
     """
     return await study_activity.create_study_activity(
-        user,
-        session,
-        interaction,
-        study_activity_input,
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        interaction=interaction,
+        study_activity_input=study_activity_input,
     )
 
 
@@ -62,6 +71,7 @@ async def create_study_activity(
 async def create_flashcards_activity(
     user: UserDep,
     session: SessionDep,
+    current_datetime: DatetimeDep,
     interaction: InteractionDep,
     flashcards_activity_input: FlashcardsActivityInput,
 ):
@@ -69,9 +79,10 @@ async def create_flashcards_activity(
     Tạo một tài liệu Flashcards rỗng.
     """
     return await study_activity.create_flashcards_activity(
-        session,
-        interaction,
-        flashcards_activity_input,
+        session=session,
+        current_datetime=current_datetime,
+        interaction=interaction,
+        flashcards_activity_input=flashcards_activity_input,
     )
 
 
@@ -93,10 +104,10 @@ async def add_flashcards(
     Thêm flashcards cho một tài liệu Flashcards.
     """
     return await study_activity.add_flashcards(
-        user,
-        session,
-        flashcard_inputs,
-        flashcards_activity_id,
+        user=user,
+        session=session,
+        flashcard_inputs=flashcard_inputs,
+        flashcards_activity_id=flashcards_activity_id,
     )
 
 
@@ -120,8 +131,8 @@ async def read_all_study_activity(
     Đọc thông tin khái quát của tất cả dạng tài liệu đã tạo trong Interaction.
     """
     return await study_activity.read_all_study_activity(
-        session,
-        interaction,
+        session=session,
+        interaction=interaction,
     )
 
 
@@ -142,9 +153,9 @@ async def read_study_activity_complete(
     Đọc thông tin chi tiết của một tài liệu.
     """
     unvalidated = await study_activity.read_study_activity_complete(
-        user,
-        session,
-        study_activity_id,
+        user=user,
+        session=session,
+        study_activity_id=study_activity_id,
     )
 
     if unvalidated.is_submitted:
@@ -180,10 +191,10 @@ async def update_study_activity(
     Cập nhật thông tin khái quát của một tài liệu (tên và mô tả).
     """
     return await study_activity.update_study_activity(
-        user,
-        session,
-        study_activity_id,
-        study_activity_update,
+        user=user,
+        session=session,
+        study_activity_id=study_activity_id,
+        study_activity_update=study_activity_update,
     )
 
 
@@ -205,10 +216,10 @@ async def update_flashcard(
     Chỉnh sửa một flashcard.
     """
     return await study_activity.update_flashcard(
-        user,
-        session,
-        flashcard_id,
-        flashcard_update,
+        user=user,
+        session=session,
+        flashcard_id=flashcard_id,
+        flashcard_update=flashcard_update,
     )
 
 
@@ -231,10 +242,10 @@ async def answer_exercise_item(
     Trả lời MỘT câu hỏi trong một tài liệu dạng Exercise.
     """
     return await study_activity.answer_exercise_item(
-        user,
-        session,
-        exercise_item_id,
-        exercise_item_update,
+        user=user,
+        session=session,
+        exercise_item_id=exercise_item_id,
+        exercise_item_update=exercise_item_update,
     )
 
 
@@ -252,15 +263,17 @@ async def answer_exercise_item(
 async def submit_exercise_activity(
     user: UserDep,
     session: SessionDep,
+    current_datetime: DatetimeDep,
     study_activity_id: int,
 ):
     """
     Nộp tài liệu dạng Exercise.
     """
     unvalidated = await study_activity.submit_exercise_activity(
-        user,
-        session,
-        study_activity_id,
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        study_activity_id=study_activity_id,
     )
 
     study_activity_output_complete = StudyActivityOutputComplete.model_validate(

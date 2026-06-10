@@ -1,9 +1,14 @@
 from fastapi import APIRouter, status
 
-from backend.src.core.dependencies import InteractionDep, SessionDep, UserDep
+from backend.src.core.dependencies import (
+    DatetimeDep,
+    InteractionDep,
+    SessionDep,
+    UserDep,
+)
 from backend.src.exceptions.core import Responses
 from backend.src.models_schema.note.note import NoteInput, NoteOutput, NoteUpdate
-from backend.src.services import note
+from backend.src.services import note as note_service
 
 router = APIRouter()
 
@@ -22,13 +27,19 @@ router = APIRouter()
 async def create_note(
     user: UserDep,
     session: SessionDep,
+    current_datetime: DatetimeDep,
     interaction: InteractionDep,
     note_input: NoteInput,
 ):
     """
     Creates a note. Notes belong to an interaction.
     """
-    note_output = await note.create_note(session, interaction, note_input)
+    note_output = await note_service.create_note(
+        session=session,
+        current_datetime=current_datetime,
+        interaction=interaction,
+        note_input=note_input,
+    )
     return note_output
 
 
@@ -51,7 +62,7 @@ async def read_all_notes(
     """
     Reads all notes related to an interaction.
     """
-    notes_output = await note.read_all_notes(session, interaction)
+    notes_output = await note_service.read_all_notes(session, interaction)
     return notes_output
 
 
@@ -75,7 +86,7 @@ async def update_note(
     """
     Updates a note.
     """
-    note_output = await note.update_note(user, session, note_id, note_update)
+    note_output = await note_service.update_note(user, session, note_id, note_update)
     return note_output
 
 
@@ -98,4 +109,4 @@ async def delete_note(
     """
     Deletes a note.
     """
-    await note.delete_note(user, session, note_id)
+    await note_service.delete_note(user, session, note_id)

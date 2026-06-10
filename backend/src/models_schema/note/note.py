@@ -7,7 +7,7 @@ from sqlmodel import Column, DateTime, Field, Relationship, SQLModel
 from backend.src.models_schema.miscellaneous.utils import beva_forbid_none
 
 if TYPE_CHECKING:
-    from .interaction import Interaction
+    from backend.src.models_schema.interaction.interaction import Interaction
 
 # ----- BASE ----- #
 
@@ -58,7 +58,6 @@ class Note(NoteBase, table=True):
         datetime,
         Field(
             sa_column=Column(DateTime(timezone=True)),
-            default_factory=lambda: datetime.now(timezone.utc),
         ),
     ]
 
