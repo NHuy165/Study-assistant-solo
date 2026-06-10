@@ -7,9 +7,11 @@ if settings.DEV_MODE:
     engine = create_async_engine(
         str(settings.POSTGRES_URL_TEST),
         echo=True,
-        pool_size=20,
-        max_overflow=60,
+        pool_size=5,
+        max_overflow=10,
         pool_timeout=30.0,
+        pool_pre_ping=True,
+        pool_recycle=300,
     )
 else:
     engine = create_async_engine(
@@ -18,6 +20,8 @@ else:
         pool_size=20,
         max_overflow=60,
         pool_timeout=30.0,
+        pool_pre_ping=True,
+        pool_recycle=300,
     )
 
 
