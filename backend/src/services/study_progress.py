@@ -1,6 +1,7 @@
 from datetime import date, datetime, timezone
 from typing import Any
 
+from sqlalchemy.dialects.postgresql import insert
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
 from sqlmodel import Date, and_, cast, col, func, or_, select
@@ -160,19 +161,26 @@ async def create_study_assessment(
     study_assessment_texts = await asyncio.gather(*assessment_tasks)
 
     study_assessments = [
-        StudyAssessment(
-            assessment_of=check_in.time,
-            content=text,
-            user=user,
-            created_at=current_datetime,
-        )
+        {
+            "assessment_of": check_in.time,
+            "content": text,
+            "user_id": user.id,
+            "created_at": current_datetime,
+        }
         for check_in, text in zip(check_ins_without_assessment, study_assessment_texts)
     ]
 
-    session.add_all(study_assessments)
+    query_insert = (
+        insert(StudyAssessment)
+        .values(study_assessments)
+        .on_conflict_do_nothing(index_elements=["user_id", "assessment_of"])
+        .returning(StudyAssessment)
+    )
+
+    study_assessments_result = (await session.execute(query_insert)).scalars().all()
     await session.commit()
 
-    return study_assessments[0] if study_assessments else None
+    return study_assessments_result[0] if study_assessments_result else None
 
 
 # ----- READ ----- #
