@@ -12,7 +12,8 @@ python-dotenv
 
 # AI and RAG
 google-genai
-google-api-core
+google-api-core>=2.15.0
+protobuf>=4.25.0
 ollama
 pypdf
 pgvector
