@@ -57,11 +57,13 @@ class TextExtractor(DocumentExtractor):
             return False
 
         try:
-            test_chunk = header[:-4] if len(header) > 4 else header
-            test_chunk.decode("utf-8")
+            header.decode("utf-8")
             return True
 
-        except UnicodeDecodeError:
+        except UnicodeDecodeError as e:
+            if e.start >= len(header) - 4:
+                return True
+
             return False
 
     @classmethod
