@@ -12,9 +12,9 @@ from backend.src.models_schema.interaction.interaction import (
 )
 from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
-    validate_model,
     validate_object_contents,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
@@ -35,7 +35,7 @@ async def test_create_interaction(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, InteractionOutput)
+    validate_response_model(response, InteractionOutput)
     validate_response_contents(response, interaction_input.model_dump())
 
 
@@ -56,7 +56,7 @@ async def test_read_all_interactions(
     response = await client.get("/api/interaction/")
 
     validate_status_code(response, 200)
-    validate_model(response, list[InteractionOutput])
+    validate_response_model(response, list[InteractionOutput])
     validate_response_contents(
         response,
         [
@@ -86,7 +86,7 @@ async def test_update_interaction(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, InteractionOutput)
+    validate_response_model(response, InteractionOutput)
     validate_response_contents(
         response, interaction_update.model_dump(exclude_unset=True)
     )

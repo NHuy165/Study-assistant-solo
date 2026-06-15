@@ -9,8 +9,8 @@ from backend.src.exceptions.core import ExceptionResponse, ExceptionType
 from backend.src.models_schema.user.user import User, UserInput, UserPasswordChange
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
-    validate_model,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
@@ -30,7 +30,7 @@ async def test_register_user(client: AsyncClient, register_user_test: User):
     )
 
     validate_status_code(response, 409)
-    validate_model(response, ExceptionResponse)
+    validate_response_model(response, ExceptionResponse)
     validate_response_contents(
         response, {"exception_type": ExceptionType.TAKEN_INFO.value}
     )
@@ -64,7 +64,7 @@ async def test_login_user(
     )
 
     validate_status_code(response, 401)
-    validate_model(response, ExceptionResponse)
+    validate_response_model(response, ExceptionResponse)
     validate_response_contents(
         response, {"exception_type": ExceptionType.AUTHENTICATION.value}
     )
@@ -94,7 +94,7 @@ async def test_update_user(
     )
 
     validate_status_code(response, 409)
-    validate_model(response, ExceptionResponse)
+    validate_response_model(response, ExceptionResponse)
     validate_response_contents(
         response, {"exception_type": ExceptionType.TAKEN_INFO.value}
     )
@@ -118,7 +118,7 @@ async def test_change_password(
     )
 
     validate_status_code(response, 401)
-    validate_model(response, ExceptionResponse)
+    validate_response_model(response, ExceptionResponse)
     validate_response_contents(
         response, {"exception_type": ExceptionType.AUTHENTICATION.value}
     )

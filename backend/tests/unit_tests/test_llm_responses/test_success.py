@@ -14,15 +14,17 @@ from backend.src.models_schema.llm_response.llm_response import (
 )
 from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
-    validate_model,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
 
 @patch.object(GlobalAPI, "generate_chat")
 @patch.object(GlobalAPI, "mass_embed")
+@patch.object(GlobalAPI, "rewrite_prompt")
 async def test_create_llm_response(
+    mock_GlobalAPI_rewrite_prompt: AsyncMock,
     mock_GlobalAPI_mass_embed: AsyncMock,
     mock_GlobalAPI_generate_chat: AsyncMock,
     client: AsyncClient,
@@ -30,6 +32,12 @@ async def test_create_llm_response(
     login_user_test: None,
     create_interaction_test: Interaction,
 ):
+    """
+    Chats with the LLM.
+    """
+
+    # Mock prompt rewrite
+    mock_GlobalAPI_rewrite_prompt.return_value = "Mock rewritten prompt"
 
     # Mock embedding
     mock_GlobalAPI_mass_embed.return_value = [
@@ -44,7 +52,7 @@ async def test_create_llm_response(
         json={"prompt": "LLM call prompt."},
     )
     validate_status_code(response, 200)
-    validate_model(response, LLMResponseOutput)
+    validate_response_model(response, LLMResponseOutput)
     validate_response_contents(
         response,
         {
@@ -63,6 +71,10 @@ async def test_read_llm_responses(
         [Interaction, str, str], CoroutineType[Any, Any, LLMResponse]
     ],
 ):
+    """
+    Reads previous conversations.
+    """
+
     llm_response1 = await create_llm_response_custom(
         create_interaction_test, "Prompt 1", "Answer 1"
     )
@@ -73,7 +85,7 @@ async def test_read_llm_responses(
     response = await client.get(f"/api/llm-response/{create_interaction_test.id}/")
 
     validate_status_code(response, 200)
-    validate_model(response, list[LLMResponseOutput])
+    validate_response_model(response, list[LLMResponseOutput])
     validate_response_contents(
         response,
         [

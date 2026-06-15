@@ -7,8 +7,8 @@ from backend.src.exceptions.core import ExceptionResponse, ExceptionType
 from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
-    validate_model,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
@@ -35,7 +35,12 @@ async def test_create_document(
     Fails to upload a document with invalid format.
     """
 
-    filepath = Path(__file__).resolve().parent.parent.parent / "test_data" / filename
+    filepath = (
+        Path(__file__).resolve().parent.parent.parent
+        / "test_data"
+        / "documents"
+        / filename
+    )
 
     with open(filepath, "rb") as f:
         response = await client.post(
@@ -44,7 +49,7 @@ async def test_create_document(
         )
 
         validate_status_code(response, 400)
-        validate_model(response, ExceptionResponse)
+        validate_response_model(response, ExceptionResponse)
         validate_response_contents(
             response, {"exception_type": ExceptionType.REQUEST_VALIDATION}
         )

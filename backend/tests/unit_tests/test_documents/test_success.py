@@ -28,9 +28,9 @@ from backend.src.models_schema.miscellaneous.enums import (
 )
 from backend.src.models_schema.user.user import User
 from backend.tests.utils.validators import (
-    validate_model,
     validate_object_contents,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
@@ -60,7 +60,7 @@ async def test_create_document(
     MIME_type: str,
 ) -> None:
     """
-    Uploads a document.
+    Uploads a PDF, text and image document.
     """
 
     # Mock embedding
@@ -90,7 +90,12 @@ async def test_create_document(
     # Mock image captaining
     mock_GlobalAPI_caption_image.return_value = "Mock image captioning"
 
-    filepath = Path(__file__).resolve().parent.parent.parent / "test_data" / filename
+    filepath = (
+        Path(__file__).resolve().parent.parent.parent
+        / "test_data"
+        / "documents"
+        / filename
+    )
 
     with open(filepath, "rb") as f:
         response = await client.post(
@@ -99,7 +104,7 @@ async def test_create_document(
         )
 
     validate_status_code(response, 200)
-    validate_model(response, tuple[DocumentOutput, DocumentAnalysisOutput])
+    validate_response_model(response, tuple[DocumentOutput, DocumentAnalysisOutput])
     validate_response_contents(
         response,
         [
@@ -135,7 +140,7 @@ async def test_read_all_documents(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, list[DocumentOutput])
+    validate_response_model(response, list[DocumentOutput])
     validate_response_contents(
         response,
         [
@@ -160,7 +165,9 @@ async def test_read_document_complete(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, tuple[DocumentOutput, DocumentAnalysisOutput | None])
+    validate_response_model(
+        response, tuple[DocumentOutput, DocumentAnalysisOutput | None]
+    )
     validate_response_contents(
         response,
         [
@@ -192,7 +199,7 @@ async def test_update_document(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, DocumentOutput)
+    validate_response_model(response, DocumentOutput)
     validate_response_contents(response, document_update.model_dump(exclude_unset=True))
 
     await session.refresh(create_document_test)
