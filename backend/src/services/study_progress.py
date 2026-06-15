@@ -1,3 +1,4 @@
+import asyncio
 from datetime import date, datetime, timezone
 from typing import Any
 
@@ -355,27 +356,6 @@ async def read_latest_study_assessment(
         .limit(1)
     )
     result = (await session.execute(query)).scalars().first()
-    return result
-
-
-async def read_study_assessment_by_date(
-    user: User, session: AsyncSession, specific_date: date
-) -> StudyAssessment:
-    query = select(StudyAssessment).where(
-        StudyAssessment.user_id == user.id,
-        StudyAssessment.assessment_of == specific_date,
-    )
-    result = (await session.execute(query)).scalars().first()
-
-    if result is None:
-        raise ExceptionNotFound_404(
-            "StudyAssessment",
-            {
-                "user_id": user.id,
-                "assessment_of": str(specific_date),
-            },
-        )
-
     return result
 
 

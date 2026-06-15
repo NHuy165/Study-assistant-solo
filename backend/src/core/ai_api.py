@@ -559,6 +559,7 @@ class GlobalAPI:
     models: dict[str, type[API]] = {
         "GOOGLE": GoogleAPI,
         "OLLAMA": OllamaAPI,
+        "CLOUDFLARE": CloudFlareAPI,
     }
     mass_embed_supported = ["GOOGLE", "OLLAMA", "CLOUDFLARE"]
 
