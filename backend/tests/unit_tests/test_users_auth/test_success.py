@@ -13,9 +13,9 @@ from backend.src.models_schema.user.user import (
 )
 from backend.src.routes.user import UserUpdate
 from backend.tests.utils.validators import (
-    validate_model,
     validate_object_contents,
     validate_response_contents,
+    validate_response_model,
     validate_status_code,
 )
 
@@ -35,7 +35,7 @@ async def test_register_user(client: AsyncClient):
     )
 
     validate_status_code(response, 200)
-    validate_model(response, UserOutput)
+    validate_response_model(response, UserOutput)
     validate_response_contents(response, user.model_dump(exclude={"password"}))
 
 
@@ -56,7 +56,7 @@ async def test_login_read_user(client: AsyncClient, register_user_test: User):
     )
 
     validate_status_code(response_login, 200)
-    validate_model(response_login, Token)
+    validate_response_model(response_login, Token)
 
     token = response_login.json().get("access_token")
 
@@ -68,7 +68,7 @@ async def test_login_read_user(client: AsyncClient, register_user_test: User):
     )
 
     validate_status_code(response_read_user, 200)
-    validate_model(response_read_user, UserOutput)
+    validate_response_model(response_read_user, UserOutput)
     validate_response_contents(
         response_read_user,
         {
@@ -97,7 +97,7 @@ async def test_read_login_streak(
     )
 
     validate_status_code(response1, 200)
-    validate_model(response1, UserOutput)
+    validate_response_model(response1, UserOutput)
     validate_response_contents(
         response1,
         {
@@ -113,7 +113,7 @@ async def test_read_login_streak(
         )
 
         validate_status_code(response2, 200)
-        validate_model(response2, UserOutput)
+        validate_response_model(response2, UserOutput)
         validate_response_contents(
             response2,
             {
@@ -129,7 +129,7 @@ async def test_read_login_streak(
         )
 
         validate_status_code(response3, 200)
-        validate_model(response3, UserOutput)
+        validate_response_model(response3, UserOutput)
         validate_response_contents(
             response3,
             {
@@ -162,7 +162,7 @@ async def test_update_user(
     )
 
     validate_status_code(response, 200)
-    validate_model(response, UserOutput)
+    validate_response_model(response, UserOutput)
     validate_response_contents(response, user_update.model_dump(exclude_unset=True))
 
     await session.refresh(register_user_test)
