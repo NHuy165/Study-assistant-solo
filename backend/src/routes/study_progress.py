@@ -103,26 +103,6 @@ async def read_study_assessment_by_date(
 
 
 @router.get(
-    "/study-assessment",
-    response_model=StudyAssessmentOutput,
-    responses={
-        401: Responses.RESPONSE_401_UNAUTHORIZED,
-        404: Responses.RESPONSE_404_NOT_FOUND,
-    },
-)
-async def read_study_assessment_by_date(
-    user: UserDep, session: SessionDep, specific_date: date
-):
-    result = await study_progress.read_study_assessment_by_date(
-        user,
-        session,
-        specific_date,
-    )
-
-    return result
-
-
-@router.get(
     "/study-assessment/",
     response_model=list[StudyAssessmentOutput],
     responses={

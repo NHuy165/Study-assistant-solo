@@ -5,7 +5,7 @@ from typing import Callable
 from pydantic import ValidationError
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import selectinload
-from sqlmodel import SQLModel, col, delete, select, update
+from sqlmodel import col, delete, select, update
 
 from backend.src.core.ai_api import ExceptionRequest_400, GlobalAPI
 from backend.src.core.config import settings

@@ -7,11 +7,11 @@ services:
       POSTGRES_PASSWORD: Q6L0N2H0LQS5016SQL5888
       POSTGRES_DB: group_project_sample
     ports:
-      - "5432:5432"
+      - '5432:5432'
     volumes:
       - postgres_data:/var/lib/postgresql/data
     healthcheck:
-      test: ["CMD-SHELL", "pg_isready -U postgres -d group_project_sample"]
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d group_project_sample']
       interval: 2s
       timeout: 5s
       retries: 10
@@ -20,8 +20,8 @@ services:
   api:
     build: .
     ports:
-      - "8000:8000"
-      - "5678:5678"
+      - '8000:8000'
+      - '5678:5678'
     env_file:
       - ./backend/.env
     environment:
@@ -39,19 +39,19 @@ services:
       - ./backend:/code/backend
     command:
       [
-        "python",
-        "-m",
-        "debugpy",
-        "--listen",
-        "0.0.0.0:5678",
-        "-m",
-        "fastapi",
-        "run",
-        "backend/src/main.py",
-        "--port",
-        "8000",
-        "--host",
-        "0.0.0.0",
+        'python',
+        '-m',
+        'debugpy',
+        '--listen',
+        '0.0.0.0:5678',
+        '-m',
+        'fastapi',
+        'run',
+        'backend/src/main.py',
+        '--port',
+        '8000',
+        '--host',
+        '0.0.0.0',
       ]
 
   # ollama:
