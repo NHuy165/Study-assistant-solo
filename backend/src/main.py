@@ -4,6 +4,8 @@ from fastapi import FastAPI
 from fastapi.exceptions import RequestValidationError
 from starlette.exceptions import HTTPException as StarletteHTTPException
 
+from fastapi.middleware.cors import CORSMiddleware # Tuấn sửa, thêm CORS do khác địa port giữa frontend và backend
+
 from backend.src.core.database import create_database_and_tables, dispose
 from backend.src.exceptions.core import ExceptionCustom
 from backend.src.exceptions.handlers import (
@@ -27,6 +29,24 @@ async def lifespan(app: FastAPI):
 
 
 app = FastAPI(lifespan=lifespan)
+
+
+# Đoạn này là để test xem backend đã chạy được chưa, có thể xóa sau khi đã xác nhận backend hoạt động bình thường
+# ----- Cấu hình CORS (Thêm đoạn này vào) ----- #
+origins = [
+    "http://localhost:5173",  # Cổng mặc định của Vite
+    "http://localhost:5174",  # Cổng hiện tại của bạn
+    "http://127.0.0.1:5173",
+    "http://127.0.0.1:5174",
+]
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=origins,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 # ----- Exception handling ----- #
 
