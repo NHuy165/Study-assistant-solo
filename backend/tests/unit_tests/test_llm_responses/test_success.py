@@ -22,9 +22,11 @@ from backend.tests.utils.validators import (
 
 @patch.object(GlobalAPI, "generate_chat")
 @patch.object(GlobalAPI, "mass_embed")
+@patch.object(GlobalAPI, "embed")
 @patch.object(GlobalAPI, "rewrite_prompt")
 async def test_create_llm_response(
     mock_GlobalAPI_rewrite_prompt: AsyncMock,
+    mock_GlobalAPI_embed: AsyncMock,
     mock_GlobalAPI_mass_embed: AsyncMock,
     mock_GlobalAPI_generate_chat: AsyncMock,
     client: AsyncClient,
@@ -38,6 +40,11 @@ async def test_create_llm_response(
 
     # Mock prompt rewrite
     mock_GlobalAPI_rewrite_prompt.return_value = "Mock rewritten prompt"
+
+    # Mock embedding
+    mock_GlobalAPI_embed.return_value = [
+        0.1
+    ] * settings.DEFAULT_EMBED_DIMENSIONALITY_CLOUDFLARE
 
     # Mock embedding
     mock_GlobalAPI_mass_embed.return_value = [

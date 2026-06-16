@@ -613,3 +613,189 @@ async def test_answer_exercise_item(
             question2,
             {"user_score": question2.max_score},
         )
+
+
+@patch.object(GlobalAPI, "embed")
+@patch.object(GlobalAPI, "grade_answers")
+@pytest.mark.parametrize(
+    "activity_format, grading_results_mock",
+    [
+        (
+            StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+            {
+                "grading_results": [
+                    {
+                        "id": 1,
+                        "explanation": "MCQ explanation 1",
+                    },
+                    {
+                        "id": 2,
+                        "explanation": "MCQ explanation 2",
+                    },
+                ]
+            },
+        ),
+        (
+            StudyActivityFormat.OPEN_ENDED,
+            {
+                "grading_results": [
+                    {
+                        "id": 1,
+                        "user_score": settings.DEFAULT_EXERCISE_TOTAL_SCORE / 2,
+                        "explanation": "Open ended explanation 1",
+                    },
+                    {
+                        "id": 2,
+                        "user_score": 0.0,
+                        "explanation": "Open ended explanation 2",
+                    },
+                ]
+            },
+        ),
+    ],
+)
+async def test_submit_exercise_activity(
+    mock_GlobalAPI_grade_answers: AsyncMock,
+    mock_GlobalAPI_embed: AsyncMock,
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_test: Interaction,
+    create_study_activity_custom: Callable[
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        CoroutineType[Any, Any, StudyActivity],
+    ],
+    activity_format: StudyActivityFormat,
+    grading_results_mock: dict,
+):
+    """
+    Submits an exercise (MCQ or open ended).
+    """
+
+    # Mock embedding
+    mock_GlobalAPI_embed.return_value = [
+        0.1
+    ] * settings.DEFAULT_EMBED_DIMENSIONALITY_CLOUDFLARE
+
+    # Mock answer grading
+    mock_GlobalAPI_grade_answers.return_value = json.dumps(grading_results_mock)
+
+    study_activity = await create_study_activity_custom(
+        create_interaction_test,
+        "Study activity creation prompt",
+        activity_format,
+        SubjectType.MATHS,
+        "Study activity name",
+        False,
+    )
+
+    response = await client.patch(
+        f"/api/study-activity/{study_activity.id}/submit",
+    )
+
+    validate_status_code(response, 200)
+    validate_response_model(response, StudyActivityOutputComplete)
+    validate_response_contents(
+        response,
+        {
+            "id": study_activity.id,
+            "is_submitted": True,
+            "items": grading_results_mock.get("grading_results"),
+        },
+    )
+
+
+async def test_delete_study_activity(
+    session: AsyncSession,
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_test: Interaction,
+    create_study_activity_custom: Callable[
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        CoroutineType[Any, Any, StudyActivity],
+    ],
+):
+    """
+    Deletes a study activity.
+    """
+
+    study_activity = await create_study_activity_custom(
+        create_interaction_test,
+        "Study activity creation prompt",
+        StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+        SubjectType.MATHS,
+        "Study activity name",
+        False,
+    )
+
+    response1 = await client.delete(
+        f"/api/study-activity/{study_activity.id}",
+    )
+
+    validate_status_code(response1, 204)
+
+    response2 = await client.delete(
+        f"/api/study-activity/{study_activity.id}",
+    )
+
+    validate_status_code(response2, 404)
+
+    # Validates database data
+    await session.refresh(study_activity)
+
+    validate_object_contents(study_activity, {"is_deleted": True})
+
+
+async def test_delete_flashcard(
+    session: AsyncSession,
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_test: Interaction,
+    create_study_activity_custom: Callable[
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        CoroutineType[Any, Any, StudyActivity],
+    ],
+):
+    """
+    Deletes a flashcard in a flashcards study activity.
+    """
+
+    study_activity = await create_study_activity_custom(
+        create_interaction_test,
+        "Study activity creation prompt",
+        StudyActivityFormat.FLASHCARDS,
+        SubjectType.ENGLISH,
+        "Study activity name",
+        False,
+    )
+
+    flashcard1, flashcard2 = study_activity.review_items
+
+    response1 = await client.delete(f"/api/study-activity/flashcards/{flashcard1.id}")
+
+    validate_status_code(response1, 204)
+
+    response2 = await client.delete(f"/api/study-activity/flashcards/{flashcard1.id}")
+
+    validate_status_code(response2, 404)
+
+    # Validates database data
+    await session.refresh(flashcard1)
+    await session.refresh(flashcard2)
+    await session.refresh(study_activity, attribute_names=["review_items"])
+
+    validate_contents_list(
+        [item.model_dump() for item in study_activity.review_items],
+        [
+            {
+                "id": flashcard1.id,
+                "is_deleted": True,
+            },
+            {
+                "id": flashcard2.id,
+                "is_deleted": False,
+            },
+        ],
+    )
