@@ -1,4 +1,10 @@
-mock_flashcards_data = {
+from backend.src.models_schema.miscellaneous.enums import (
+    ReviewItemContentType,
+    StudyActivityFormat,
+    StudyActivityType,
+)
+
+mock_flashcards_llm_return_data = {
     "name": "Mock flashcards name",
     "description": "Mock flashcards description",
     "activity_items": [
@@ -25,7 +31,7 @@ mock_flashcards_data = {
     ],
 }
 
-validation_flashcards_data = [
+validation_flashcards_creation_data = [
     {
         "contents": [
             {
@@ -87,3 +93,35 @@ validation_flashcards_data = [
         ]
     },
 ]
+
+validation_flashcards_read_data = {
+    "activity_type": StudyActivityType.REVIEW,
+    "activity_format": StudyActivityFormat.FLASHCARDS,
+    "is_submitted": False,
+    "items": [
+        {
+            "contents": [
+                {
+                    "content": "Flashcard front 1",
+                    "type": ReviewItemContentType.FLASHCARDS_FRONT,
+                },
+                {
+                    "content": "Flashcard back 1",
+                    "type": ReviewItemContentType.FLASHCARDS_BACK,
+                },
+            ],
+        },
+        {
+            "contents": [
+                {
+                    "content": "Flashcard front 2",
+                    "type": ReviewItemContentType.FLASHCARDS_FRONT,
+                },
+                {
+                    "content": "Flashcard back 2",
+                    "type": ReviewItemContentType.FLASHCARDS_BACK,
+                },
+            ],
+        },
+    ],
+}
