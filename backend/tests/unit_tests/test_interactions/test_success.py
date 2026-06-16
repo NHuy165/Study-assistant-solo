@@ -99,6 +99,7 @@ async def test_update_interaction(
 
 
 async def test_delete_interaction(
+    session: AsyncSession,
     client: AsyncClient,
     register_user_test: User,
     login_user_test: None,
@@ -118,3 +119,11 @@ async def test_delete_interaction(
     )
 
     validate_status_code(response2, 404)
+
+    # Validates database data
+    await session.refresh(create_interaction_test)
+
+    validate_object_contents(
+        create_interaction_test,
+        {"is_deleted": True},
+    )
