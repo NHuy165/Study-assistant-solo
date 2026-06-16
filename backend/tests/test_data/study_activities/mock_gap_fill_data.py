@@ -1,4 +1,10 @@
-mock_gap_fill_data = {
+from backend.src.models_schema.miscellaneous.enums import (
+    ReviewItemContentType,
+    StudyActivityFormat,
+    StudyActivityType,
+)
+
+mock_gap_fill_llm_return_data = {
     "name": "Mock gap fill name",
     "description": "Mock gap fill description",
     "activity_items": [
@@ -60,7 +66,7 @@ mock_gap_fill_data = {
     ],
 }
 
-validation_gap_fill_data = [
+validation_gap_fill_creation_data = [
     {
         "contents": [
             {
@@ -222,3 +228,59 @@ validation_gap_fill_data = [
         ],
     },
 ]
+
+validation_gap_fill_read_data = {
+    "activity_type": StudyActivityType.REVIEW,
+    "activity_format": StudyActivityFormat.GAP_FILL,
+    "is_submitted": False,
+    "items": [
+        {
+            "contents": [
+                {
+                    "content": "Text 1: $!BLANK!$ - $!BLANK!$",
+                    "type": ReviewItemContentType.GAP_FILL_TEXT,
+                },
+                {
+                    "content": "Correct 1-1",
+                    "type": ReviewItemContentType.GAP_FILL_CORRECT,
+                },
+                {
+                    "content": "Correct 1-2",
+                    "type": ReviewItemContentType.GAP_FILL_CORRECT,
+                },
+                {
+                    "content": "Distractor 1-1",
+                    "type": ReviewItemContentType.GAP_FILL_DISTRACTOR,
+                },
+                {
+                    "content": "Distractor 1-2",
+                    "type": ReviewItemContentType.GAP_FILL_DISTRACTOR,
+                },
+            ],
+        },
+        {
+            "contents": [
+                {
+                    "content": "Text 2: $!BLANK!$ - $!BLANK!$",
+                    "type": ReviewItemContentType.GAP_FILL_TEXT,
+                },
+                {
+                    "content": "Correct 2-1",
+                    "type": ReviewItemContentType.GAP_FILL_CORRECT,
+                },
+                {
+                    "content": "Correct 2-2",
+                    "type": ReviewItemContentType.GAP_FILL_CORRECT,
+                },
+                {
+                    "content": "Distractor 2-1",
+                    "type": ReviewItemContentType.GAP_FILL_DISTRACTOR,
+                },
+                {
+                    "content": "Distractor 2-2",
+                    "type": ReviewItemContentType.GAP_FILL_DISTRACTOR,
+                },
+            ],
+        },
+    ],
+}

@@ -57,7 +57,7 @@ def create_dummy_MCQ(
     item1 = ExerciseItem(
         max_score=50,
         question="Question 1",
-        user_score=50 if is_submitted else 0,
+        user_score=50,
         attempt="1",
         explanation="Explanation 1" if is_submitted else None,
         contents=[choice1_1, choice1_2, choice1_3, choice1_4],
@@ -93,7 +93,7 @@ def create_dummy_MCQ(
         max_score=50,
         question="Question 2",
         user_score=0,
-        attempt="7",
+        attempt=None,
         explanation="Explanation 2" if is_submitted else None,
         contents=[choice2_1, choice2_2, choice2_3, choice2_4],
     )
@@ -136,7 +136,9 @@ def create_dummy_open_ended(
     item1 = ExerciseItem(
         max_score=50,
         question="Question 1",
-        user_score=50 if is_submitted else 0,
+        user_score=50
+        if is_submitted
+        else 0,  # Open ended quesiton is only graded after being submitted
         attempt="Answer 1",
         explanation="Explanation 1" if is_submitted else None,
         contents=[correct1],
@@ -154,7 +156,7 @@ def create_dummy_open_ended(
         max_score=50,
         question="Question 2",
         user_score=0,
-        attempt="Answer 2",
+        attempt=None,
         explanation="Explanation 2" if is_submitted else None,
         contents=[correct2],
     )

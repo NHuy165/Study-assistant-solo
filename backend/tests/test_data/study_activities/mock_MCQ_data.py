@@ -1,6 +1,11 @@
 from backend.src.core.config import settings
+from backend.src.models_schema.miscellaneous.enums import (
+    ExerciseItemContentType,
+    StudyActivityFormat,
+    StudyActivityType,
+)
 
-mock_MCQ_data = {
+mock_MCQ_llm_return_data = {
     "name": "Mock MCQ name",
     "description": "Mock MCQ description",
     "activity_items": [
@@ -59,7 +64,7 @@ mock_MCQ_data = {
 
 max_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / 5
 
-validation_MCQ_data = [
+validation_MCQ_creation_data = [
     {
         "max_score": max_score,
         "question": "Mock MCQ question 1",
@@ -206,3 +211,65 @@ validation_MCQ_data = [
         ],
     },
 ]
+
+validation_MCQ_read_data = {
+    "activity_type": StudyActivityType.EXERCISE,
+    "activity_format": StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+    "is_submitted": False,
+    "items": [
+        {
+            "question": "Question 1",
+            "user_score": None,
+            "attempt": "1",
+            "contents": [
+                {
+                    "content": "Choice 1-1",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 1-2",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 1-3",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 1-4",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+            ],
+        },
+        {
+            "question": "Question 2",
+            "user_score": None,
+            "attempt": None,
+            "contents": [
+                {
+                    "content": "Choice 2-1",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 2-2",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 2-3",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+                {
+                    "content": "Choice 2-4",
+                    "type": ExerciseItemContentType.MULTIPLE_CHOICE_QUESTIONS_CHOICE,
+                    "is_correct": None,
+                },
+            ],
+        },
+    ],
+}
