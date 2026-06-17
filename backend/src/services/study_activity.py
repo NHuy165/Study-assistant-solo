@@ -342,10 +342,17 @@ async def create_study_activity(
             continue
 
     # === Saves response === #
+    if study_activity_input.activity_format in (
+        StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+        StudyActivityFormat.OPEN_ENDED,
+    ):
+        activity_type = StudyActivityType.EXERCISE
+    else:
+        activity_type = StudyActivityType.REVIEW
 
     study_activity = StudyActivity(
         prompt=study_activity_input.prompt,
-        activity_type=study_activity_input.activity_type,  # type: ignore
+        activity_type=activity_type,
         activity_format=study_activity_input.activity_format,
         subject_type=study_activity_input.subject_type,
         name=validated_activity.name,
