@@ -139,19 +139,27 @@ async def test_create_study_activity(
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 
+    if study_activity_input.activity_format in (
+        StudyActivityFormat.FLASHCARDS,
+        StudyActivityFormat.GAP_FILL,
+    ):
+        activity_type = StudyActivityType.REVIEW
+    else:
+        activity_type = StudyActivityType.EXERCISE
+
     validate_status_code(response, 200)
     validate_response_model(response, StudyActivityOutputComplete)
     validate_model(
         response.json().get("items"),
         list[ReviewItemOutput]
-        if study_activity_input.activity_type == StudyActivityType.REVIEW
+        if activity_type == StudyActivityType.REVIEW
         else list[ExerciseItemOutput],
     )
     validate_response_contents(
         response,
         {
             "prompt": "Study activity generation prompt",
-            "activity_type": study_activity_input.activity_type,
+            "activity_type": activity_type,
             "activity_format": study_activity_input.activity_format,
             "subject_type": study_activity_input.subject_type,
             "is_submitted": False,
