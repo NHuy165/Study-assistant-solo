@@ -11,6 +11,7 @@ class Settings(BaseSettings):
 
     # === Developer mode === #
     DEV_MODE: bool
+    RUN_INTEGRATION: bool
 
     # === Database === #
     POSTGRES_URL: PostgresDsn

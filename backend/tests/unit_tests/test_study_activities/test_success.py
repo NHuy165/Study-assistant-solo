@@ -1,5 +1,4 @@
 import json
-from ctypes.wintypes import BOOLEAN
 from types import CoroutineType
 from typing import Any, Callable
 from unittest.mock import AsyncMock, patch
