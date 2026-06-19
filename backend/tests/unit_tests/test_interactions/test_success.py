@@ -91,6 +91,7 @@ async def test_update_interaction(
         response, interaction_update.model_dump(exclude_unset=True)
     )
 
+    # Validates database data
     await session.refresh(create_interaction_test)
 
     validate_object_contents(
