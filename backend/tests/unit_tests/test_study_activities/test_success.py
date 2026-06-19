@@ -1,4 +1,5 @@
 import json
+from ctypes.wintypes import BOOLEAN
 from types import CoroutineType
 from typing import Any, Callable
 from unittest.mock import AsyncMock, patch
@@ -261,7 +262,7 @@ async def test_read_all_study_activities(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -306,18 +307,22 @@ async def test_read_all_study_activities(
     await create_study_activity_custom(
         **MCQ_dummy,  # type: ignore
         interaction=create_interaction_test,
+        is_deleted=False,
     )
     await create_study_activity_custom(
         **open_ended_dummy,  # type: ignore
         interaction=create_interaction_test,
+        is_deleted=False,
     )
     await create_study_activity_custom(
         **flashcards_dummy,  # type: ignore
         interaction=create_interaction_test,
+        is_deleted=False,
     )
     await create_study_activity_custom(
         **gap_fill_dummy,  # type: ignore
         interaction=create_interaction_test,
+        is_deleted=False,
     )
 
     # Testing
@@ -374,7 +379,7 @@ async def test_read_study_activity_complete(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
     activity_format: StudyActivityFormat,
@@ -390,6 +395,7 @@ async def test_read_study_activity_complete(
         subject_type,
         "Study activity name",
         is_submitted,
+        False,
     )
 
     response = await client.get(
@@ -418,7 +424,7 @@ async def test_update_study_activity(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -433,6 +439,7 @@ async def test_update_study_activity(
         SubjectType.MATHS,
         "Study activity name",
         True,
+        False,
     )
 
     study_activity_update = StudyActivityUpdate(
@@ -468,7 +475,7 @@ async def test_update_flashcard(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -482,6 +489,7 @@ async def test_update_flashcard(
         StudyActivityFormat.FLASHCARDS,
         SubjectType.ENGLISH,
         "Study activity name",
+        False,
         False,
     )
     flashcard1, flashcard2 = study_activity.review_items
@@ -569,7 +577,7 @@ async def test_answer_exercise_item(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
     activity_format: StudyActivityFormat,
@@ -585,6 +593,7 @@ async def test_answer_exercise_item(
         activity_format,
         SubjectType.MATHS,
         "Study activity name",
+        False,
         False,
     )
 
@@ -670,7 +679,7 @@ async def test_submit_exercise_activity(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
     activity_format: StudyActivityFormat,
@@ -694,6 +703,7 @@ async def test_submit_exercise_activity(
         activity_format,
         SubjectType.MATHS,
         "Study activity name",
+        False,
         False,
     )
 
@@ -720,7 +730,7 @@ async def test_delete_study_activity(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -734,6 +744,7 @@ async def test_delete_study_activity(
         StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
         SubjectType.MATHS,
         "Study activity name",
+        False,
         False,
     )
 
@@ -762,7 +773,7 @@ async def test_delete_flashcard(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -776,6 +787,7 @@ async def test_delete_flashcard(
         StudyActivityFormat.FLASHCARDS,
         SubjectType.ENGLISH,
         "Study activity name",
+        False,
         False,
     )
 

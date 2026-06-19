@@ -1,4 +1,4 @@
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 
 import time_machine
 from httpx import AsyncClient
@@ -89,7 +89,7 @@ async def test_read_login_streak(
     """
     Tests login streak record.
     """
-    today = datetime.now().date()
+    today = datetime.now(timezone.utc).date()
 
     # Logins today
     response1 = await client.get(

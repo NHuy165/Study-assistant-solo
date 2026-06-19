@@ -26,6 +26,7 @@ def create_dummy_MCQ(
     subject_type: SubjectType,
     name: str,
     is_submitted: bool,
+    is_deleted: bool,
 ) -> StudyActivity:
 
     # === Item 1 === #
@@ -59,6 +60,7 @@ def create_dummy_MCQ(
         question="Question 1",
         user_score=50,
         attempt="1",
+        is_deleted=is_deleted,
         explanation="Explanation 1" if is_submitted else None,
         contents=[choice1_1, choice1_2, choice1_3, choice1_4],
     )
@@ -94,6 +96,7 @@ def create_dummy_MCQ(
         question="Question 2",
         user_score=0,
         attempt=None,
+        is_deleted=is_deleted,
         explanation="Explanation 2" if is_submitted else None,
         contents=[choice2_1, choice2_2, choice2_3, choice2_4],
     )
@@ -108,6 +111,7 @@ def create_dummy_MCQ(
         name=name,
         description=f"{name}-description",
         is_submitted=is_submitted,
+        is_deleted=is_deleted,
         created_at=datetime.now(timezone.utc),
         submitted_at=datetime.now(timezone.utc) if is_submitted else None,
         interaction=interaction,
@@ -123,6 +127,7 @@ def create_dummy_open_ended(
     subject_type: SubjectType,
     name: str,
     is_submitted: bool,
+    is_deleted: bool,
 ) -> StudyActivity:
 
     # === Item 1 === #
@@ -139,6 +144,7 @@ def create_dummy_open_ended(
         user_score=50
         if is_submitted
         else 0,  # Open ended quesiton is only graded after being submitted
+        is_deleted=is_deleted,
         attempt="Answer 1",
         explanation="Explanation 1" if is_submitted else None,
         contents=[correct1],
@@ -156,6 +162,7 @@ def create_dummy_open_ended(
         max_score=50,
         question="Question 2",
         user_score=0,
+        is_deleted=is_deleted,
         attempt=None,
         explanation="Explanation 2" if is_submitted else None,
         contents=[correct2],
@@ -171,6 +178,7 @@ def create_dummy_open_ended(
         name=name,
         description=f"{name}-description",
         is_submitted=is_submitted,
+        is_deleted=is_deleted,
         created_at=datetime.now(timezone.utc),
         submitted_at=datetime.now(timezone.utc) if is_submitted else None,
         interaction=interaction,
@@ -185,6 +193,7 @@ def create_dummy_flashcards(
     prompt: str,
     subject_type: SubjectType,
     name: str,
+    is_deleted: bool,
 ) -> StudyActivity:
 
     # === Item 1 === #
@@ -198,7 +207,10 @@ def create_dummy_flashcards(
         type=ReviewItemContentType.FLASHCARDS_BACK,
     )
 
-    item1 = ReviewItem(contents=[front1, back1])
+    item1 = ReviewItem(
+        contents=[front1, back1],
+        is_deleted=is_deleted,
+    )
 
     # === Item 2 === #
 
@@ -211,7 +223,10 @@ def create_dummy_flashcards(
         type=ReviewItemContentType.FLASHCARDS_BACK,
     )
 
-    item2 = ReviewItem(contents=[front2, back2])
+    item2 = ReviewItem(
+        contents=[front2, back2],
+        is_deleted=is_deleted,
+    )
 
     # === Activity === #
 
@@ -222,6 +237,7 @@ def create_dummy_flashcards(
         subject_type=subject_type,
         name=name,
         description=f"{name}-description",
+        is_deleted=is_deleted,
         created_at=datetime.now(timezone.utc),
         interaction=interaction,
         review_items=[item1, item2],
@@ -235,6 +251,7 @@ def create_dummy_gap_fill(
     prompt: str,
     subject_type: SubjectType,
     name: str,
+    is_deleted: bool,
 ) -> StudyActivity:
 
     # === Item 1 === #
@@ -261,7 +278,8 @@ def create_dummy_gap_fill(
     )
 
     item1 = ReviewItem(
-        contents=[text1, correct1_1, correct1_2, distractor1_1, distractor1_2]
+        contents=[text1, correct1_1, correct1_2, distractor1_1, distractor1_2],
+        is_deleted=is_deleted,
     )
 
     # === Item 2 === #
@@ -288,7 +306,8 @@ def create_dummy_gap_fill(
     )
 
     item2 = ReviewItem(
-        contents=[text2, correct2_1, correct2_2, distractor2_1, distractor2_2]
+        contents=[text2, correct2_1, correct2_2, distractor2_1, distractor2_2],
+        is_deleted=is_deleted,
     )
 
     # === Activity === #
@@ -300,6 +319,7 @@ def create_dummy_gap_fill(
         subject_type=subject_type,
         name=name,
         description=f"{name}-description",
+        is_deleted=is_deleted,
         created_at=datetime.now(timezone.utc),
         interaction=interaction,
         review_items=[item1, item2],
@@ -312,7 +332,7 @@ def create_dummy_gap_fill(
 async def create_study_activity_custom_fixture(
     session: AsyncSession,
 ) -> Callable[
-    [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+    [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
     CoroutineType[Any, Any, StudyActivity],
 ]:
     """
@@ -326,6 +346,7 @@ async def create_study_activity_custom_fixture(
         subject_type: SubjectType,
         name: str,
         is_submitted: bool,
+        is_deleted: bool,
     ) -> StudyActivity:
 
         if activity_format == StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS:
@@ -335,6 +356,7 @@ async def create_study_activity_custom_fixture(
                 subject_type=subject_type,
                 name=name,
                 is_submitted=is_submitted,
+                is_deleted=is_deleted,
             )
         elif activity_format == StudyActivityFormat.OPEN_ENDED:
             study_activity = create_dummy_open_ended(
@@ -343,6 +365,7 @@ async def create_study_activity_custom_fixture(
                 subject_type=subject_type,
                 name=name,
                 is_submitted=is_submitted,
+                is_deleted=is_deleted,
             )
         elif activity_format == StudyActivityFormat.FLASHCARDS:
             study_activity = create_dummy_flashcards(
@@ -350,6 +373,7 @@ async def create_study_activity_custom_fixture(
                 prompt=prompt,
                 subject_type=subject_type,
                 name=name,
+                is_deleted=is_deleted,
             )
         else:
             study_activity = create_dummy_gap_fill(
@@ -357,6 +381,7 @@ async def create_study_activity_custom_fixture(
                 prompt=prompt,
                 subject_type=subject_type,
                 name=name,
+                is_deleted=is_deleted,
             )
 
         session.add(study_activity)
