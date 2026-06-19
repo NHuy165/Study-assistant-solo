@@ -185,7 +185,7 @@ async def test_answer_exercise_item(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -200,6 +200,7 @@ async def test_answer_exercise_item(
         SubjectType.MATHS,
         "Study activity name",
         True,
+        False,
     )
     question1 = study_activity.exercise_items[0]
 
@@ -223,7 +224,7 @@ async def test_submit_exercise_activity(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -238,6 +239,7 @@ async def test_submit_exercise_activity(
         SubjectType.MATHS,
         "Study activity name",
         True,
+        False,
     )
 
     response = await client.patch(
@@ -268,7 +270,7 @@ async def test_submit_exercise_activity_failed_api(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
     endpoint_failure: str,
@@ -315,6 +317,7 @@ async def test_submit_exercise_activity_failed_api(
         SubjectType.MATHS,
         "Study activity name",
         False,
+        False,
     )
 
     response = await client.patch(
@@ -338,7 +341,7 @@ async def test_submit_exercise_activity_wrong_api_generation(
     login_user_test: None,
     create_interaction_test: Interaction,
     create_study_activity_custom: Callable[
-        [Interaction, str, StudyActivityFormat, SubjectType, str, bool],
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
         CoroutineType[Any, Any, StudyActivity],
     ],
 ):
@@ -364,6 +367,7 @@ async def test_submit_exercise_activity_wrong_api_generation(
         StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
         SubjectType.MATHS,
         "Study activity name",
+        False,
         False,
     )
 

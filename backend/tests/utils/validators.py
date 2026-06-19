@@ -32,7 +32,7 @@ def is_subset_dict(received_contents: dict, expected_contents: dict) -> bool:
         received_content = received_contents.get(expected_key)
 
         # If current value is a list
-        if isinstance(expected_value, list):
+        if isinstance(expected_value, (list, tuple)):
             # If received content is None or not a list
             if received_content is None or not isinstance(received_content, list):
                 return False
@@ -57,7 +57,7 @@ def is_subset_dict(received_contents: dict, expected_contents: dict) -> bool:
     return True
 
 
-def is_subset_list(received_contents: list, expected_contents: list) -> bool:
+def is_subset_list(received_contents: list, expected_contents: list | tuple) -> bool:
     """
     This function assumes what is being checked has no duplicated element.
     """
@@ -73,7 +73,7 @@ def is_subset_list(received_contents: list, expected_contents: list) -> bool:
                 return False
 
         # If current value is a list
-        elif isinstance(expected_content, list):
+        elif isinstance(expected_content, (list, tuple)):
             for received_content in received_contents:
                 if isinstance(received_content, list) and is_subset_list(
                     received_content, expected_content
@@ -99,7 +99,7 @@ def validate_contents_dict(received_contents: dict, expected_contents: dict) -> 
     )
 
 
-def validate_contents_list(received_contents: list, expected_contents: list) -> None:
+def validate_contents_list(received_contents: list, expected_contents: list | tuple) -> None:
     assert is_subset_list(received_contents, expected_contents), (
         f"Expected: {expected_contents}. Received: {received_contents}"
     )
@@ -110,7 +110,7 @@ def validate_object_contents(object: BaseModel, expected_contents: dict) -> None
 
 
 def validate_response_contents(
-    response: Response, expected_contents: dict | list[dict]
+    response: Response, expected_contents: dict | list | tuple
 ) -> None:
     response_contents = response.json()
     if isinstance(expected_contents, dict):

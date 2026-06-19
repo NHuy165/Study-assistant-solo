@@ -50,6 +50,44 @@ DatetimeDep = Annotated[datetime, Depends(get_current_datetime)]
 # ----- USER DEPENDENCY ----- #
 
 
+async def check_in(
+    user: User,
+    session: AsyncSession,
+    current_datetime: datetime,
+    last_check_in: CheckIn | None,
+):
+    today = current_datetime.date()
+
+    # If user has never logged in or didn't log in today
+    if last_check_in is None or last_check_in.time < today:
+        # If user has never logged in
+        if last_check_in is None:
+            user.login_streak = 1
+            user.longest_login_streak = 1
+        else:
+            time_between = today - last_check_in.time
+
+            # If user last logged in yesterday
+            if time_between == timedelta(days=1):
+                user.login_streak += 1
+                if user.login_streak > user.longest_login_streak:
+                    user.longest_login_streak = user.login_streak
+
+            # If user didn't log in yesterday
+            elif time_between > timedelta(days=1):
+                user.login_streak = 1
+
+        # Inserting with race condition check
+        query_insert = (
+            insert(CheckIn)
+            .values({"time": today, "user_id": user.id})
+            .on_conflict_do_nothing(index_elements=["user_id", "time"])
+        )
+
+        await session.execute(query_insert)
+        await session.commit()
+
+
 async def get_current_user(
     session: SessionDep,
     token: Annotated[str, Depends(oauth2_scheme)],
@@ -93,36 +131,12 @@ async def get_current_user(
     assert isinstance(user, User)
     assert isinstance(last_check_in, CheckIn | None)
 
-    today = current_datetime.date()
-
-    # If user has never logged in or didn't log in today
-    if last_check_in is None or last_check_in.time < today:
-        # If user has never logged in
-        if last_check_in is None:
-            user.login_streak = 1
-            user.longest_login_streak = 1
-        else:
-            time_between = today - last_check_in.time
-
-            # If user last logged in yesterday
-            if time_between == timedelta(days=1):
-                user.login_streak += 1
-                if user.login_streak > user.longest_login_streak:
-                    user.longest_login_streak = user.login_streak
-
-            # If user didn't log in yesterday
-            elif time_between > timedelta(days=1):
-                user.login_streak = 1
-
-        # Inserting with race condition check
-        query_insert = (
-            insert(CheckIn)
-            .values({"time": today, "user_id": user.id})
-            .on_conflict_do_nothing(index_elements=["user_id", "time"])
-        )
-
-        await session.execute(query_insert)
-        await session.commit()
+    await check_in(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        last_check_in=last_check_in,
+    )
 
     return user
 

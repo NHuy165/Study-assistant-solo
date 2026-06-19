@@ -15,7 +15,7 @@ from backend.src.services.study_activity import StudyActivityFormat, StudyActivi
 
 class Criterion(BaseModel):
     attribute: CriterionAttribute
-    value: bool | int | str | datetime | None
+    value: datetime | bool | int | str | None
     operator: OperatorType
 
     @model_validator(mode="after")
@@ -25,7 +25,7 @@ class Criterion(BaseModel):
                 SubjectType(self.value)
             except ValueError:
                 raise ExceptionRequestValidation_400(
-                    custom_message=f"{self.value} không phải là giá trị hợp lệ cho đặc trưng subject_type."
+                    custom_message=f"{self.value} is not a valid value for the attribute subject_type."
                 )
         return self
 
@@ -36,7 +36,7 @@ class Criterion(BaseModel):
                 StudyActivityType(self.value)
             except ValueError:
                 raise ExceptionRequestValidation_400(
-                    custom_message=f"{self.value} không phải là giá trị hợp lệ cho đặc trưng activity_type."
+                    custom_message=f"{self.value} is not a valid value for the attribute activity_type."
                 )
         return self
 
@@ -47,7 +47,7 @@ class Criterion(BaseModel):
                 StudyActivityFormat(self.value)
             except ValueError:
                 raise ExceptionRequestValidation_400(
-                    custom_message=f"{self.value} không phải là giá trị hợp lệ cho đặc trưng activity_format."
+                    custom_message=f"{self.value} is not a valid value for the attribute activity_format."
                 )
         return self
 
@@ -59,11 +59,11 @@ class Criterion(BaseModel):
             and self.value is not None
         ):
             try:
-                parsed_date = datetime.strptime(self.value, "%d%m%Y").date()  # type: ignore
-                self.value = parsed_date  # type: ignore
+                parsed_date = datetime.strptime(self.value, "%Y-%m-%d")  # type: ignore
+                self.value = parsed_date
             except (TypeError, ValueError):
                 raise ExceptionRequestValidation_400(
-                    custom_message=f"value không hợp lệ cho đặc trưng {self.attribute}."
+                    custom_message=f"{self.value} is not a valid value for the attribute {self.attribute}."
                 )
         return self
 
@@ -76,18 +76,40 @@ class Criterion(BaseModel):
                 "GROUP_BY",
             ):
                 raise ExceptionRequestValidation_400(
-                    custom_message="Đặc trưng is_submitted chỉ có thể nhận so sánh bằng (EQ), khác (NE) hoặc nhóm (GROUP_BY)."
+                    custom_message="The attribute is_submitted can only work with the operators EQ, NE or GROUP_BY."
                 )
-            if self.value not in (True, False, None):
-                raise ExceptionRequestValidation_400(
-                    custom_message="Đặc trưng is_submitted chỉ có thể nhận các giá trị true, false hoặc null."
-                )
+            if self.value is not None:
+                try:
+                    self.value = bool(self.value)
+                except ValueError:
+                    raise ExceptionRequestValidation_400(
+                        custom_message=f"{self.value} is not a valid value for the attribute is_submitted (only True, False, or null allowed)."
+                    )
+        return self
+
+    @model_validator(mode="after")
+    def validate_group_by(self):
+        if self.operator == "GROUP_BY" and self.value is not None:
+            raise ExceptionRequestValidation_400(
+                custom_message="GROUP_BY must strictly go with the value null."
+            )
         return self
 
     @model_validator(mode="after")
     def validate_null_value(self):
         if self.value is None and self.operator not in ("NE", "EQ", "GROUP_BY"):
             raise ExceptionRequestValidation_400(
-                custom_message="Giá trị null chỉ có thể nhận so sánh bằng (EQ) hoặc khác (NE)."
+                custom_message="The value null can only work with the operators EQ or NE."
             )
+        return self
+
+    @model_validator(mode="after")
+    def validate_interaction_id(self):
+        if self.attribute == "interaction_id":
+            try:
+                self.value = int(self.value)  # type: ignore
+            except ValueError:
+                raise ExceptionRequestValidation_400(
+                    custom_message=f"{self.value} is not a valid value for the attribute interaction_id"
+                )
         return self

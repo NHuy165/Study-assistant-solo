@@ -41,7 +41,7 @@ async def create_study_assessment(
 
 
 @router.post(
-    "/",
+    "",
     response_model=list[tuple],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -83,7 +83,7 @@ async def read_latest_study_assessment(
 
 
 @router.get(
-    "/study-assessment",
+    "/study-assessment/by-date",
     response_model=StudyAssessmentOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -103,7 +103,7 @@ async def read_study_assessment_by_date(
 
 
 @router.get(
-    "/study-assessment/",
+    "/study-assessment",
     response_model=list[StudyAssessmentOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

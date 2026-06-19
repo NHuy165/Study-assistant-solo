@@ -276,6 +276,12 @@ async def get_study_progress(
     criteria: list[Criterion],
     target: AggregateTarget,
 ) -> list[tuple]:
+    """
+    There are 3 kinds of statistics to be fetched: counting study activities, counting activity items, and counting scores. This is dictated by the variable 'target'.
+    The variable 'criteria' allows for custom filtering and grouping by custom attributes.
+    Inside each criterion is an attribute name, a value and an operator (like GE (>=), LT (<),...or GROUP_BY).
+    This function is only designed to aggregate and return whatever data is available, it won't account for missing data (activity types or missing subject types...) if the currently available data does not contain records related to them.
+    """
 
     group_cols = process_group_bys(criteria)
 
