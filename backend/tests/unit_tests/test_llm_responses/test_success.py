@@ -10,6 +10,7 @@ from backend.src.core.config import settings
 from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.llm_response.llm_response import (
     LLMResponse,
+    LLMResponseInput,
     LLMResponseOutput,
 )
 from backend.src.models_schema.user.user import User
@@ -47,9 +48,11 @@ async def test_create_llm_response(
     # Mock chat generation
     mock_GlobalAPI_generate_chat.return_value = "Mock LLM response."
 
+    llm_response_input = LLMResponseInput(prompt="LLM call prompt.")
+
     response = await client.post(
         f"/api/llm-response/{create_interaction_test.id}/chat",
-        json={"prompt": "LLM call prompt."},
+        json=llm_response_input.model_dump(),
     )
     validate_status_code(response, 200)
     validate_response_model(response, LLMResponseOutput)

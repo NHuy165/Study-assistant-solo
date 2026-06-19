@@ -3,9 +3,15 @@ import base64
 from abc import ABC, abstractmethod
 from types import FunctionType
 from typing import Any
+from weakref import WeakKeyDictionary
 
 import httpx
 import ollama
+from fastapi import UploadFile
+from google import genai
+from google.genai import Client, errors
+from pydantic import BaseModel
+
 from backend.src.core.config import settings
 from backend.src.exceptions.core import (
     ExceptionExternalService_503,
@@ -13,10 +19,6 @@ from backend.src.exceptions.core import (
     ExceptionLLMError_502,
     ExceptionRequest_400,
 )
-from fastapi import UploadFile
-from google import genai
-from google.genai import Client, errors
-from pydantic import BaseModel
 
 # ----- MODEL CONFIGURATIONS ----- #
 
@@ -30,13 +32,27 @@ class GeminiKeysManager:
 
         self.keys = keys
         self.current_key_index = 0
-        self.client: Client = genai.Client(api_key=self.keys[self.current_key_index])
+        self.loops_clients = WeakKeyDictionary()
+
+    @property
+    def client(self) -> Client:
+        loop = asyncio.get_running_loop()
+
+        # If current loop doesn't have a client, make one.
+        if loop not in self.loops_clients:
+            self.loops_clients[loop] = genai.Client(
+                api_key=self.keys[self.current_key_index]
+            )
+
+        return self.loops_clients[loop]
 
     def rotate(self) -> None:
         self.current_key_index += 1
         if self.current_key_index == len(self.keys):
             self.current_key_index = 0
-        self.client: Client = genai.Client(api_key=self.keys[self.current_key_index])
+
+        # Clears so a new client will be used.
+        self.loops_clients.clear()
 
 
 keys_manager = GeminiKeysManager(settings.gemini_keys_list)
