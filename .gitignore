@@ -207,10 +207,10 @@ __marimo__/
 
 # Custom:
 .vscode
-node_modules/
 NEED_READ_FILES_GO_HERE/
 structure.txt
 to_do.txt
 bugs_fixed.txt
 copy_paste.txt
 notes.txt
+info.txt
