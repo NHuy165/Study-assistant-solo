@@ -40,10 +40,8 @@ class InteractionOutput(InteractionBase):
 
 
 class InteractionUpdate(SQLModel):
-    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = (
-        None  # User không được enter giá trị None
-    )
-    description: str = ""
+    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- TABLE MODEL ----- #
