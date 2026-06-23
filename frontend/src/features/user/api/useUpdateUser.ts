@@ -1,23 +1,23 @@
 import {
-  type InteractionInput,
-  type InteractionOutput,
-  InteractionOutputSchema,
-} from '@/features/interactions/types/interaction';
+  type UserOutput,
+  UserOutputSchema,
+  type UserUpdate,
+} from '@/features/user/types/user';
 import { apiFetchProtected } from '@/lib/api';
 import { ResponseErrorSchema } from '@/types/error';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 
-const createInteractionRequest = async (
-  interactionInput: InteractionInput,
-): Promise<InteractionOutput> => {
+const updateUserRequest = async (
+  userUpdate: UserUpdate,
+): Promise<UserOutput> => {
   // Sends the request and catches operational errors
   const options = {
-    method: 'POST',
+    method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(interactionInput),
+    body: JSON.stringify(userUpdate),
   };
 
-  const response = await apiFetchProtected('/interaction/create', options);
+  const response = await apiFetchProtected('/user/me', options);
   const rawData = await response.json();
 
   // Catches backend response errors
@@ -27,17 +27,15 @@ const createInteractionRequest = async (
   }
 
   // Returns
-  const validatedData = InteractionOutputSchema.parse(rawData);
+  const validatedData = UserOutputSchema.parse(rawData);
   return validatedData;
 };
 
-export const useCreateInteraction = () => {
+export const useUpdateUser = () => {
   const queryClient = useQueryClient();
 
   return useMutation({
-    mutationFn: createInteractionRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['interactions'] });
-    },
+    mutationFn: updateUserRequest,
+    onSuccess: () => queryClient.invalidateQueries({ queryKey: ['user'] }),
   });
 };
