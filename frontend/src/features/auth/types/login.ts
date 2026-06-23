@@ -8,13 +8,3 @@ export const LoginInputSchema = z.object({
 });
 
 export type LoginInput = z.infer<typeof LoginInputSchema>;
-
-// ----- STORE STATE ----- //
-
-export type LoginFormState = LoginInput & {
-  username: string;
-  password: string;
-
-  setUsername: (s: string) => void;
-  setPassword: (s: string) => void;
-};

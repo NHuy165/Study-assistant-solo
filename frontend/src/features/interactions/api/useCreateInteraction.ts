@@ -1,4 +1,3 @@
-import { useInteractionStore } from '@/features/interactions/stores/useInteractionStore';
 import {
   type InteractionInput,
   InteractionInputSchema,
@@ -44,13 +43,11 @@ const createInteractionRequest = async (
 
 export const useCreateInteraction = () => {
   const queryClient = useQueryClient();
-  const resetCreate = useInteractionStore((state) => state.resetCreate);
 
   return useMutation({
     mutationFn: createInteractionRequest,
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['interactions'] });
-      resetCreate();
     },
   });
 };

@@ -1,19 +1,31 @@
+import { FormField } from '@/components/FormField';
+import { SubmitButton } from '@/components/SubmitButton';
 import { useCreateInteraction } from '@/features/interactions/api/useCreateInteraction';
-import { useInteractionStore } from '@/features/interactions/stores/useInteractionStore';
+import {
+  type InteractionInput,
+  InteractionInputSchema,
+} from '@/features/interactions/types/interaction';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
 export const InteractionCreateForm = () => {
+  // Fetches states
   const {
-    createName: name,
-    createDescription: description,
-    setCreateName: setName,
-    setCreateDescription: setDescription,
-  } = useInteractionStore();
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<InteractionInput>({
+    resolver: zodResolver(InteractionInputSchema),
+    defaultValues: {
+      name: '',
+      description: '',
+    },
+  });
 
   const createInteraction = useCreateInteraction();
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    createInteraction.mutate({ name, description });
+  const onSubmit = (data: InteractionInput) => {
+    createInteraction.mutate(data);
   };
 
   return (
@@ -21,26 +33,31 @@ export const InteractionCreateForm = () => {
       {createInteraction.isError && <p>{createInteraction.error.message}</p>}
       {createInteraction.isPending && <p>Creating interaction, please wait.</p>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
-        <label>
-          Name:
-          <input value={name} onChange={(e) => setName(e.target.value)} />
-        </label>
+        <FormField
+          label="Name"
+          name="name"
+          register={register}
+          error={errors.name}
+        />
 
         <br />
 
         {/* Description */}
-        <label>
-          Description:
-          <input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Description"
+          name="description"
+          register={register}
+          error={errors.description}
+        />
 
         {/* Submit button */}
-        <button type="submit">Register</button>
+        <SubmitButton
+          disabled={createInteraction.isPending}
+          text="Create"
+          textDisabled="Creating..."
+        />
       </form>
     </div>
   );

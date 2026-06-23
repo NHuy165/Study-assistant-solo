@@ -28,25 +28,3 @@ export const InteractionUpdateSchema = z.object({
 });
 
 export type InteractionUpdate = z.infer<typeof InteractionUpdateSchema>;
-
-// ----- STORE STATE ----- //
-
-export type InteractionFormState = {
-  // Create
-  createName: string;
-  createDescription: string;
-
-  setCreateName: (s: string) => void;
-  setCreateDescription: (s: string) => void;
-  resetCreate: () => void;
-
-  // Update
-  updateId: number | null;
-  updateName: string;
-  updateDescription: string;
-
-  setUpdateName: (s: string) => void;
-  setUpdateDescription: (s: string) => void;
-  setUpdateId: (n: number | null) => void;
-  resetUpdate: () => void;
-};

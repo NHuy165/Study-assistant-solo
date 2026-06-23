@@ -1,28 +1,45 @@
+import { FormField } from '@/components/FormField';
+import { SubmitButton } from '@/components/SubmitButton';
 import { useUpdateInteraction } from '@/features/interactions/api/useUpdateInteraction';
-import { useInteractionStore } from '@/features/interactions/stores/useInteractionStore';
+import {
+  type InteractionUpdate,
+  type InteractionOutput,
+  InteractionUpdateSchema,
+} from '@/features/interactions/types/interaction';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 
-export const InteractionUpdateForm = () => {
+export const InteractionUpdateForm = ({
+  interaction,
+  onUpdate,
+}: {
+  interaction: InteractionOutput;
+  onUpdate: () => void;
+}) => {
   // Fetches states
-  const updateId = useInteractionStore((state) => state.updateId);
-  const updateName = useInteractionStore((state) => state.updateName);
-  const updateDescription = useInteractionStore(
-    (state) => state.updateDescription,
-  );
-
-  const setUpdateName = useInteractionStore((state) => state.setUpdateName);
-  const setUpdateDescription = useInteractionStore(
-    (state) => state.setUpdateDescription,
-  );
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<InteractionUpdate>({
+    resolver: zodResolver(InteractionUpdateSchema),
+    values: {
+      name: interaction.name,
+      description: interaction.description,
+    },
+  });
 
   const updateInteraction = useUpdateInteraction();
 
-  // Update function
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    updateInteraction.mutate({
-      id: updateId as number,
-      interactionUpdate: { name: updateName, description: updateDescription },
-    });
+  // Updates function
+  const onSubmit = (data: InteractionUpdate) => {
+    updateInteraction.mutate(
+      {
+        id: interaction.id,
+        interactionUpdate: data,
+      },
+      { onSuccess: () => onUpdate() },
+    );
   };
 
   return (
@@ -32,29 +49,31 @@ export const InteractionUpdateForm = () => {
         <p>Updating the interaction, please wait.</p>
       )}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
-        <label>
-          Name:
-          <input
-            value={updateName}
-            onChange={(e) => setUpdateName(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Name"
+          name="name"
+          register={register}
+          error={errors.name}
+        />
 
         <br />
 
         {/* Description */}
-        <label>
-          Description:
-          <input
-            value={updateDescription}
-            onChange={(e) => setUpdateDescription(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Description"
+          name="description"
+          register={register}
+          error={errors.description}
+        />
 
         {/* Submit button */}
-        <button type="submit">Update</button>
+        <SubmitButton
+          disabled={updateInteraction.isPending}
+          text="Update"
+          textDisabled="Updating..."
+        />
       </form>
     </div>
   );
