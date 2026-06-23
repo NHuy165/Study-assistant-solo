@@ -1,15 +1,14 @@
-from datetime import datetime, timedelta, timezone
+from datetime import datetime
 
 from pydantic import EmailStr
 from sqlalchemy.ext.asyncio import AsyncSession
-from sqlmodel import col, select
+from sqlmodel import select
 
 from backend.src.core.security import get_hashed_password, verify_password
 from backend.src.exceptions.core import (
-    ExceptionAuthentication_401,
     ExceptionTakenInfo_409,
+    ExceptionWrongPassword_401,
 )
-from backend.src.models_schema.user.check_in import CheckIn
 from backend.src.models_schema.user.user import (
     User,
     UserInput,
@@ -81,7 +80,7 @@ async def update_password(
     user: User, session: AsyncSession, password_change: UserPasswordChange
 ) -> None:
     if not verify_password(password_change.old_password, user.hashed_password):
-        raise ExceptionAuthentication_401()
+        raise ExceptionWrongPassword_401()
 
     update = {"hashed_password": get_hashed_password(password_change.new_password)}
     user.sqlmodel_update(update)
