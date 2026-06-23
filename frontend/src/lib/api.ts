@@ -1,4 +1,5 @@
 import { useTokenStore } from '@/features/auth/stores/useTokenStore';
+import { ResponseErrorSchema } from '@/types/error';
 
 const API_URL: string = import.meta.env.VITE_API_URL;
 
@@ -52,11 +53,17 @@ export const apiFetchProtected = async (
 
   const response = await apiFetch(url, updatedOptions);
 
-  // If token is expired
+  // If status code is 401
   if (response.status === 401) {
-    useTokenStore.getState().setToken(null);
-    window.location.href = '/auth/login';
-    return new Promise(() => {});
+    // If exception type is AUTHENTICATION (user authentication problems)
+    const rawData = await response.json();
+    const validatedError = ResponseErrorSchema.parse(rawData);
+
+    if (validatedError.exception_type === 'AUTHENTICATION') {
+      useTokenStore.getState().setToken(null);
+      window.location.href = '/auth/login';
+      return new Promise(() => {});
+    }
   }
 
   return response;

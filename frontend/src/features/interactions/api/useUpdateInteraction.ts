@@ -2,7 +2,6 @@ import {
   type InteractionOutput,
   InteractionOutputSchema,
   type InteractionUpdate,
-  InteractionUpdateSchema,
 } from '@/features/interactions/types/interaction';
 import { apiFetchProtected } from '@/lib/api';
 import { ResponseErrorSchema } from '@/types/error';
@@ -15,20 +14,11 @@ const updateInteractionRequest = async ({
   id: number;
   interactionUpdate: InteractionUpdate;
 }): Promise<InteractionOutput> => {
-  // Validates form input
-  const validatedInteractionUpdate =
-    InteractionUpdateSchema.safeParse(interactionUpdate);
-
-  if (!validatedInteractionUpdate.success) {
-    const errorMessage = validatedInteractionUpdate.error.issues[0].message;
-    throw new Error(errorMessage);
-  }
-
   // Sends the request and catches operational errors
   const options = {
     method: 'PATCH',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(validatedInteractionUpdate.data),
+    body: JSON.stringify(interactionUpdate),
   };
 
   const response = await apiFetchProtected(`/interaction/${id}`, options);
