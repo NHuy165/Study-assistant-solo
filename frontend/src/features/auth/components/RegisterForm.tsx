@@ -1,74 +1,89 @@
+import { FormField } from '@/components/FormField';
+import { SubmitButton } from '@/components/SubmitButton';
 import { useRegister } from '@/features/auth/api/useRegister';
-import { useRegisterStore } from '@/features/auth/stores/useRegisterStore';
+import {
+  type RegisterInput,
+  RegisterInputSchema,
+} from '@/features/auth/types/register';
+import { zodResolver } from '@hookform/resolvers/zod';
+import { useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 export const RegisterForm = () => {
-  const {
-    username,
-    email,
-    password,
-    description,
-    setUsername,
-    setEmail,
-    setPassword,
-    setDescription,
-  } = useRegisterStore();
-  const register = useRegister();
+  // Fetches state
+  const registerUser = useRegister();
 
-  const handleSubmit = (e: React.SubmitEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    register.mutate({ username, email, password, description });
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm<RegisterInput>({
+    resolver: zodResolver(RegisterInputSchema),
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+      description: '',
+    },
+  });
+
+  // Registers
+  const onSubmit = (data: RegisterInput) => {
+    registerUser.mutate(data);
   };
 
   return (
     <div>
       <h2>Register</h2>
 
-      {register.isError && <p>{register.error.message}</p>}
-      {register.isPending && <p>Registering user, please wait</p>}
+      {registerUser.isError && <p>{registerUser.error.message}</p>}
+      {registerUser.isPending && <p>Registering user, please wait</p>}
 
-      <form onSubmit={handleSubmit}>
+      <form onSubmit={handleSubmit(onSubmit)}>
         {/* Username */}
-        <label>
-          Username:
-          <input
-            value={username}
-            onChange={(e) => setUsername(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Username"
+          name="username"
+          register={register}
+          error={errors.username}
+        />
 
         <br />
 
         {/* Email */}
-        <label>
-          Email:
-          <input value={email} onChange={(e) => setEmail(e.target.value)} />
-        </label>
+        <FormField
+          label="Email"
+          name="email"
+          register={register}
+          error={errors.email}
+        />
 
         <br />
 
         {/* Password */}
-        <label>
-          Password:
-          <input
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Password"
+          name="password"
+          register={register}
+          error={errors.password}
+        />
 
         <br />
 
         {/* Description */}
-        <label>
-          Description:
-          <input
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-          />
-        </label>
+        <FormField
+          label="Description"
+          name="description"
+          register={register}
+          error={errors.description}
+        />
 
         {/* Submit button */}
-        <button type="submit">Register</button>
+        <SubmitButton
+          disabled={registerUser.isPending}
+          text="Register"
+          textDisabled="Registering..."
+        />
       </form>
 
       <br />

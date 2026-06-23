@@ -10,17 +10,3 @@ export const RegisterInputSchema = z.object({
 });
 
 export type RegisterInput = z.infer<typeof RegisterInputSchema>;
-
-// ----- STORE STATE ----- //
-
-export type RegisterFormState = {
-  username: string;
-  email: string;
-  description: string;
-  password: string;
-
-  setUsername: (s: string) => void;
-  setEmail: (s: string) => void;
-  setDescription: (s: string) => void;
-  setPassword: (s: string) => void;
-};
