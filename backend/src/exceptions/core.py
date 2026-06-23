@@ -13,6 +13,7 @@ class ExceptionType(str, Enum):
 
     # 401
     AUTHENTICATION = "AUTHENTICATION"
+    WRONG_PASSWORD = "WRONG_PASSWORD"
 
     # 404
     NOT_FOUND = "NOT_FOUND"
@@ -142,6 +143,16 @@ class ExceptionAuthentication_401(ExceptionCustom):
             status_code=401,
             exception_type=ExceptionType.AUTHENTICATION,
             message="Invalid credentials.",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+
+
+class ExceptionWrongPassword_401(ExceptionCustom):
+    def __init__(self):
+        super().__init__(
+            status_code=401,
+            exception_type=ExceptionType.WRONG_PASSWORD,
+            message="Wrong password entered.",
             headers={"WWW-Authenticate": "Bearer"},
         )
 
