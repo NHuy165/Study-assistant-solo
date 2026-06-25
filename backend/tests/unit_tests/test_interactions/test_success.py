@@ -30,7 +30,7 @@ async def test_create_interaction(
     interaction_input = InteractionInput(name="test", description="test-description")
 
     response = await client.post(
-        "/api/interaction/create",
+        "/api/interaction",
         json=interaction_input.model_dump(),
     )
 

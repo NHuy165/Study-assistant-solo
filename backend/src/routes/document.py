@@ -24,7 +24,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/{interaction_id}/upload",
+    "/{interaction_id}",
     response_model=tuple[DocumentOutput, DocumentAnalysisOutput | None],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -83,7 +83,7 @@ async def read_all_documents(
 
 
 @router.get(
-    "/{interaction_id}/{document_id}",
+    "/{document_id}/complete",
     response_model=tuple[DocumentOutput, DocumentAnalysisOutput | None],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -93,15 +93,14 @@ async def read_all_documents(
 async def read_document_complete(
     user: UserDep,
     session: SessionDep,
-    interaction: InteractionDep,
     document_id: int,
 ):
     """
     Reads a document_service, together with the document_service analysis performed by the LLM.
     """
     result = await document_service.read_document_complete(
+        user=user,
         session=session,
-        interaction=interaction,
         document_id=document_id,
     )
     return result

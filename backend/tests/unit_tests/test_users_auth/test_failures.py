@@ -120,5 +120,5 @@ async def test_change_password(
     validate_status_code(response, 401)
     validate_response_model(response, ExceptionResponse)
     validate_response_contents(
-        response, {"exception_type": ExceptionType.AUTHENTICATION.value}
+        response, {"exception_type": ExceptionType.WRONG_PASSWORD}
     )

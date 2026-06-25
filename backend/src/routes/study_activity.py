@@ -33,7 +33,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/{interaction_id}/create",
+    "/{interaction_id}",
     response_model=StudyActivityOutputComplete,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -62,7 +62,7 @@ async def create_study_activity(
 
 
 @router.post(
-    "/{interaction_id}/flashcards/create",
+    "/{interaction_id}/flashcards",
     response_model=StudyActivityOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -137,7 +137,7 @@ async def read_all_study_activity(
 
 
 @router.get(
-    "/{study_activity_id}",
+    "/{study_activity_id}/complete",
     response_model=StudyActivityOutputComplete,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
@@ -174,7 +174,7 @@ async def read_study_activity_complete(
 
 
 @router.patch(
-    "/{study_activity_id}/update",
+    "/{study_activity_id}",
     response_model=StudyActivityOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

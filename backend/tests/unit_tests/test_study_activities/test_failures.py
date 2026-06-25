@@ -118,7 +118,7 @@ async def test_create_study_activity_failed_api(
     )
 
     response = await client.post(
-        f"/api/study-activity/{create_interaction_test.id}/create",
+        f"/api/study-activity/{create_interaction_test.id}",
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 
@@ -167,7 +167,7 @@ async def test_create_study_activity_wrong_api_generation(
     )
 
     response = await client.post(
-        f"/api/study-activity/{create_interaction_test.id}/create",
+        f"/api/study-activity/{create_interaction_test.id}",
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 

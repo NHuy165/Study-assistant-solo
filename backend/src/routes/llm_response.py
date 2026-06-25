@@ -22,7 +22,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/{interaction_id}/chat",
+    "/{interaction_id}",
     response_model=LLMResponseOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

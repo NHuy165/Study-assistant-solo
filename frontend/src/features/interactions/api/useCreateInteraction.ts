@@ -17,7 +17,7 @@ const createInteractionRequest = async (
     body: JSON.stringify(interactionInput),
   };
 
-  const response = await apiFetchProtected('/interaction/create', options);
+  const response = await apiFetchProtected('/interaction', options);
   const rawData = await response.json();
 
   // Catches backend response errors

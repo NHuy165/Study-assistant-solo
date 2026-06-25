@@ -108,12 +108,13 @@ async def read_all_documents(
 
 
 async def read_document_complete(
-    session: AsyncSession, interaction: Interaction, document_id: int
+    user: User, session: AsyncSession, document_id: int
 ) -> tuple[Document, DocumentAnalysis | None]:
     query = query = (
         select(Document)
+        .join(Interaction)
         .where(
-            Document.interaction_id == interaction.id,
+            Interaction.user_id == user.id,
             Document.id == document_id,
         )
         .options(
@@ -134,7 +135,7 @@ async def read_document_complete(
             "Document",
             {
                 "id": document_id,
-                "interaction_id": interaction.id,
+                "user_id": user.id,
             },
         )
 
