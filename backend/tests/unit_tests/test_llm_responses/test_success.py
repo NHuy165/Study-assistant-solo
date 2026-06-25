@@ -51,7 +51,7 @@ async def test_create_llm_response(
     llm_response_input = LLMResponseInput(prompt="LLM call prompt.")
 
     response = await client.post(
-        f"/api/llm-response/{create_interaction_test.id}/chat",
+        f"/api/llm-response/{create_interaction_test.id}",
         json=llm_response_input.model_dump(),
     )
     validate_status_code(response, 200)

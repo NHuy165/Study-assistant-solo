@@ -36,7 +36,7 @@ async def test_create_note(
     )
 
     response = await client.post(
-        f"/api/note/{create_interaction_test.id}/upload",
+        f"/api/note/{create_interaction_test.id}",
         json=note_input.model_dump(),
     )
 

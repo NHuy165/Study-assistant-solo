@@ -20,7 +20,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/create",
+    "",
     response_model=InteractionOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

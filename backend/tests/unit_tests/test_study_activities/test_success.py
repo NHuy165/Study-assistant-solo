@@ -135,7 +135,7 @@ async def test_create_study_activity(
     )
 
     response = await client.post(
-        f"/api/study-activity/{create_interaction_test.id}/create",
+        f"/api/study-activity/{create_interaction_test.id}",
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 
@@ -187,7 +187,7 @@ async def test_create_add_flashcards_activity(
     )
 
     response_create = await client.post(
-        f"/api/study-activity/{create_interaction_test.id}/flashcards/create",
+        f"/api/study-activity/{create_interaction_test.id}/flashcards",
         json=flashcards_activity_input.model_dump(),
     )
 
@@ -398,7 +398,7 @@ async def test_read_study_activity_complete(
     )
 
     response = await client.get(
-        f"/api/study-activity/{study_activity.id}",
+        f"/api/study-activity/{study_activity.id}/complete",
     )
 
     validate_status_code(response, 200)
@@ -447,7 +447,7 @@ async def test_update_study_activity(
     )
 
     response = await client.patch(
-        f"/api/study-activity/{study_activity.id}/update",
+        f"/api/study-activity/{study_activity.id}",
         json=study_activity_update.model_dump(exclude_unset=True),
     )
 

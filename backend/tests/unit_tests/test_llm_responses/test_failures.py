@@ -71,7 +71,7 @@ async def test_create_llm_response_failed_api(
         mock_GlobalAPI_generate_chat.return_value = "Mock LLM response."
 
     response = await client.post(
-        f"/api/llm-response/{create_interaction_test.id}/chat",
+        f"/api/llm-response/{create_interaction_test.id}",
         json={"prompt": "LLM call prompt."},
     )
     validate_status_code(response, 503)

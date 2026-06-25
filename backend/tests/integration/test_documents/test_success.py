@@ -51,7 +51,7 @@ async def test_create_document(
 
     with open(filepath, "rb") as f:
         response = await client.post(
-            f"/api/document/{create_interaction_test.id}/upload?subject_type_overwrite=true",
+            f"/api/document/{create_interaction_test.id}?subject_type_overwrite=true",
             files={"file": (filename, f, MIME_type)},
         )
 

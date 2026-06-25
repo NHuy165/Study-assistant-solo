@@ -17,7 +17,7 @@ router = APIRouter()
 
 
 @router.post(
-    "/{interaction_id}/upload",
+    "/{interaction_id}",
     response_model=NoteOutput,
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
