@@ -54,7 +54,7 @@ async def create_llm_response(
 
 
 @router.get(
-    "/{interaction_id}/",
+    "/{interaction_id}",
     response_model=list[LLMResponseOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

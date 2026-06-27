@@ -60,7 +60,7 @@ async def save_document(
 
 
 @router.get(
-    "/{interaction_id}/",
+    "/{interaction_id}",
     response_model=list[DocumentOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

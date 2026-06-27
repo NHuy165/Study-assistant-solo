@@ -48,7 +48,7 @@ async def create_interaction(
 
 
 @router.get(
-    "/",
+    "",
     response_model=list[InteractionOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

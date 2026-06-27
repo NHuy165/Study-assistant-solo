@@ -59,7 +59,7 @@ async def test_read_all_notes(
     await create_note_custom(create_interaction_test, "test2")
 
     response = await client.get(
-        f"/api/note/{create_interaction_test.id}/",
+        f"/api/note/{create_interaction_test.id}",
     )
 
     validate_status_code(response, 200)

@@ -9,7 +9,7 @@ import { z } from 'zod';
 
 const getInteractionsRequest = async (): Promise<InteractionOutput[]> => {
   // Sends the request and catches operational errors
-  const response = await apiFetchProtected('/interaction/');
+  const response = await apiFetchProtected('/interaction');
   const rawData = await response.json();
 
   // Catches backend response errors

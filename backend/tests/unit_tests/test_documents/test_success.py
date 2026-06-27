@@ -136,7 +136,7 @@ async def test_read_all_documents(
     await create_document_custom(create_interaction_test, "test2")
 
     response = await client.get(
-        f"/api/document/{create_interaction_test.id}/",
+        f"/api/document/{create_interaction_test.id}",
     )
 
     validate_status_code(response, 200)
