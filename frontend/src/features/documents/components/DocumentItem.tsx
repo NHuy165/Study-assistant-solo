@@ -3,6 +3,7 @@ import type { DocumentOutput } from '@/features/documents/types/document';
 import { useDeleteDocument } from '@/features/documents/api/useDeleteDocument';
 import { DocumentUpdateForm } from '@/features/documents/components/DocumentUpdateForm';
 import { useGetDocumentComplete } from '@/features/documents/api/useGetDocumentComplete';
+import { capitalizeString } from '@/utils/format-string';
 
 export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
   // Fetches states
@@ -17,8 +18,11 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
   return (
     <li>
       <>
-        #{document.id} ({document.created_at}) {document.name} (
-        {document.subject_type}) (type: {document.type})
+        #{document.id} ({document.created_at}) {document.name} (Subject:{' '}
+        {document.subject_type
+          ? capitalizeString(document.subject_type)
+          : 'Other'}
+        ) (Type: {document.type}):{' '}
       </>
 
       {/* Analysis button */}
