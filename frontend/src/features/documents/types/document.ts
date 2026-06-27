@@ -81,7 +81,7 @@ export type DocumentOutputComplete = z.infer<
 export const DocumentUpdateSchema = z.object({
   name: z.string(),
   page_starts_at: z.int(),
-  subject_type: z.enum(SubjectType),
+  subject_type: z.enum(SubjectType).nullable(),
 });
 
 export type DocumentUpdate = z.infer<typeof DocumentUpdateSchema>;
