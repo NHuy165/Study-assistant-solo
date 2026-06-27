@@ -40,10 +40,12 @@ export const useUpdateDocument = () => {
 
   return useMutation({
     mutationFn: updateDocumentRequest,
-    onSuccess: (data, variables) => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    onSuccess: (data, params) => {
       queryClient.invalidateQueries({
-        queryKey: ['document', variables.documentId],
+        queryKey: ['documents', data.interaction_id],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', params.documentId],
       });
     },
   });
