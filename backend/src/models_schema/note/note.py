@@ -30,6 +30,7 @@ class NoteInput(NoteBase):
 
 class NoteOutput(NoteBase):
     id: int
+    interaction_id: int
     created_at: datetime
 
 

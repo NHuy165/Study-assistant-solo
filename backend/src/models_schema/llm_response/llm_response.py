@@ -25,6 +25,7 @@ class LLMResponseInput(LLMResponseBase):
 
 class LLMResponseOutput(LLMResponseBase):
     id: int
+    interaction_id: int
     answer: str
     created_at: datetime
 
