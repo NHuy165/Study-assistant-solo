@@ -6,7 +6,7 @@ import {
   RegisterInputSchema,
 } from '@/features/auth/types/register';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 import { Link } from 'react-router-dom';
 
 export const RegisterForm = () => {
@@ -28,7 +28,7 @@ export const RegisterForm = () => {
   });
 
   // Registers
-  const onSubmit = (data: RegisterInput) => {
+  const onSubmit: SubmitHandler<RegisterInput> = (data) => {
     registerUser.mutate(data);
   };
 

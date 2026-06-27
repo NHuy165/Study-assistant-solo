@@ -12,13 +12,10 @@ export const ChangeableUserField = ({
   const value = useGetUser().data?.[field];
   const [showUpdateForm, setShowUpdateForm] = useState(false);
 
-  const handleOnclick = () => {
-    setShowUpdateForm(!showUpdateForm);
-  };
   return (
     <div>
       {capitalizeString(replaceUnderscore(field))}: {value}
-      <button onClick={handleOnclick}>Update</button>
+      <button onClick={() => setShowUpdateForm(!showUpdateForm)}>Update</button>
       {showUpdateForm && (
         <UserFieldUpdateForm
           field={field}

@@ -6,7 +6,7 @@ import {
   InteractionInputSchema,
 } from '@/features/interactions/types/interaction';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const InteractionCreateForm = () => {
   // Fetches states
@@ -24,7 +24,7 @@ export const InteractionCreateForm = () => {
 
   const createInteraction = useCreateInteraction();
 
-  const onSubmit = (data: InteractionInput) => {
+  const onSubmit: SubmitHandler<InteractionInput> = (data) => {
     createInteraction.mutate(data);
   };
 

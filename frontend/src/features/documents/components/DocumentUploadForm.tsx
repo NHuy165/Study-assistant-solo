@@ -7,7 +7,7 @@ import {
 } from '@/features/documents/types/document';
 import { SubjectType } from '@/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const DocumentUploadForm = ({
   interactionId,
@@ -31,7 +31,7 @@ export const DocumentUploadForm = ({
 
   const uploadDocument = useUploadDocument();
 
-  const onSubmit = (data: DocumentInput) => {
+  const onSubmit: SubmitHandler<DocumentInput> = (data) => {
     uploadDocument.mutate({ interactionId, documentInput: data });
   };
 
