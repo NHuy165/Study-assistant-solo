@@ -85,7 +85,7 @@ async def test_read_llm_responses(
         create_interaction_test, "Prompt 2", "Answer 2"
     )
 
-    response = await client.get(f"/api/llm-response/{create_interaction_test.id}/")
+    response = await client.get(f"/api/llm-response/{create_interaction_test.id}")
 
     validate_status_code(response, 200)
     validate_response_model(response, list[LLMResponseOutput])

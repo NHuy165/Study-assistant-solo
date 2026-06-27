@@ -115,7 +115,7 @@ async def add_flashcards(
 
 
 @router.get(
-    "/{interaction_id}/",
+    "/{interaction_id}",
     response_model=list[StudyActivityOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

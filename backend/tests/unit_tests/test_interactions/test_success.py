@@ -53,7 +53,7 @@ async def test_read_all_interactions(
     await create_interaction_custom(register_user_test, "test1")
     await create_interaction_custom(register_user_test, "test2")
 
-    response = await client.get("/api/interaction/")
+    response = await client.get("/api/interaction")
 
     validate_status_code(response, 200)
     validate_response_model(response, list[InteractionOutput])

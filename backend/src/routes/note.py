@@ -47,7 +47,7 @@ async def create_note(
 
 
 @router.get(
-    "/{interaction_id}/",
+    "/{interaction_id}",
     response_model=list[NoteOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,

@@ -11,7 +11,7 @@ const getDocumentsRequest = async (
   interactionId: number,
 ): Promise<DocumentOutput[]> => {
   // Sends the request and catches operational errors
-  const response = await apiFetchProtected(`/document/${interactionId}/`);
+  const response = await apiFetchProtected(`/document/${interactionId}`);
   const rawData = await response.json();
 
   // Catches backend response errors

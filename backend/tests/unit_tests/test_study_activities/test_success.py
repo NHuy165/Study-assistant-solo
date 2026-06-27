@@ -327,7 +327,7 @@ async def test_read_all_study_activities(
     # Testing
 
     response = await client.get(
-        f"/api/study-activity/{create_interaction_test.id}/",
+        f"/api/study-activity/{create_interaction_test.id}",
     )
 
     validate_status_code(response, 200)
