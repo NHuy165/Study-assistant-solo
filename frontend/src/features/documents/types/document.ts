@@ -34,6 +34,7 @@ export type DocumentInput = z.infer<typeof DocumentInputSchema>;
 
 export const DocumentOutputSchema = z.object({
   id: z.int(),
+  interaction_id: z.int(),
   name: z.string(),
   page_starts_at: z.int(),
   created_at: z.iso.datetime(),

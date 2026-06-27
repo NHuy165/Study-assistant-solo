@@ -1,6 +1,7 @@
 import { apiFetchProtected } from '@/lib/api';
 import { ResponseErrorSchema } from '@/types/error';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useParams } from 'react-router-dom';
 
 const deleteDocumentRequest = async (documentId: number): Promise<void> => {
   // Sends the request and catches operational errors
@@ -20,13 +21,16 @@ const deleteDocumentRequest = async (documentId: number): Promise<void> => {
 
 export const useDeleteDocument = () => {
   const queryClient = useQueryClient();
+  const { interactionId } = useParams() as { interactionId: string };
 
   return useMutation({
     mutationFn: deleteDocumentRequest,
-    onSuccess: (data, variable) => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    onSuccess: (data, param) => {
       queryClient.invalidateQueries({
-        queryKey: ['document', variable],
+        queryKey: ['documents', Number(interactionId)],
+      });
+      queryClient.invalidateQueries({
+        queryKey: ['document', param],
       });
     },
   });

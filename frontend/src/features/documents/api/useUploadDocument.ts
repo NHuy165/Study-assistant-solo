@@ -54,8 +54,10 @@ export const useUploadDocument = () => {
 
   return useMutation({
     mutationFn: uploadDocumentRequest,
-    onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['documents'] });
+    onSuccess: (data, params) => {
+      queryClient.invalidateQueries({
+        queryKey: ['documents', params.interactionId],
+      });
     },
   });
 };
