@@ -48,6 +48,7 @@ class DocumentInput(DocumentBase):
 
 class DocumentOutput(DocumentBase):
     id: int
+    interaction_id: int
     created_at: datetime
     type: DocumentType
 

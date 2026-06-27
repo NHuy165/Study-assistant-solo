@@ -51,6 +51,7 @@ class FlashcardsActivityInput(SQLModel):
 
 class StudyActivityOutput(StudyActivityBase):
     id: int
+    interaction_id: int
     name: str
     description: str
     activity_type: StudyActivityType
