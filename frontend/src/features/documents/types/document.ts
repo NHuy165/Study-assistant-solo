@@ -37,7 +37,7 @@ export const DocumentOutputSchema = z.object({
   name: z.string(),
   page_starts_at: z.int(),
   created_at: z.iso.datetime(),
-  subject_type: z.enum(SubjectType),
+  subject_type: z.enum(SubjectType).nullable(),
   type: z.enum(DocumentType),
 });
 
