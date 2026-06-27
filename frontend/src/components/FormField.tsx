@@ -31,10 +31,10 @@ export const FormField = <T extends FieldValues>({
         accept={type === 'file' ? accept : undefined}
         placeholder={placeholder}
         {...register(name, {
-          // Converts number field to an actual number
+          // Converts number field to an actual number, make it null if input is lacking
           setValueAs: (value) => {
             if (type === 'number') {
-              return Number(value);
+              return value === '' ? null : Number(value);
             }
             return value;
           },
