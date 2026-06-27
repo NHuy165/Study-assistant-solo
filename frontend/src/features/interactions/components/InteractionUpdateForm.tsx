@@ -7,7 +7,7 @@ import {
   InteractionUpdateSchema,
 } from '@/features/interactions/types/interaction';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const InteractionUpdateForm = ({
   interaction,
@@ -32,7 +32,7 @@ export const InteractionUpdateForm = ({
   const updateInteraction = useUpdateInteraction();
 
   // Updates function
-  const onSubmit = (data: InteractionUpdate) => {
+  const onSubmit: SubmitHandler<InteractionUpdate> = (data) => {
     updateInteraction.mutate(
       {
         id: interaction.id,

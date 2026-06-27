@@ -9,7 +9,7 @@ import {
 } from '@/features/user/types/user';
 import { replaceUnderscore } from '@/utils/format-string';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const UserFieldUpdateForm = ({
   field,
@@ -32,7 +32,7 @@ export const UserFieldUpdateForm = ({
 
   const updateUser = useUpdateUser();
 
-  const onSubmit = (data: UserUpdate) => {
+  const onSubmit: SubmitHandler<UserUpdate> = (data) => {
     updateUser.mutate(data, { onSuccess: () => onUpdate() });
   };
 

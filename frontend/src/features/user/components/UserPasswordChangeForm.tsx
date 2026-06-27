@@ -7,7 +7,7 @@ import {
 } from '@/features/user/types/user';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { useState } from 'react';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const UserPasswordChangeForm = () => {
   const [showUpdateForm, setShowUpdateForm] = useState(false);
@@ -23,7 +23,7 @@ export const UserPasswordChangeForm = () => {
 
   const changePassword = useChangePassword();
 
-  const onSubmit = (data: UserPasswordChange) => {
+  const onSubmit: SubmitHandler<UserPasswordChange> = (data) => {
     changePassword.mutate(data, { onSuccess: () => setShowUpdateForm(false) });
   };
 

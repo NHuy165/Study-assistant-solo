@@ -8,7 +8,7 @@ import {
 } from '@/features/documents/types/document';
 import { DocumentType, SubjectType } from '@/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const DocumentUpdateForm = ({
   document,
@@ -34,7 +34,7 @@ export const DocumentUpdateForm = ({
   const updateDocument = useUpdateDocument();
 
   // Updates function
-  const onSubmit = (data: DocumentUpdate) => {
+  const onSubmit: SubmitHandler<DocumentUpdate> = (data) => {
     updateDocument.mutate(
       {
         documentId: document.id,

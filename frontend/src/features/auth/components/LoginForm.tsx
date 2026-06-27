@@ -1,6 +1,6 @@
 import { useLogin } from '@/features/auth/api/useLogin';
 import { Link } from 'react-router-dom';
-import { useForm } from 'react-hook-form';
+import { useForm, type SubmitHandler } from 'react-hook-form';
 import { type LoginInput, LoginInputSchema } from '@/features/auth/types/login';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { FormField } from '@/components/FormField';
@@ -23,7 +23,7 @@ export const LoginForm = () => {
   const login = useLogin();
 
   // Logins
-  const onSubmit = (data: LoginInput) => {
+  const onSubmit: SubmitHandler<LoginInput> = (data) => {
     login.mutate(data);
   };
 
