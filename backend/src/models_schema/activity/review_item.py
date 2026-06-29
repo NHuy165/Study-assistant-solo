@@ -29,6 +29,7 @@ class FlashcardInput(SQLModel):
 
 class ReviewItemOutput(ReviewItemBase):
     id: int
+    study_activity_id: int
     contents: list["ReviewItemContentOutput"]
 
 
