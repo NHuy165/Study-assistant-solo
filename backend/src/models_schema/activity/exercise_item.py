@@ -23,6 +23,7 @@ class ExerciseItemBase(SQLModel):
 
 class ExerciseItemOutput(ExerciseItemBase):
     id: int
+    study_activity_id: int
     user_score: float | None = None
     explanation: str | None = None
     attempt: str | None
