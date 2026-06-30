@@ -1,4 +1,4 @@
-import { FormField } from '@/components/FormField';
+import { FormField } from '@/components/form-elements';
 import { SubmitButton } from '@/components/SubmitButton';
 import { useCreateChat } from '@/features/chat/api/useCreateChat';
 import { type ChatInput, ChatInputSchema } from '@/features/chat/types/chat';

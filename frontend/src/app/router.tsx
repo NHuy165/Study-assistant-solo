@@ -9,6 +9,7 @@ import { AuthPage } from '@/app/routes/AuthPage';
 import { useTokenStore } from '@/features/auth/stores/useTokenStore';
 import { HomePage } from '@/app/routes/HomePage';
 import { MainInteractionPage } from '@/app/routes/MainInteractionPage';
+import { StudyActivityPage } from '@/app/routes/StudyActivityPage';
 
 // Redirects to auth if token is null
 export const ProtectedRoute = () => {
@@ -37,6 +38,10 @@ export const AppRouter = () => {
           <Route
             path="/interaction/:interactionId"
             element={<MainInteractionPage />}
+          />
+          <Route
+            path="/study-activity/:studyActivityId"
+            element={<StudyActivityPage />}
           />
         </Route>
       </Routes>

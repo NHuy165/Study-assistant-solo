@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { type LoginInput, LoginInputSchema } from '@/features/auth/types/login';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormField } from '@/components/FormField';
+import { FormField } from '@/components/form-elements';
 import { SubmitButton } from '@/components/SubmitButton';
 
 export const LoginForm = () => {

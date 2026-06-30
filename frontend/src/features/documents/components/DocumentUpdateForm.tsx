@@ -1,4 +1,4 @@
-import { FormField, SelectField } from '@/components/FormField';
+import { FormField, SelectField } from '@/components/form-elements';
 import { SubmitButton } from '@/components/SubmitButton';
 import { useUpdateDocument } from '@/features/documents/api/useUpdateDocument';
 import {
