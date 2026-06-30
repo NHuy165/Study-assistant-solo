@@ -1,4 +1,7 @@
-import type { SelectOption } from '@/types/miscellaneous/select-option';
+import type {
+  RadioOption,
+  SelectOption,
+} from '@/types/miscellaneous/custom-component-types';
 import {
   type UseFormRegister,
   type Path,
@@ -14,6 +17,7 @@ export const FormField = <T extends FieldValues>({
   accept,
   type = 'text',
   placeholder = '',
+  disabled = false,
 }: {
   label: string;
   name: Path<T>;
@@ -22,14 +26,17 @@ export const FormField = <T extends FieldValues>({
   accept?: string;
   type?: React.HTMLInputTypeAttribute;
   placeholder?: string;
+  disabled?: boolean;
 }) => {
   return (
     <label>
       {label}
+      <br />
       <input
         type={type}
         accept={type === 'file' ? accept : undefined}
         placeholder={placeholder}
+        disabled={disabled}
         {...register(name, {
           // Converts number field to an actual number, make it null if input is lacking
           setValueAs: (value) => {
@@ -49,12 +56,14 @@ export const SelectField = <T extends FieldValues>({
   label,
   name,
   options,
+  includeNoneOption = false,
   register,
   error,
 }: {
   label: string;
   name: Path<T>;
   options: SelectOption[];
+  includeNoneOption?: boolean;
   register: UseFormRegister<T>;
   error?: FieldError;
 }) => {
@@ -68,7 +77,7 @@ export const SelectField = <T extends FieldValues>({
           setValueAs: (value) => (value === '' ? null : value),
         })}
       >
-        <option value="">None</option>
+        {includeNoneOption && <option value="">None</option>}
 
         {options.map((option) => (
           <option key={option.value} value={option.value}>
@@ -79,5 +88,49 @@ export const SelectField = <T extends FieldValues>({
 
       {error && error.message}
     </label>
+  );
+};
+
+export const RadioGroupField = <T extends FieldValues>({
+  label,
+  name,
+  currentAnswer,
+  options,
+  register,
+  disabled,
+  error,
+}: {
+  label: string;
+  name: Path<T>;
+  currentAnswer: number;
+  options: RadioOption[];
+  register: UseFormRegister<T>;
+  disabled: boolean;
+  error?: FieldError;
+}) => {
+  return (
+    <div>
+      <p>{label}</p>
+
+      {options.map((option) => (
+        <label key={option.value}>
+          <input
+            type="radio"
+            value={option.value}
+            disabled={disabled}
+            {...register(name)}
+          />
+          {option.label}
+          {/* If the answer is correct, display a correct sign. Else if the answer is not correct AND the user chose it, display a wrong sign. */}
+          {option.isCorrect !== null &&
+            (option.isCorrect
+              ? ' (Correct answer)'
+              : currentAnswer === option.value && ' (Wrong answer)')}
+          <br />
+        </label>
+      ))}
+
+      {error && error.message}
+    </div>
   );
 };

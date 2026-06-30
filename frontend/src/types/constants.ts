@@ -20,14 +20,35 @@ export type DocumentType = (typeof DocumentType)[keyof typeof DocumentType];
 
 // ----- STUDY ACTIVITY ----- //
 
-// === FORMAT === //
+// === Format === //
 
 export const StudyActivityFormat = {
   MultipleChoiceQuestions: 'MULTIPLE_CHOICE_QUESTIONS',
   OpenEnded: 'OPEN_ENDED',
   Flashcards: 'FLASHCARDS',
-  GapFill: 'GAP_FILL',
 } as const;
 
 export type StudyActivityFormat =
   (typeof StudyActivityFormat)[keyof typeof StudyActivityFormat];
+
+// === Study Activity Type === //
+
+export const StudyActivityType = {
+  Exercise: 'EXERCISE',
+  Review: 'REVIEW',
+} as const;
+
+export type StudyActivityType =
+  (typeof StudyActivityType)[keyof typeof StudyActivityType];
+
+// === Study Activity Item Content Type === //
+
+export const ReviewItemContentType = {
+  FlashcardFront: 'FLASHCARDS_FRONT',
+  FlashcardBack: 'FLASHCARDS_BACK',
+};
+
+export const ExerciseItemContentType = {
+  MultipleChoiceQuestionChoice: 'MULTIPLE_CHOICE_QUESTIONS_CHOICE',
+  OpenEndedCorrect: 'OPEN_ENDED_CORRECT',
+};

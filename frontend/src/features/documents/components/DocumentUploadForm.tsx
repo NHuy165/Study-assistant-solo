@@ -1,4 +1,4 @@
-import { FormField, SelectField } from '@/components/FormField';
+import { FormField, SelectField } from '@/components/form-elements';
 import { SubmitButton } from '@/components/SubmitButton';
 import { useUploadDocument } from '@/features/documents/api/useUploadDocument';
 import {
@@ -18,13 +18,14 @@ export const DocumentUploadForm = ({
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<DocumentInput>({
     resolver: zodResolver(DocumentInputSchema),
     defaultValues: {
       name: null,
       page_starts_at: 1,
-      subject_type: null,
+      subject_type: '' as unknown as null, // This bypasses the check and gets the select field to default to the nu;l; option (whose initial value is actually '')
       subject_type_overwrite: false,
     },
   });
@@ -32,7 +33,10 @@ export const DocumentUploadForm = ({
   const uploadDocument = useUploadDocument();
 
   const onSubmit: SubmitHandler<DocumentInput> = (data) => {
-    uploadDocument.mutate({ interactionId, documentInput: data });
+    uploadDocument.mutate(
+      { interactionId, documentInput: data },
+      { onSuccess: () => reset() },
+    );
   };
 
   return (
@@ -82,6 +86,7 @@ export const DocumentUploadForm = ({
           options={Object.entries(SubjectType).map(([label, value]) => {
             return { label, value };
           })}
+          includeNoneOption={true}
           register={register}
           error={errors.subject_type}
         />

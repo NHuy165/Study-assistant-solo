@@ -1,4 +1,4 @@
-import { FormField } from '@/components/FormField';
+import { FormField } from '@/components/form-elements';
 import { SubmitButton } from '@/components/SubmitButton';
 import { useGetUser } from '@/features/user/api/useGetUser';
 import { useUpdateUser } from '@/features/user/api/useUpdateUser';
