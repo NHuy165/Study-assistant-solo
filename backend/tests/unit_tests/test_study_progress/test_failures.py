@@ -1,81 +1,31 @@
-import json
-import time
-from datetime import date, datetime, timedelta, timezone
-from types import CoroutineType, NoneType
+from datetime import datetime, timedelta, timezone
+from types import CoroutineType
 from typing import Any, Callable
 from unittest.mock import AsyncMock, patch
 
 import pytest
 import time_machine
 from httpx import AsyncClient
-from sqlalchemy.ext.asyncio import AsyncSession
 
 from backend.src.core.ai_api import GlobalAPI
-from backend.src.core.config import settings
 from backend.src.exceptions.core import (
     ExceptionExternalService_503,
     ExceptionResponse,
     ExceptionType,
 )
-from backend.src.models_schema.activity.exercise_item import (
-    ExerciseItemOutput,
-    ExerciseItemUpdate,
-)
-from backend.src.models_schema.activity.review_item import (
-    FlashcardInput,
-    FlashcardUpdate,
-    ReviewItemOutput,
-)
 from backend.src.models_schema.activity.study_activity import (
-    FlashcardsActivityInput,
     StudyActivity,
-    StudyActivityInput,
-    StudyActivityOutput,
-    StudyActivityOutputComplete,
-    StudyActivityUpdate,
 )
 from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.miscellaneous.enums import (
     AggregateTarget,
     CriterionAttribute,
-    ExerciseItemContentType,
     OperatorType,
-    ReviewItemContentType,
     StudyActivityFormat,
-    StudyActivityType,
     SubjectType,
 )
-from backend.src.models_schema.study_progress.assessment import (
-    StudyAssessment,
-    StudyAssessmentOutput,
-)
-from backend.src.models_schema.study_progress.criterion import Criterion
 from backend.src.models_schema.user.user import User
-from backend.tests.test_data.study_activities.mock_flashcards_data import (
-    mock_flashcards_llm_return_data,
-    validation_flashcards_creation_data,
-    validation_flashcards_read_data,
-)
-from backend.tests.test_data.study_activities.mock_gap_fill_data import (
-    mock_gap_fill_llm_return_data,
-    validation_gap_fill_creation_data,
-    validation_gap_fill_read_data,
-)
-from backend.tests.test_data.study_activities.mock_MCQ_data import (
-    mock_MCQ_llm_return_data,
-    validation_MCQ_creation_data,
-    validation_MCQ_read_data,
-)
-from backend.tests.test_data.study_activities.mock_open_ended_data import (
-    mock_open_ended_llm_return_data,
-    validation_open_ended_creation_data,
-    validation_open_ended_read_data,
-)
 from backend.tests.utils.validators import (
-    validate_contents_dict,
-    validate_contents_list,
-    validate_model,
-    validate_object_contents,
     validate_response_contents,
     validate_response_model,
     validate_status_code,
