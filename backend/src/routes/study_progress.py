@@ -18,7 +18,7 @@ router = APIRouter()
 
 @router.post(
     "/study-assessment",
-    response_model=StudyAssessmentOutput | None,
+    response_model=list[StudyAssessmentOutput],
     responses={
         401: Responses.RESPONSE_401_UNAUTHORIZED,
     },

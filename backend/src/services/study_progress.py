@@ -129,7 +129,7 @@ async def create_study_assessment(
     user: User,
     session: AsyncSession,
     current_datetime: datetime,
-) -> StudyAssessment | None:
+) -> list[StudyAssessment]:
     today = current_datetime.date()
 
     # Checks check ins without assessment
@@ -151,7 +151,7 @@ async def create_study_assessment(
     )
 
     if not check_ins_without_assessment:
-        return None
+        return []
 
     # Preserves space so race conditions don't happen
     study_assessments_preservation = [
@@ -177,7 +177,7 @@ async def create_study_assessment(
     await session.commit()
 
     if not study_assessments_preserved:
-        return None
+        return []
 
     # Creates prompts
     final_prompts = [
@@ -206,7 +206,7 @@ async def create_study_assessment(
     session.add_all(study_assessments_preserved)
     await session.commit()
 
-    return study_assessments_preserved[0] if study_assessments_preserved else None
+    return list(study_assessments_preserved)
 
 
 # ----- READ ----- #

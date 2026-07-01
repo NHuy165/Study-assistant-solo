@@ -38,10 +38,12 @@ async def test_create_study_assessment(
         )
 
     validate_status_code(response, 200)
-    validate_response_model(response, StudyAssessmentOutput)
+    validate_response_model(response, list[StudyAssessmentOutput])
     validate_response_contents(
         response,
-        {
-            "assessment_of": today.isoformat(),
-        },
+        [
+            {
+                "assessment_of": today.isoformat(),
+            },
+        ],
     )

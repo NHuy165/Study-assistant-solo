@@ -52,7 +52,7 @@ async def test_create_study_assessment(
     )
 
     validate_status_code(response_today, 200)
-    validate_response_model(response_today, NoneType)
+    validate_response_model(response_today, list)
 
     today = datetime.now(timezone.utc).date()
     with time_machine.travel(today + timedelta(days=1)):
@@ -61,13 +61,15 @@ async def test_create_study_assessment(
         )
 
     validate_status_code(response_tomorrow, 200)
-    validate_response_model(response_tomorrow, StudyAssessmentOutput)
+    validate_response_model(response_tomorrow, list[StudyAssessmentOutput])
     validate_response_contents(
         response_tomorrow,
-        {
-            "content": "Mock study assessment",
-            "assessment_of": today.isoformat(),
-        },
+        [
+            {
+                "content": "Mock study assessment",
+                "assessment_of": today.isoformat(),
+            },
+        ],
     )
 
 
