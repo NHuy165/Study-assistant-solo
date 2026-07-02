@@ -6,7 +6,8 @@ import {
   type DocumentOutput,
   type DocumentUpdate,
 } from '@/features/documents/types/document';
-import { DocumentType, SubjectType } from '@/types/constants';
+import { SubjectType } from '@/types/constants';
+import { DocumentType } from '@/features/documents/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
