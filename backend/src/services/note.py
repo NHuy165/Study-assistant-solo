@@ -36,7 +36,11 @@ async def create_note(
 
 
 async def read_all_notes(session: AsyncSession, interaction: Interaction) -> list[Note]:
-    query = select(Note).where(Note.interaction_id == interaction.id)
+    query = (
+        select(Note)
+        .where(Note.interaction_id == interaction.id)
+        .order_by(col(Note.id).asc())
+    )
     notes = (await session.execute(query)).scalars().all()
 
     return list(notes)

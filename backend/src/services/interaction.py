@@ -16,7 +16,6 @@ from backend.src.models_schema.interaction.interaction import (
 from backend.src.models_schema.llm_response.llm_response import LLMResponse
 from backend.src.models_schema.note.note import Note
 from backend.src.models_schema.user.user import User
-from backend.src.services.study_activity import ExerciseItemContent, ReviewItemContent
 
 # ----- CREATE ----- #
 
@@ -45,8 +44,10 @@ async def create_interaction(
 
 
 async def read_all_interactions(user: User, session: AsyncSession) -> list[Interaction]:
-    query = select(Interaction).where(
-        Interaction.user_id == user.id, Interaction.is_deleted == False
+    query = (
+        select(Interaction)
+        .where(Interaction.user_id == user.id, Interaction.is_deleted == False)
+        .order_by(col(Interaction.id).asc())
     )
     interactions = (await session.execute(query)).scalars().all()
 

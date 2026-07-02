@@ -180,6 +180,11 @@ async def create_study_assessment(
         return []
 
     # Creates prompts
+    study_assessments_preserved = sorted(
+        list(study_assessments_preserved),
+        key=lambda assessment: assessment.id or 0,
+        reverse=True,  # Ascending order (latest assessment appears first)
+    )
     final_prompts = [
         await create_study_assessment_prompt(user, session, assessment.assessment_of)
         for assessment in study_assessments_preserved
