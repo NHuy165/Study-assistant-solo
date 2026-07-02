@@ -101,7 +101,11 @@ async def save_document(
 async def read_all_documents(
     session: AsyncSession, interaction: Interaction
 ) -> list[Document]:
-    query = select(Document).where(Document.interaction_id == interaction.id)
+    query = (
+        select(Document)
+        .where(Document.interaction_id == interaction.id)
+        .order_by(col(Document.id).asc())
+    )
     documents = (await session.execute(query)).scalars().all()
 
     return list(documents)
