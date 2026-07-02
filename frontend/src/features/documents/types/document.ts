@@ -1,4 +1,5 @@
-import { SubjectType, DocumentType } from '@/types/constants';
+import { SubjectType } from '@/types/constants';
+import { DocumentType } from '@/features/documents/types/constants';
 import { z } from 'zod';
 
 // ----- INPUT ----- //
