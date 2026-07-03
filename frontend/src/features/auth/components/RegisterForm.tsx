@@ -37,9 +37,6 @@ export const RegisterForm = () => {
     <div className="flex flex-col">
       <h2 className="text-2xl font-bold text-center">Register</h2>
 
-      {registerUser.isError && <p>{registerUser.error.message}</p>}
-      {registerUser.isPending && <p>Registering user, please wait</p>}
-
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Username */}
         <FormField
