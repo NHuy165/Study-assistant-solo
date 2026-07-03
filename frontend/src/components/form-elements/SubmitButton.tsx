@@ -8,7 +8,11 @@ export const SubmitButton = ({
   textDisabled: string;
 }) => {
   return (
-    <button type="submit" disabled={disabled}>
+    <button
+      className="btn btn-primary btn-hover my-6"
+      type="submit"
+      disabled={disabled}
+    >
       {disabled ? textDisabled : text}
     </button>
   );

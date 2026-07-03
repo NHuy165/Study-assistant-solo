@@ -1,4 +1,4 @@
-import { FormField } from '@/components/form-elements';
+import { FormField } from '@/components/form-elements/FormField';
 import { useAnswerExerciseItem } from '@/features/study-activities/api/useAnswerExerciseItem';
 import {
   type ExerciseItemAnswer,

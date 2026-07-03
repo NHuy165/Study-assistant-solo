@@ -1,5 +1,6 @@
-import { FormField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { FormField } from '@/components/form-elements/FormField';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { TextArea } from '@/components/form-elements/TextArea';
 import { useRegister } from '@/features/auth/api/useRegister';
 import {
   type RegisterInput,
@@ -33,8 +34,8 @@ export const RegisterForm = () => {
   };
 
   return (
-    <div>
-      <h2>Register</h2>
+    <div className="flex flex-col">
+      <h2 className="text-2xl font-bold text-center">Register</h2>
 
       {registerUser.isError && <p>{registerUser.error.message}</p>}
       {registerUser.isPending && <p>Registering user, please wait</p>}
@@ -48,8 +49,6 @@ export const RegisterForm = () => {
           error={errors.username}
         />
 
-        <br />
-
         {/* Email */}
         <FormField
           label="Email"
@@ -57,8 +56,6 @@ export const RegisterForm = () => {
           register={register}
           error={errors.email}
         />
-
-        <br />
 
         {/* Password */}
         <FormField
@@ -68,13 +65,12 @@ export const RegisterForm = () => {
           error={errors.password}
         />
 
-        <br />
-
         {/* Description */}
-        <FormField
+        <TextArea
           label="Description"
           name="description"
           register={register}
+          placeholder="Tell us a few things about yourself (academic background, achievements...)"
           error={errors.description}
         />
 
@@ -86,9 +82,9 @@ export const RegisterForm = () => {
         />
       </form>
 
-      <br />
-
-      <Link to="/auth/login">Log into an account</Link>
+      <div className="link link-primary link-hover">
+        <Link to="/auth/login">Log into an account</Link>
+      </div>
     </div>
   );
 };

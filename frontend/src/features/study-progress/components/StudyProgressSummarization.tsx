@@ -1,4 +1,4 @@
-import { SelectField } from '@/components/form-elements';
+import { SelectField } from '@/components/form-elements/SelectField';
 import { useFetchByFormat } from '@/features/study-progress/api/fetch-study-progress/useFetchByFormat';
 import { useFetchBySubject } from '@/features/study-progress/api/fetch-study-progress/useFetchBySubject';
 import { useFetchScoreByFormat } from '@/features/study-progress/api/fetch-study-progress/useFetchScoreByFormat';

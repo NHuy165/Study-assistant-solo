@@ -1,4 +1,4 @@
-import { RadioGroupField } from '@/components/form-elements';
+import { RadioGroupField } from '@/components/form-elements/RadioField';
 import { useAnswerExerciseItem } from '@/features/study-activities/api/useAnswerExerciseItem';
 import {
   type ExerciseItemAnswer,

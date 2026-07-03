@@ -1,5 +1,5 @@
-import { FormField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { FormField } from '@/components/form-elements/FormField';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
 import { useCreateChat } from '@/features/chat/api/useCreateChat';
 import { type ChatInput, ChatInputSchema } from '@/features/chat/types/chat';
 import { zodResolver } from '@hookform/resolvers/zod';

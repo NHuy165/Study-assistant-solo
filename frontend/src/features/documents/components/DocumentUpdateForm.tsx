@@ -1,5 +1,4 @@
-import { FormField, SelectField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
 import { useUpdateDocument } from '@/features/documents/api/useUpdateDocument';
 import {
   DocumentUpdateSchema,
@@ -10,6 +9,8 @@ import { SubjectType } from '@/types/constants';
 import { DocumentType } from '@/features/documents/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type SubmitHandler, useForm } from 'react-hook-form';
+import { FormField } from '@/components/form-elements/FormField';
+import { SelectField } from '@/components/form-elements/SelectField';
 
 export const DocumentUpdateForm = ({
   document,

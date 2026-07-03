@@ -11,14 +11,17 @@ export const AuthPage = () => {
   }
 
   return (
-    <div>
-      <h1>AUTH PAGE</h1>
+    <div className="min-h-screen flex flex-col items-center justify-center gap-8">
+      <h1 className="text-6xl font-bold text-center">AUTHENTICATION</h1>
 
-      <Routes>
-        <Route path="register" element={<RegisterForm />} />
-        <Route path="login" element={<LoginForm />} />
-        <Route index element={<Navigate to="login" replace />} />
-      </Routes>
+      {/* The actual forms */}
+      <div className="card w-96 p-8 shadow-xl border">
+        <Routes>
+          <Route path="register" element={<RegisterForm />} />
+          <Route path="login" element={<LoginForm />} />
+          <Route index element={<Navigate to="login" replace />} />
+        </Routes>
+      </div>
     </div>
   );
 };

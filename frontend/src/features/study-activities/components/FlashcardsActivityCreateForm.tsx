@@ -1,5 +1,6 @@
-import { FormField, SelectField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { FormField } from '@/components/form-elements/FormField';
+import { SelectField } from '@/components/form-elements/SelectField';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
 import { useCreateFlashcardsActivity } from '@/features/study-activities/api/useCreateFlashcardsActivity';
 import {
   type FlashcardsActivityInput,

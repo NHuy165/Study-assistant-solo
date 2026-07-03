@@ -1,0 +1,50 @@
+import {
+  type UseFormRegister,
+  type Path,
+  type FieldValues,
+  type FieldError,
+} from 'react-hook-form';
+
+export const FormField = <T extends FieldValues>({
+  label,
+  name,
+  register,
+  error,
+  accept,
+  type = 'text',
+  placeholder = '',
+  disabled = false,
+}: {
+  label: string;
+  name: Path<T>;
+  register: UseFormRegister<T>;
+  error?: FieldError;
+  accept?: string;
+  type?: React.HTMLInputTypeAttribute;
+  placeholder?: string;
+  disabled?: boolean;
+}) => {
+  return (
+    <label>
+      <p className="font-bold">{label}</p>
+      <input
+        className="input"
+        type={type}
+        accept={type === 'file' ? accept : undefined}
+        placeholder={placeholder}
+        disabled={disabled}
+        {...register(name, {
+          // Converts number field to an actual number, make it null if input is lacking
+          setValueAs: (value) => {
+            if (type === 'number') {
+              return value === '' ? null : Number(value);
+            }
+            return value;
+          },
+        })}
+      />
+
+      <div className="min-h-6 text-error">{error && error.message}</div>
+    </label>
+  );
+};

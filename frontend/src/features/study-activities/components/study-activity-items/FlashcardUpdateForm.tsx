@@ -1,5 +1,5 @@
-import { FormField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { FormField } from '@/components/form-elements/FormField';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
 import { useUpdateFlashcard } from '@/features/study-activities/api/useUpdateFlashcard';
 import {
   FlashcardUpdateSchema,

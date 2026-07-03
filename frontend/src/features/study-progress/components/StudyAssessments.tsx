@@ -1,4 +1,4 @@
-import { FormField } from '@/components/form-elements';
+import { FormField } from '@/components/form-elements/FormField';
 import { useCreateStudyAssessment } from '@/features/study-progress/api/study-assessment/useCreateStudyAssessment';
 import { useGetStudyAssessments } from '@/features/study-progress/api/study-assessment/useGetStudyAssessments';
 import { StudyAssessmentItem } from '@/features/study-progress/components/StudyAssessmentItem';

@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { type LoginInput, LoginInputSchema } from '@/features/auth/types/login';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { FormField } from '@/components/form-elements';
-import { SubmitButton } from '@/components/SubmitButton';
+import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { FormField } from '@/components/form-elements/FormField';
 
 export const LoginForm = () => {
   // Fetches states
@@ -28,30 +28,26 @@ export const LoginForm = () => {
   };
 
   return (
-    <div>
-      <h2>Login</h2>
+    <div className="flex flex-col">
+      <h2 className="text-2xl font-bold text-center">Login</h2>
 
       {login.isError && <p>{login.error.message}</p>}
       {login.isPending && <p>Logging in, please wait</p>}
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
         <FormField
-          label="Email"
+          label="Email:"
           name="username"
           register={register}
           error={errors.username}
         />
 
-        <br />
-
         <FormField
-          label="Password"
+          label="Password:"
           name="password"
           register={register}
           error={errors.password}
         />
-
-        <br />
 
         <SubmitButton
           disabled={login.isPending}
@@ -60,9 +56,9 @@ export const LoginForm = () => {
         />
       </form>
 
-      <br />
-
-      <Link to="/auth/register">Register an account</Link>
+      <div className="link link-primary link-hover">
+        <Link to="/auth/register">Register an account</Link>
+      </div>
     </div>
   );
 };
