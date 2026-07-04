@@ -3,7 +3,6 @@ import { type RegisterInput } from '@/features/auth/types/register';
 import { ResponseErrorSchema } from '@/types/error';
 import { useMutation } from '@tanstack/react-query';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 const registerUserRequest = async (
   registerInput: RegisterInput,
@@ -31,8 +30,5 @@ export const useRegister = () => {
   return useMutation({
     mutationFn: registerUserRequest,
     onSuccess: () => navigate('/auth/login', { replace: true }),
-    onError: (error) => {
-      toast.error(error.message);
-    },
   });
 };

@@ -5,7 +5,6 @@ import { TokenSchema, type Token } from '@/features/auth/types/token';
 import { useMutation } from '@tanstack/react-query';
 import { useTokenStore } from '@/features/auth/stores/useTokenStore';
 import { useNavigate } from 'react-router-dom';
-import toast from 'react-hot-toast';
 
 const loginUserRequest = async (loginInput: LoginInput): Promise<Token> => {
   // Sends the request and catches operational errors
@@ -38,9 +37,6 @@ export const useLogin = () => {
     onSuccess: (data) => {
       setToken(data.access_token);
       navigate('/home', { replace: true });
-    },
-    onError: (error) => {
-      toast.error(error.message);
     },
   });
 };
