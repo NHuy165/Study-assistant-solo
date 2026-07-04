@@ -1,5 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useChangePassword } from '@/features/user/api/useChangePassword';
 import {
   type UserPasswordChange,
@@ -29,11 +29,13 @@ export const UserPasswordChangeForm = () => {
 
   return (
     <div>
-      Change password:
-      <button onClick={() => setShowUpdateForm(!showUpdateForm)}>Show</button>
-      <br />
+      <Button
+        text="Change password"
+        onClick={() => setShowUpdateForm(!showUpdateForm)}
+        style="w-full mt-6"
+      />
       {showUpdateForm && (
-        <>
+        <div className="card shadow-xl border mt-6 p-6">
           {changePassword.isError && changePassword.error.message}
           {changePassword.isPending && 'Updating field, please wait.'}
           <form onSubmit={handleSubmit(onSubmit)}>
@@ -51,13 +53,13 @@ export const UserPasswordChangeForm = () => {
               error={errors.new_password}
             />
 
-            <SubmitButton
-              disabled={changePassword.isPending}
+            <Button
               text="Confirm"
               textDisabled="Updating field..."
+              disabled={changePassword.isPending}
             />
           </form>
-        </>
+        </div>
       )}
     </div>
   );

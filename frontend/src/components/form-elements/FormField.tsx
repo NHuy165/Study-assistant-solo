@@ -11,6 +11,8 @@ export const FormField = <T extends FieldValues>({
   register,
   error,
   accept,
+  wrapperStyle,
+  inputStyle,
   type = 'text',
   placeholder = '',
   disabled = false,
@@ -20,15 +22,17 @@ export const FormField = <T extends FieldValues>({
   register: UseFormRegister<T>;
   error?: FieldError;
   accept?: string;
+  wrapperStyle?: string;
+  inputStyle?: string;
   type?: React.HTMLInputTypeAttribute;
   placeholder?: string;
   disabled?: boolean;
 }) => {
   return (
-    <label>
-      <p className="font-bold">{label}</p>
+    <label className={`${wrapperStyle}`}>
+      <p className="font-semibold mb-3">{label}</p>
       <input
-        className="input"
+        className={`input ${inputStyle}`}
         type={type}
         accept={type === 'file' ? accept : undefined}
         placeholder={placeholder}

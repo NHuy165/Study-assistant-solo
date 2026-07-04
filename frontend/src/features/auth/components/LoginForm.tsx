@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom';
 import { useForm, type SubmitHandler } from 'react-hook-form';
 import { type LoginInput, LoginInputSchema } from '@/features/auth/types/login';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { FormField } from '@/components/form-elements/FormField';
 
 export const LoginForm = () => {
@@ -31,7 +31,10 @@ export const LoginForm = () => {
     <div className="flex flex-col">
       <h2 className="text-2xl font-bold text-center">Login</h2>
 
-      <form className="flex flex-col gap-4" onSubmit={handleSubmit(onSubmit)}>
+      <form
+        className="flex flex-col gap-4 p-4"
+        onSubmit={handleSubmit(onSubmit)}
+      >
         <FormField
           label="Email:"
           name="username"
@@ -46,10 +49,12 @@ export const LoginForm = () => {
           error={errors.password}
         />
 
-        <SubmitButton
-          disabled={login.isPending}
+        <Button
           text="Log in"
           textDisabled="Logging in..."
+          style="w-full my-6"
+          disabled={login.isPending}
+          type="submit"
         />
       </form>
 

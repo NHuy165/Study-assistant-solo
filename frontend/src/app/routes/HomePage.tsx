@@ -8,23 +8,36 @@ import { UserProfile } from '@/features/user/components/UserProfile';
 
 export const HomePage = () => {
   return (
-    <div>
-      <h1>HOME PAGE</h1>
+    <div className="max-w-3xl mx-auto py-6 space-y-8">
+      <h1 className="text-6xl font-bold text-center">HOME PAGE</h1>
 
-      <h2>User</h2>
-      <LogoutButton />
-      <UserPasswordChangeForm />
-      <UserProfile />
+      {/* User info */}
+      <div className="card shadow-xl border p-8">
+        <h2 className="text-2xl font-bold text-center">User profile</h2>
 
-      <h2>Study assessments</h2>
-      <StudyAssessments />
+        <UserProfile />
+        <UserPasswordChangeForm />
+        <LogoutButton />
+      </div>
 
-      <h2>Interactions</h2>
-      <InteractionCreateForm />
-      <InteractionsList />
+      {/* Study assessments */}
+      <div className="card shadow-xl border p-8">
+        <h2 className="text-2xl font-bold text-center">Study assessments</h2>
+        <StudyAssessments />
+      </div>
 
-      <h2>Study progress</h2>
-      <StudyProgressSummarization />
+      {/* Interactions */}
+      <div className="card shadow-xl border p-8">
+        <h2 className="text-2xl font-bold text-center">Interactions</h2>
+        <InteractionCreateForm />
+        <InteractionsList />
+      </div>
+
+      {/* Study progress */}
+      <div className="card shadow-xl border p-8">
+        <h2 className="text-2xl font-bold text-center">Study progress</h2>
+        <StudyProgressSummarization />
+      </div>
     </div>
   );
 };

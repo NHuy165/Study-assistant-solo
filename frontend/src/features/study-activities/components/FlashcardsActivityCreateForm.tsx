@@ -1,6 +1,6 @@
 import { FormField } from '@/components/form-elements/FormField';
 import { SelectField } from '@/components/form-elements/SelectField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useCreateFlashcardsActivity } from '@/features/study-activities/api/useCreateFlashcardsActivity';
 import {
   type FlashcardsActivityInput,
@@ -84,7 +84,7 @@ export const FlashcardsActivityCreateForm = ({
 
         <br />
 
-        <SubmitButton
+        <Button
           disabled={createFlashcardsActivity.isPending}
           text="Create"
           textDisabled="Creating..."

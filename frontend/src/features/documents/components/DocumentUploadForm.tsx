@@ -1,6 +1,6 @@
 import { FormField } from '@/components/form-elements/FormField';
 import { SelectField } from '@/components/form-elements/SelectField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useUploadDocument } from '@/features/documents/api/useUploadDocument';
 import {
   DocumentInputSchema,
@@ -106,7 +106,7 @@ export const DocumentUploadForm = ({
         <br />
 
         {/* Submit button */}
-        <SubmitButton
+        <Button
           disabled={uploadDocument.isPending}
           text="Upload"
           textDisabled="Uploading..."

@@ -1,6 +1,6 @@
 import { FormField } from '@/components/form-elements/FormField';
 import { SelectField } from '@/components/form-elements/SelectField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useCreateStudyActivity } from '@/features/study-activities/api/useCreateStudyActivity';
 import {
   type StudyActivityInput,
@@ -85,7 +85,7 @@ export const StudyActivityCreateForm = ({
 
         <br />
 
-        <SubmitButton
+        <Button
           disabled={createStudyActivity.isPending}
           text="Create"
           textDisabled="Creating..."

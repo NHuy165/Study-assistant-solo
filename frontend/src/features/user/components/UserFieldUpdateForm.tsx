@@ -1,5 +1,6 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { TextArea } from '@/components/form-elements/TextArea';
+import { Button } from '@/components/miscellaneous/Button';
 import { useGetUser } from '@/features/user/api/useGetUser';
 import { useUpdateUser } from '@/features/user/api/useUpdateUser';
 import {
@@ -7,14 +8,15 @@ import {
   type UserOutput,
   type UserUpdate,
 } from '@/features/user/types/user';
-import { replaceUnderscore } from '@/utils/format-string';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 
 export const UserFieldUpdateForm = ({
+  label,
   field,
   onUpdate,
 }: {
+  label: string;
   field: keyof UserOutput & keyof UserUpdate;
   onUpdate: () => void;
 }) => {
@@ -37,21 +39,34 @@ export const UserFieldUpdateForm = ({
   };
 
   return (
-    <div>
-      {updateUser.isError && updateUser.error.message}
-      {updateUser.isPending && 'Updating field, please wait.'}
+    <div className="card shadow-xl border mt-3 mb-6 p-6">
       <form onSubmit={handleSubmit(onSubmit)}>
-        <FormField
-          label={`New ${replaceUnderscore(field.toLowerCase())}`}
-          name={field}
-          register={register}
-          error={errors[field]}
-        />
+        {field === 'description' ? (
+          <TextArea
+            label={label}
+            name={field}
+            wrapperStyle="w-full"
+            inputStyle="w-full"
+            register={register}
+            placeholder="Tell us a few things about yourself (academic background, achievements...)"
+            error={errors.description}
+          />
+        ) : (
+          <FormField
+            label={label}
+            name={field}
+            wrapperStyle="w-full"
+            inputStyle="w-full"
+            register={register}
+            error={errors[field]}
+          />
+        )}
 
-        <SubmitButton
+        <Button
           disabled={updateUser.isPending}
           text="Confirm"
-          textDisabled="Updating field..."
+          textDisabled="Updating..."
+          type="submit"
         />
       </form>
     </div>

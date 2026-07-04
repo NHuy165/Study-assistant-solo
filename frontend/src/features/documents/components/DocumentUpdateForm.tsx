@@ -1,4 +1,4 @@
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useUpdateDocument } from '@/features/documents/api/useUpdateDocument';
 import {
   DocumentUpdateSchema,
@@ -88,7 +88,7 @@ export const DocumentUpdateForm = ({
         <br />
 
         {/* Submit button */}
-        <SubmitButton
+        <Button
           disabled={updateDocument.isPending}
           text="Update"
           textDisabled="Updating..."

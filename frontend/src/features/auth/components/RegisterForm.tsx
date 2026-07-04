@@ -1,5 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { TextArea } from '@/components/form-elements/TextArea';
 import { useRegister } from '@/features/auth/api/useRegister';
 import {
@@ -72,10 +72,12 @@ export const RegisterForm = () => {
         />
 
         {/* Submit button */}
-        <SubmitButton
-          disabled={registerUser.isPending}
+        <Button
           text="Register"
           textDisabled="Registering..."
+          style="w-full my-6"
+          disabled={registerUser.isPending}
+          type="submit"
         />
       </form>
 

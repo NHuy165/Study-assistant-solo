@@ -1,5 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useCreateChat } from '@/features/chat/api/useCreateChat';
 import { type ChatInput, ChatInputSchema } from '@/features/chat/types/chat';
 import { zodResolver } from '@hookform/resolvers/zod';
@@ -39,7 +39,7 @@ export const ChatForm = ({ interactionId }: { interactionId: number }) => {
 
         <br />
 
-        <SubmitButton
+        <Button
           disabled={createChat.isPending}
           text="Send"
           textDisabled="Sending text..."

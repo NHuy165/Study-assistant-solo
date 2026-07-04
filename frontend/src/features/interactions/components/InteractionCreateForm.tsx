@@ -1,5 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useCreateInteraction } from '@/features/interactions/api/useCreateInteraction';
 import {
   type InteractionInput,
@@ -53,7 +53,7 @@ export const InteractionCreateForm = () => {
         />
 
         {/* Submit button */}
-        <SubmitButton
+        <Button
           disabled={createInteraction.isPending}
           text="Create"
           textDisabled="Creating..."

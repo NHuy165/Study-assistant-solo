@@ -1,5 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
-import { SubmitButton } from '@/components/form-elements/SubmitButton';
+import { Button } from '@/components/miscellaneous/Button';
 import { useUpdateFlashcard } from '@/features/study-activities/api/useUpdateFlashcard';
 import {
   FlashcardUpdateSchema,
@@ -70,7 +70,7 @@ export const FlashcardUpdateForm = ({
           error={errors.back}
         />
         <br />
-        <SubmitButton
+        <Button
           disabled={updateFlashcard.isPending}
           text="Update"
           textDisabled="Updating"

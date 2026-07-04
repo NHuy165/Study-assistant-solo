@@ -10,19 +10,23 @@ export const TextArea = <T extends FieldValues>({
   name,
   register,
   error,
+  wrapperStyle,
+  inputStyle,
   placeholder = '',
 }: {
   label: string;
   name: Path<T>;
   register: UseFormRegister<T>;
   error?: FieldError;
+  wrapperStyle?: string;
+  inputStyle?: string;
   placeholder?: string;
 }) => {
   return (
-    <label>
-      <p className="font-bold">{label}</p>
+    <label className={`${wrapperStyle}`}>
+      <p className="font-semibold mb-3">{label}</p>
       <textarea
-        className="textarea h-32"
+        className={`textarea h-32 ${inputStyle}`}
         placeholder={placeholder}
         {...register(name)}
         maxLength={2000}
