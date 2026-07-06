@@ -47,9 +47,7 @@ class UserUpdate(UserBase):
         str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
     ] = None
     email: Annotated[EmailStr | None, BeforeValidator(beva_forbid_none)] = None
-    description: Annotated[
-        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
-    ] = None
+    description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
 class UserPasswordChange(SQLModel):
