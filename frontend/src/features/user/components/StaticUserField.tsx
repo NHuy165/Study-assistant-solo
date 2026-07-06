@@ -8,12 +8,18 @@ export const StaticUserField = ({
   label: string;
   field: Exclude<keyof UserOutput, keyof UserUpdate>;
 }) => {
-  const value = useGetUser().data?.[field];
+  const getUser = useGetUser();
 
   return (
     <div className="flex items-center border-b min-h-10">
       <span className="font-semibold w-1/3">{label}</span>
-      <span className="flex-1">{value ?? 'Fetching data'}</span>
+      <span className="flex-1">
+        {getUser.isPending
+          ? 'Fetching data...'
+          : getUser.isError
+            ? 'Failed to fetch data.'
+            : getUser.data[field]}
+      </span>
     </div>
   );
 };

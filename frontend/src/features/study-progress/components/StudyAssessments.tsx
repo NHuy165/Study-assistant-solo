@@ -1,4 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
+import { Button } from '@/components/miscellaneous/Button';
 import { useCreateStudyAssessment } from '@/features/study-progress/api/study-assessment/useCreateStudyAssessment';
 import { useGetStudyAssessments } from '@/features/study-progress/api/study-assessment/useGetStudyAssessments';
 import { StudyAssessmentItem } from '@/features/study-progress/components/StudyAssessmentItem';
@@ -19,8 +20,8 @@ export const StudyAssessments = () => {
     mutate();
   }, [mutate]);
 
-  const { register, control } = useForm<{ date: string }>({
-    defaultValues: { date: dayjs.utc().format('YYYY-MM-DD') },
+  const { register, control, setValue } = useForm<{ date: string }>({
+    defaultValues: { date: '' },
   });
 
   const searchDate = useWatch({ control, name: 'date' });
@@ -30,56 +31,68 @@ export const StudyAssessments = () => {
       dayjs.utc(assessment.assessment_of).format('YYYY-MM-DD') === yesterday,
   );
 
-  const searchAssessment = getStudyAssessments.data?.find(
-    (assessment) =>
-      dayjs.utc(assessment.assessment_of).format('YYYY-MM-DD') === searchDate,
+  const filteredStudyAssessment = getStudyAssessments.data?.filter(
+    (assessment) => !searchDate || assessment.assessment_of === searchDate,
   );
 
   return (
     <div>
-      {getStudyAssessments.isError && (
-        <p>{getStudyAssessments.error.message}</p>
-      )}
-      {getStudyAssessments.isPending && (
-        <p>Fetching study assessments, please wait.</p>
-      )}
+      {getStudyAssessments.isPending && 'Fetching data...'}
+      {getStudyAssessments.isError && 'Failed to fetch data.'}
+      {createStudyAssessment.isPending && 'Study assessment in progress...'}
+      {createStudyAssessment.isError && 'Failed to generate study assessment'}
 
-      {createStudyAssessment.isError && (
-        <p>{createStudyAssessment.error.message}</p>
-      )}
-      {createStudyAssessment.isPending && (
-        <p>Updating study assessments, please wait.</p>
-      )}
+      {getStudyAssessments.isPending ||
+        getStudyAssessments.isError ||
+        createStudyAssessment.isPending ||
+        createStudyAssessment.isError || (
+          <div>
+            {/* Yesterday assessment */}
+            <div className="mb-6">
+              <h3 className="font-bold">Yesterday's assessment:</h3>
+              {/* Properly displays dummy assessments without content */}
+              <span>
+                {yesterdayAssessment
+                  ? yesterdayAssessment.content ||
+                    'Study assessment in progress...'
+                  : "User didn't log in yesterday."}
+              </span>
+            </div>
 
-      {!getStudyAssessments.isPending && !getStudyAssessments.isError && (
-        <>
-          <h3>Yesterday's assessment:</h3>
-          {/* Properly displays dummy assessments without content */}
-          {yesterdayAssessment
-            ? yesterdayAssessment.content ||
-              'Generating study assessment, please wait.'
-            : "You didn't log in yesterday"}
+            {/* Assessments history */}
+            <div>
+              <h3 className="font-bold">Study assessments history:</h3>
+              <div className="flex mt-3 h-12">
+                <FormField
+                  label=""
+                  name="date"
+                  wrapperStyle="w-1/4 mr-3"
+                  inputStyle=""
+                  register={register}
+                  type="date"
+                />
+                <Button
+                  text="All"
+                  style="w-1/8"
+                  onClick={() => setValue('date', '')}
+                />
+              </div>
 
-          <h3>All study assessments:</h3>
-          <ul>
-            {getStudyAssessments.data.map((assessment) => (
-              <StudyAssessmentItem
-                key={assessment.assessment_of}
-                assessment={assessment}
-              />
-            ))}
-          </ul>
-
-          <h3>Search assessment by date</h3>
-          <FormField label="Date" name="date" register={register} type="date" />
-          <br />
-          {/* Properly displays dummy assessments without content */}
-          {searchAssessment
-            ? searchAssessment.content ||
-              'Generating study assessment, please wait'
-            : 'No study assessment found on this date'}
-        </>
-      )}
+              {filteredStudyAssessment && filteredStudyAssessment.length > 0 ? (
+                <ul>
+                  {filteredStudyAssessment.map((assessment) => (
+                    <StudyAssessmentItem
+                      key={assessment.assessment_of}
+                      assessment={assessment}
+                    />
+                  ))}
+                </ul>
+              ) : (
+                <span>No study assessment found.</span>
+              )}
+            </div>
+          </div>
+        )}
     </div>
   );
 };

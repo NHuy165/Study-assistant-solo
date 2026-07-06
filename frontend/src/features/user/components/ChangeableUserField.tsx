@@ -11,7 +11,7 @@ export const ChangeableUserField = ({
   label: string;
   field: keyof UserOutput & keyof UserUpdate;
 }) => {
-  const value = useGetUser().data?.[field];
+  const getUser = useGetUser();
   const [showUpdateForm, setShowUpdateForm] = useState(false);
 
   return (
@@ -19,13 +19,19 @@ export const ChangeableUserField = ({
       <div className="flex items-center min-h-10 max-h-30">
         <span className="font-semibold w-1/3">{label}</span>
         <span className="flex-1 max-h-30 overflow-y-auto break-all whitespace-pre-wrap">
-          {value ?? 'Fetching data...'}
+          {getUser.isPending
+            ? 'Fetching data...'
+            : getUser.isError
+              ? 'Failed to fetch data.'
+              : getUser.data[field]}
         </span>
-        <Button
-          text="Update"
-          onClick={() => setShowUpdateForm(!showUpdateForm)}
-          style="btn-ghost ml-3"
-        />
+        {getUser.isPending || (
+          <Button
+            text="Update"
+            onClick={() => setShowUpdateForm(!showUpdateForm)}
+            style="btn-ghost ml-3"
+          />
+        )}
       </div>
       {showUpdateForm && (
         <UserFieldUpdateForm

@@ -29,7 +29,7 @@ export const UserFieldUpdateForm = ({
     formState: { errors },
   } = useForm<UserUpdate>({
     resolver: zodResolver(UserUpdateSchema),
-    values: data,
+    values: data, // Fine since this form will only show when user data has been fetched
   });
 
   const updateUser = useUpdateUser();
