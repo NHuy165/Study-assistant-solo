@@ -13,7 +13,7 @@ export const HomePage = () => {
 
       {/* User info */}
       <div className="card shadow-xl border p-8">
-        <h2 className="text-2xl font-bold text-center">User profile</h2>
+        <h2 className="text-5xl font-bold text-center mb-10">User profile</h2>
 
         <UserProfile />
         <UserPasswordChangeForm />
@@ -22,20 +22,22 @@ export const HomePage = () => {
 
       {/* Study assessments */}
       <div className="card shadow-xl border p-8">
-        <h2 className="text-2xl font-bold text-center">Study assessments</h2>
+        <h2 className="text-5xl font-bold text-center mb-10">
+          Study assessments
+        </h2>
         <StudyAssessments />
       </div>
 
       {/* Interactions */}
       <div className="card shadow-xl border p-8">
-        <h2 className="text-2xl font-bold text-center">Interactions</h2>
+        <h2 className="text-5xl font-bold text-center mb-10">Interactions</h2>
         <InteractionCreateForm />
         <InteractionsList />
       </div>
 
       {/* Study progress */}
       <div className="card shadow-xl border p-8">
-        <h2 className="text-2xl font-bold text-center">Study progress</h2>
+        <h2 className="text-5xl font-bold text-center mb-10">Study progress</h2>
         <StudyProgressSummarization />
       </div>
     </div>

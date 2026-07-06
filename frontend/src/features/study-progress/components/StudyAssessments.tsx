@@ -37,10 +37,14 @@ export const StudyAssessments = () => {
 
   return (
     <div>
-      {getStudyAssessments.isPending && 'Fetching data...'}
-      {getStudyAssessments.isError && 'Failed to fetch data.'}
-      {createStudyAssessment.isPending && 'Study assessment in progress...'}
-      {createStudyAssessment.isError && 'Failed to generate study assessment'}
+      {getStudyAssessments.isPending && <p>'Fetching data...'</p>}
+      {getStudyAssessments.isError && <p>'Failed to fetch data.'</p>}
+      {createStudyAssessment.isPending && (
+        <p>'Study assessment in progress...'</p>
+      )}
+      {createStudyAssessment.isError && (
+        <p>'Failed to generate study assessment'</p>
+      )}
 
       {getStudyAssessments.isPending ||
         getStudyAssessments.isError ||

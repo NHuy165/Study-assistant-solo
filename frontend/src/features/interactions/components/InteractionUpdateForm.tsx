@@ -1,4 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
+import { TextArea } from '@/components/form-elements/TextArea';
 import { Button } from '@/components/miscellaneous/Button';
 import { useUpdateInteraction } from '@/features/interactions/api/useUpdateInteraction';
 import {
@@ -43,27 +44,24 @@ export const InteractionUpdateForm = ({
   };
 
   return (
-    <div>
-      {updateInteraction.isError && <p>{updateInteraction.error.message}</p>}
-      {updateInteraction.isPending && (
-        <p>Updating the interaction, please wait.</p>
-      )}
+    <div className="card shadow-xl border mt-3 mb-6 p-6">
+      <h3 className="font-bold text-3xl mb-3">Update</h3>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
         <FormField
-          label="Name"
+          label="New Name"
           name="name"
+          inputStyle="w-1/1"
           register={register}
           error={errors.name}
         />
 
-        <br />
-
         {/* Description */}
-        <FormField
-          label="Description"
+        <TextArea
+          label="New Description"
           name="description"
+          inputStyle="w-1/1"
           register={register}
           error={errors.description}
         />
@@ -73,6 +71,7 @@ export const InteractionUpdateForm = ({
           disabled={updateInteraction.isPending}
           text="Update"
           textDisabled="Updating..."
+          type="submit"
         />
       </form>
     </div>

@@ -1,4 +1,5 @@
 import { FormField } from '@/components/form-elements/FormField';
+import { TextArea } from '@/components/form-elements/TextArea';
 import { Button } from '@/components/miscellaneous/Button';
 import { useCreateInteraction } from '@/features/interactions/api/useCreateInteraction';
 import {
@@ -13,6 +14,7 @@ export const InteractionCreateForm = () => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm<InteractionInput>({
     resolver: zodResolver(InteractionInputSchema),
@@ -25,29 +27,28 @@ export const InteractionCreateForm = () => {
   const createInteraction = useCreateInteraction();
 
   const onSubmit: SubmitHandler<InteractionInput> = (data) => {
-    createInteraction.mutate(data);
+    createInteraction.mutate(data, { onSuccess: () => reset() });
   };
 
   return (
-    <div>
-      {createInteraction.isError && <p>{createInteraction.error.message}</p>}
-      {createInteraction.isPending && <p>Creating interaction, please wait.</p>}
+    <div className="card shadow-xl border py-6 px-10 mx-10 mb-6">
+      <h3 className="font-bold text-2xl mb-3">Create Interaction</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
         <FormField
           label="Name"
           name="name"
+          inputStyle="w-1/1"
           register={register}
           error={errors.name}
         />
 
-        <br />
-
         {/* Description */}
-        <FormField
+        <TextArea
           label="Description"
           name="description"
+          inputStyle="w-1/1"
           register={register}
           error={errors.description}
         />
@@ -57,6 +58,7 @@ export const InteractionCreateForm = () => {
           disabled={createInteraction.isPending}
           text="Create"
           textDisabled="Creating..."
+          type="submit"
         />
       </form>
     </div>

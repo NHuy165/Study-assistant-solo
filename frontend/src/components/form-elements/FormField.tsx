@@ -30,7 +30,7 @@ export const FormField = <T extends FieldValues>({
 }) => {
   return (
     <label className={`${wrapperStyle}`}>
-      {label && <span className="font-semibold mb-3">{label}</span>}
+      {label && <p className="font-semibold mb-1">{label}</p>}
       <input
         className={`input ${inputStyle}`}
         type={type}
