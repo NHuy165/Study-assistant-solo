@@ -105,8 +105,10 @@ export const StudyProgressSummarization = () => {
   return (
     <div>
       <SelectField
-        label="Show statistics of:"
+        label="Statistics range:"
         name="limit"
+        labelStyle="font-semibold text-xl mr-5"
+        inputStyle="w-1/5 select-primary"
         options={Object.entries(TimeLimitWindow).map(([label, value]) => {
           return {
             label: label === 'All' ? label : 'Last ' + label.toLowerCase(),
@@ -116,133 +118,133 @@ export const StudyProgressSummarization = () => {
         register={register}
       />
 
-      {hookList.map((hook, index) =>
-        hook.isError ? <p key={index}>{hook.error.message}</p> : null,
-      )}
+      {hookList.some((hook) => hook.isError) && <p>Failed to fetch data.</p>}
+      {hookList.some((hook) => hook.isPending) && <p>Fetching data...</p>}
 
-      {hookList.some((hook) => hook.isPending) ? (
-        <p>Fetching study progress, please wait.</p>
-      ) : (
+      {hookList.some((hook) => hook.isError || hook.isPending) || (
         <div>
-          <p>
-            <b>--- Total study activities generated: {totalActivities} ---</b>
-          </p>
+          <div>
+            <p className="divider font-bold text-2xl my-6">
+              Total study activities generated: {totalActivities}
+            </p>
 
-          {/* Activities by format */}
-          <p>
-            <b>Study activities count grouped by format:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchActivitiesByFormat.data ?? {}).map(
-              ([format, count]) => {
-                return (
-                  <li key={format}>
-                    {titleString(replaceUnderscore(format))}: {count}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Activities by format */}
+            <p className="font-bold text-lg my-2">
+              Study activities count grouped by format:
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchActivitiesByFormat.data ?? {}).map(
+                ([format, count]) => {
+                  return (
+                    <li key={format}>
+                      {titleString(replaceUnderscore(format))}: {count}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
 
-          {/* Activities by subject */}
-          <p>
-            <b>Study activities count grouped by subject:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchActivitiesBySubject.data ?? {}).map(
-              ([subject, count]) => {
-                return (
-                  <li key={subject}>
-                    {titleString(replaceUnderscore(subject))}: {count}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Activities by subject */}
+            <p className="font-bold text-lg my-2">
+              Study activities count grouped by subject:
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchActivitiesBySubject.data ?? {}).map(
+                ([subject, count]) => {
+                  return (
+                    <li key={subject}>
+                      {titleString(replaceUnderscore(subject))}: {count}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
+          </div>
 
-          <p>
-            <b>--- Total study activity items generated: {totalItems} ---</b>
-          </p>
+          <div>
+            <p className="divider font-bold text-2xl my-6">
+              Total study activity items generated: {totalItems}
+            </p>
 
-          {/* Items by format */}
-          <p>
-            <b>Study activity items count grouped by format:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchItemsByFormat.data ?? {}).map(
-              ([format, count]) => {
-                return (
-                  <li key={format}>
-                    {titleString(replaceUnderscore(format))}: {count}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Items by format */}
+            <p className="font-bold text-lg my-2">
+              Study activity items count grouped by format:
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchItemsByFormat.data ?? {}).map(
+                ([format, count]) => {
+                  return (
+                    <li key={format}>
+                      {titleString(replaceUnderscore(format))}: {count}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
 
-          {/* Items by subject */}
-          <p>
-            <b>Study activity items count grouped by subject:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchItemsBySubject.data ?? {}).map(
-              ([subject, count]) => {
-                return (
-                  <li key={subject}>
-                    {titleString(replaceUnderscore(subject))}: {count}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Items by subject */}
+            <p className="font-bold text-lg my-2">
+              Study activity items count grouped by subject:
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchItemsBySubject.data ?? {}).map(
+                ([subject, count]) => {
+                  return (
+                    <li key={subject}>
+                      {titleString(replaceUnderscore(subject))}: {count}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
+          </div>
 
-          <p>
-            <b>
-              --- Exercise average grades:{' '}
+          <div>
+            <p className="divider font-bold text-2xl my-6">
+              Exercise average grades:{' '}
               {Number.isNaN(totalUserScore / totalMaximumScore)
                 ? 'No data'
                 : (totalUserScore / totalMaximumScore) * 10 + ' out of 10'}{' '}
-              ---
-            </b>
-          </p>
+            </p>
 
-          {/* Scores by format */}
-          <p>
-            <b>Exercise average grades grouped by format:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchScoresByFormat.data ?? {}).map(
-              ([format, scores]) => {
-                return (
-                  <li key={format}>
-                    {titleString(replaceUnderscore(format))}:{' '}
-                    {Number.isNaN(scores[0] / scores[1])
-                      ? 'No data'
-                      : (scores[0] / scores[1]) * 10 + ' out of 10'}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Scores by format */}
+            <p className="font-bold text-lg my-2">
+              <b>Exercise average grades grouped by format:</b>
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchScoresByFormat.data ?? {}).map(
+                ([format, scores]) => {
+                  return (
+                    <li key={format}>
+                      {titleString(replaceUnderscore(format))}:{' '}
+                      {Number.isNaN(scores[0] / scores[1])
+                        ? 'No data'
+                        : (scores[0] / scores[1]) * 10 + ' out of 10'}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
 
-          {/* Scores by subject */}
-          <p>
-            <b>Exercise average grades grouped by subject:</b>
-          </p>
-          <ul>
-            {Object.entries(fetchScoresBySubject.data ?? {}).map(
-              ([subject, scores]) => {
-                return (
-                  <li key={subject}>
-                    {titleString(replaceUnderscore(subject))}:{' '}
-                    {Number.isNaN(scores[0] / scores[1])
-                      ? 'No data'
-                      : (scores[0] / scores[1]) * 10 + ' out of 10'}
-                  </li>
-                );
-              },
-            )}
-          </ul>
+            {/* Scores by subject */}
+            <p className="font-bold text-lg my-2">
+              <b>Exercise average grades grouped by subject:</b>
+            </p>
+            <ul className="list-disc ml-12 space-y-1">
+              {Object.entries(fetchScoresBySubject.data ?? {}).map(
+                ([subject, scores]) => {
+                  return (
+                    <li key={subject}>
+                      {titleString(replaceUnderscore(subject))}:{' '}
+                      {Number.isNaN(scores[0] / scores[1])
+                        ? 'No data'
+                        : (scores[0] / scores[1]) * 10 + ' out of 10'}
+                    </li>
+                  );
+                },
+              )}
+            </ul>
+          </div>
         </div>
       )}
     </div>
