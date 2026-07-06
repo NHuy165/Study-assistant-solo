@@ -12,6 +12,9 @@ export const RadioGroupField = <T extends FieldValues>({
   currentAnswer,
   options,
   register,
+  wrapperStyle,
+  labelStyle,
+  inputStyle,
   disabled,
   error,
 }: {
@@ -20,12 +23,15 @@ export const RadioGroupField = <T extends FieldValues>({
   currentAnswer: number;
   options: RadioOption[];
   register: UseFormRegister<T>;
+  wrapperStyle?: string;
+  labelStyle?: string;
+  inputStyle?: string;
   disabled: boolean;
   error?: FieldError;
 }) => {
   return (
-    <div>
-      <p>{label}</p>
+    <div className={`${wrapperStyle}`}>
+      {label && <span className={`${labelStyle}`}>{label}</span>}
 
       {options.map((option) => (
         <label key={option.value}>
@@ -35,7 +41,7 @@ export const RadioGroupField = <T extends FieldValues>({
             disabled={disabled}
             {...register(name)}
           />
-          {option.label}
+          <span className={`input ${inputStyle}`}>{option.label}</span>
           {/* If the answer is correct, display a correct sign. Else if the answer is not correct AND the user chose it, display a wrong sign. */}
           {option.isCorrect !== null &&
             (option.isCorrect

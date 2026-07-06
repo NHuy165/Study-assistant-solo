@@ -40,6 +40,7 @@ export const InteractionCreateForm = () => {
           label="Name"
           name="name"
           inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.name}
         />
@@ -49,6 +50,7 @@ export const InteractionCreateForm = () => {
           label="Description"
           name="description"
           inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.description}
         />

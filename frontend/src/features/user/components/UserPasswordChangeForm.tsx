@@ -42,6 +42,7 @@ export const UserPasswordChangeForm = () => {
             <FormField
               label="Old password"
               name="old_password"
+              labelStyle="font-semibold block mb-2"
               register={register}
               error={errors.old_password}
             />
@@ -49,6 +50,7 @@ export const UserPasswordChangeForm = () => {
             <FormField
               label="New password"
               name="new_password"
+              labelStyle="font-semibold block mb-2"
               register={register}
               error={errors.new_password}
             />

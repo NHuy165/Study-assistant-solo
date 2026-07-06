@@ -12,6 +12,7 @@ export const FormField = <T extends FieldValues>({
   error,
   accept,
   wrapperStyle,
+  labelStyle,
   inputStyle,
   type = 'text',
   placeholder = '',
@@ -23,6 +24,7 @@ export const FormField = <T extends FieldValues>({
   error?: FieldError;
   accept?: string;
   wrapperStyle?: string;
+  labelStyle?: string;
   inputStyle?: string;
   type?: React.HTMLInputTypeAttribute;
   placeholder?: string;
@@ -30,7 +32,7 @@ export const FormField = <T extends FieldValues>({
 }) => {
   return (
     <label className={`${wrapperStyle}`}>
-      {label && <p className="font-semibold mb-1">{label}</p>}
+      {label && <span className={`${labelStyle}`}>{label}</span>}
       <input
         className={`input ${inputStyle}`}
         type={type}

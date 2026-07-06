@@ -12,6 +12,9 @@ export const SelectField = <T extends FieldValues>({
   options,
   includeNoneOption = false,
   register,
+  wrapperStyle,
+  labelStyle,
+  inputStyle,
   error,
 }: {
   label: string;
@@ -19,14 +22,18 @@ export const SelectField = <T extends FieldValues>({
   options: SelectOption[];
   includeNoneOption?: boolean;
   register: UseFormRegister<T>;
+  wrapperStyle?: string;
+  labelStyle?: string;
+  inputStyle?: string;
   error?: FieldError;
 }) => {
   return (
-    <label>
-      {label}
+    <label className={`${wrapperStyle}`}>
+      {label && <span className={`${labelStyle}`}>{label}</span>}
 
       {/* If any value is "", it's changed to null. */}
       <select
+        className={`select ${inputStyle}`}
         {...register(name, {
           setValueAs: (value) => (value === '' ? null : value),
         })}

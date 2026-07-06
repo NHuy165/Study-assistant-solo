@@ -11,6 +11,7 @@ export const TextArea = <T extends FieldValues>({
   register,
   error,
   wrapperStyle,
+  labelStyle,
   inputStyle,
   placeholder = '',
 }: {
@@ -19,12 +20,13 @@ export const TextArea = <T extends FieldValues>({
   register: UseFormRegister<T>;
   error?: FieldError;
   wrapperStyle?: string;
+  labelStyle?: string;
   inputStyle?: string;
   placeholder?: string;
 }) => {
   return (
     <label className={`${wrapperStyle}`}>
-      {label && <p className="font-semibold mb-1">{label}</p>}
+      {label && <span className={`${labelStyle}`}>{label}</span>}
       <textarea
         className={`textarea ${inputStyle}`}
         placeholder={placeholder}

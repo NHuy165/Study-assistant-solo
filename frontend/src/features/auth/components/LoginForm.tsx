@@ -35,6 +35,7 @@ export const LoginForm = () => {
         <FormField
           label="Email:"
           name="username"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.username}
         />
@@ -42,6 +43,7 @@ export const LoginForm = () => {
         <FormField
           label="Password:"
           name="password"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.password}
         />

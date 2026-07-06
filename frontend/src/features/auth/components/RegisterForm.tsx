@@ -42,6 +42,7 @@ export const RegisterForm = () => {
         <FormField
           label="Username"
           name="username"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.username}
         />
@@ -50,6 +51,7 @@ export const RegisterForm = () => {
         <FormField
           label="Email"
           name="email"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.email}
         />
@@ -58,6 +60,7 @@ export const RegisterForm = () => {
         <FormField
           label="Password"
           name="password"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.password}
         />
@@ -66,6 +69,7 @@ export const RegisterForm = () => {
         <TextArea
           label="Description"
           name="description"
+          labelStyle="font-semibold block mb-2"
           register={register}
           placeholder="Tell us a few things about yourself (academic background, achievements...)"
           error={errors.description}
