@@ -10,12 +10,14 @@ import toast, { Toaster } from 'react-hot-toast';
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
     onError: (error) => {
+      console.log(`Request error: ${error.message}`);
       toast.error(error.message);
     },
   }),
 
   mutationCache: new MutationCache({
     onError: (error) => {
+      console.log(`Request error: ${error.message}`);
       toast.error(error.message);
     },
   }),
