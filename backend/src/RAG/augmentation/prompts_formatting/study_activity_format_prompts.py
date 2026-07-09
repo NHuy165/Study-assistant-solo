@@ -39,29 +39,6 @@ Additional information:
 + The default number of flashcards is 10. This can be changed according to the user's explicit request.
 """
 
-gap_fill_format_prompt = """
-{
-    "name": "string (A concise name of this set of clozes)",
-    "description": "string (A description of the contents of the clozes and what knowledge they cover)",
-    "activity_items": [
-        {
-            "text": "string"
-            "corrects": ["string1", "string2", ...]
-            "distractors": ["string1", "string2", ...]
-        }
-    ]
-}
-
-Additional information:
-+ Material breakdown: A banked cloze test where the student is given some text with blanks, together with a list of given words containing both the correct words and surplus wrong answers.
-+ The "activity_items" key is a JSON array containing separate unrelated problems. Each problem contains the text with blanks, a list of the correct words in the correct order to fill in those blanks, and a list of surplus wrong answers.
-+ "text": The main information with blanks, each text may only contain an amount of text equivalent to 2 or 3 sentences, 4 at maximum. Each blank is marked by the string $!BLANK!$
-+ "corrects": The words that will correctly fill in the blanks of the main text. The array has to contain the words in the correct order based on the text provided in "text". The blanked out words should be important concepts, points of information that are essential to the overall information being displayed in "text", basically something that the user has to engrave in memories. 
-* IMPORTANT!!!: The number of correct words HAS TO MATCH the number of $!BLANK!$ in the main text, in the correct order.
-+ "distractors": The wrong words, given to confuse the student and test their ability to discern between the right answers and the wrong ones. These words should be somewhat semantically similar to the correct words,. The number of distractors provided should be arbitrary, the more distractors provided, the harder the problem will be.
-+ The default number of texts is 10. This can be changed according to the user's explicit request.
-"""
-
 open_ended_format_prompt = """
 {
     "name": "string",

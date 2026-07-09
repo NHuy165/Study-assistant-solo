@@ -28,7 +28,6 @@ from backend.src.models_schema.activity.study_activity import (
 )
 from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.miscellaneous.enums import (
-    ExerciseItemContentType,
     ReviewItemContentType,
     StudyActivityFormat,
     StudyActivityType,
@@ -39,11 +38,6 @@ from backend.tests.test_data.study_activities.mock_flashcards_data import (
     mock_flashcards_llm_return_data,
     validation_flashcards_creation_data,
     validation_flashcards_read_data,
-)
-from backend.tests.test_data.study_activities.mock_gap_fill_data import (
-    mock_gap_fill_llm_return_data,
-    validation_gap_fill_creation_data,
-    validation_gap_fill_read_data,
 )
 from backend.tests.test_data.study_activities.mock_MCQ_data import (
     mock_MCQ_llm_return_data,
@@ -56,7 +50,6 @@ from backend.tests.test_data.study_activities.mock_open_ended_data import (
     validation_open_ended_read_data,
 )
 from backend.tests.utils.validators import (
-    validate_contents_dict,
     validate_contents_list,
     validate_model,
     validate_object_contents,
@@ -91,12 +84,6 @@ from backend.tests.utils.validators import (
             SubjectType.ENGLISH,
             mock_flashcards_llm_return_data,
             validation_flashcards_creation_data,
-        ),
-        (
-            StudyActivityFormat.GAP_FILL,
-            SubjectType.ENGLISH,
-            mock_gap_fill_llm_return_data,
-            validation_gap_fill_creation_data,
         ),
     ],
 )
@@ -139,10 +126,7 @@ async def test_create_study_activity(
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 
-    if study_activity_input.activity_format in (
-        StudyActivityFormat.FLASHCARDS,
-        StudyActivityFormat.GAP_FILL,
-    ):
+    if study_activity_input.activity_format in (StudyActivityFormat.FLASHCARDS,):
         activity_type = StudyActivityType.REVIEW
     else:
         activity_type = StudyActivityType.EXERCISE
@@ -295,14 +279,6 @@ async def test_read_all_study_activities(
         "is_submitted": False,
     }
 
-    gap_fill_dummy = {
-        "prompt": "Gap fill prompt",
-        "activity_format": StudyActivityFormat.GAP_FILL,
-        "subject_type": SubjectType.ENGLISH,
-        "name": "Gap fill",
-        "is_submitted": False,
-    }
-
     await create_study_activity_custom(
         **MCQ_dummy,  # type: ignore
         interaction=create_interaction_test,
@@ -315,11 +291,6 @@ async def test_read_all_study_activities(
     )
     await create_study_activity_custom(
         **flashcards_dummy,  # type: ignore
-        interaction=create_interaction_test,
-        is_deleted=False,
-    )
-    await create_study_activity_custom(
-        **gap_fill_dummy,  # type: ignore
         interaction=create_interaction_test,
         is_deleted=False,
     )
@@ -338,7 +309,6 @@ async def test_read_all_study_activities(
             MCQ_dummy,
             open_ended_dummy,
             flashcards_dummy,
-            gap_fill_dummy,
         ],
     )
 
@@ -363,12 +333,6 @@ async def test_read_all_study_activities(
             SubjectType.ENGLISH,
             False,
             validation_flashcards_read_data,
-        ),
-        (
-            StudyActivityFormat.GAP_FILL,
-            SubjectType.ENGLISH,
-            False,
-            validation_gap_fill_read_data,
         ),
     ],
 )

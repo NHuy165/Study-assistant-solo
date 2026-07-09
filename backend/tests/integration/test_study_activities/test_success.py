@@ -50,10 +50,6 @@ from backend.tests.utils.validators import (
             StudyActivityFormat.FLASHCARDS,
             SubjectType.ENGLISH,
         ),
-        (
-            StudyActivityFormat.GAP_FILL,
-            SubjectType.ENGLISH,
-        ),
     ],
 )
 async def test_create_study_activity(
@@ -79,10 +75,7 @@ async def test_create_study_activity(
         json=study_activity_input.model_dump(exclude_unset=True),
     )
 
-    if study_activity_input.activity_format in (
-        StudyActivityFormat.FLASHCARDS,
-        StudyActivityFormat.GAP_FILL,
-    ):
+    if study_activity_input.activity_format in (StudyActivityFormat.FLASHCARDS,):
         activity_type = StudyActivityType.REVIEW
     else:
         activity_type = StudyActivityType.EXERCISE

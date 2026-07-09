@@ -61,30 +61,6 @@ class FlashcardsSchema(StudyActivityValidationBase):
     activity_items: list[FlashcardItemSchema]
 
 
-# ++ Gap Fill ++ #
-
-
-class GapFillItemSchema(SQLModel):
-    text: str
-    corrects: list[str]
-    distractors: list[str]
-
-    @model_validator(mode="after")
-    def validate_output(self):
-        blank_count = self.text.count("$!BLANK!$")
-        if blank_count == 0:
-            raise ExceptionLLMError_502("Text had no blank.")
-        elif len(self.corrects) != blank_count:
-            raise ExceptionLLMError_502(
-                "The number of correct answers doesn't match the number of blanks."
-            )
-        return self
-
-
-class GapFillSchema(StudyActivityValidationBase):
-    activity_items: list[GapFillItemSchema]
-
-
 # ----- GRADING SCHEMAS ----- #
 
 # === Base schema === #

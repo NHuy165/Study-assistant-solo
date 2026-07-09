@@ -26,7 +26,6 @@ from backend.src.models_schema.activity.llm_request_json_schema import (
 )
 from backend.src.models_schema.activity.llm_return_json_schema import (
     FlashcardsSchema,
-    GapFillSchema,
     GradedItemSchema,
     GradedSchema,
     MCQGradedCrossValidation,
@@ -74,7 +73,6 @@ from backend.src.RAG.augmentation.formatters.conversations.core import (
 from backend.src.RAG.augmentation.prompts_formatting.study_activity_format_prompts import (
     MCQ_format_prompt,
     flashcards_format_prompt,
-    gap_fill_format_prompt,
     open_ended_format_prompt,
 )
 from backend.src.RAG.retrieval.core import retrieval
@@ -92,7 +90,6 @@ format_schema_map: dict[
         MCQSchema,
     ),
     StudyActivityFormat.FLASHCARDS: (flashcards_format_prompt, FlashcardsSchema),
-    StudyActivityFormat.GAP_FILL: (gap_fill_format_prompt, GapFillSchema),
     StudyActivityFormat.OPEN_ENDED: (open_ended_format_prompt, OpenEndedCreationSchema),
 }
 
@@ -166,46 +163,6 @@ def save_open_ended(
     study_activity.exercise_items = exercise_items
 
 
-def save_gap_fill(
-    activity_data: StudyActivityValidationBase,
-    study_activity: StudyActivity,
-) -> None:
-    assert isinstance(activity_data, GapFillSchema)
-
-    # Begins saving
-    review_items = []
-    for item in activity_data.activity_items:
-        # Saves item contents
-        review_item_text = ReviewItemContent(
-            content=item.text,
-            type=ReviewItemContentType.GAP_FILL_TEXT,
-        )
-        review_item_corrects = [
-            ReviewItemContent(
-                content=correct,
-                type=ReviewItemContentType.GAP_FILL_CORRECT,
-            )
-            for correct in item.corrects
-        ]
-        review_item_distractors = [
-            ReviewItemContent(
-                content=distractor,
-                type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-            )
-            for distractor in item.distractors
-        ]
-        review_item_contents = (
-            [review_item_text] + review_item_corrects + review_item_distractors
-        )
-
-        # Saves item
-        review_item = ReviewItem(contents=review_item_contents)
-
-        review_items.append(review_item)
-
-    study_activity.review_items = review_items
-
-
 def save_flashcards(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
@@ -238,7 +195,6 @@ save_mapper = {
     StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: save_multiple_choice_questions,
     StudyActivityFormat.OPEN_ENDED: save_open_ended,
     StudyActivityFormat.FLASHCARDS: save_flashcards,
-    StudyActivityFormat.GAP_FILL: save_gap_fill,
 }
 
 

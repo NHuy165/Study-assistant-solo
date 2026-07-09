@@ -127,11 +127,7 @@ class StudyActivity(StudyActivityBase, table=True):
             )
         elif (
             self.activity_type == StudyActivityType.REVIEW
-            and self.activity_format
-            not in (
-                StudyActivityFormat.FLASHCARDS,
-                StudyActivityFormat.GAP_FILL,
-            )
+            and self.activity_format not in (StudyActivityFormat.FLASHCARDS,)
         ):
             raise ExceptionRequestValidation_400(
                 f"Review activity type does not support format: {self.activity_format.value}."

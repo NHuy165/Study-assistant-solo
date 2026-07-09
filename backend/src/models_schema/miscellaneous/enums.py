@@ -25,16 +25,11 @@ class StudyActivityFormat(str, Enum):
 
     # REVIEW
     FLASHCARDS = "FLASHCARDS"
-    GAP_FILL = "GAP_FILL"
 
 
 class ReviewItemContentType(str, Enum):
     FLASHCARDS_FRONT = "FLASHCARDS_FRONT"
     FLASHCARDS_BACK = "FLASHCARDS_BACK"
-
-    GAP_FILL_TEXT = "GAP_FILL_TEXT"
-    GAP_FILL_CORRECT = "GAP_FILL_CORRECT"
-    GAP_FILL_DISTRACTOR = "GAP_FILL_DISTRACTOR"
 
 
 class ExerciseItemContentType(str, Enum):

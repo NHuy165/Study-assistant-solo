@@ -1,4 +1,3 @@
-
 from backend.src.models_schema.miscellaneous.enums import (
     AggregateTarget,
     CriterionAttribute,
@@ -16,20 +15,19 @@ study_activities = [
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.MATHS, False, True),
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.MATHS, True, True),
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.ENGLISH, True, True),
-    (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.VIETNAMESE, False, False),
-    
+    (
+        StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+        SubjectType.VIETNAMESE,
+        False,
+        False,
+    ),
     (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, False, False),
     (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, True, False),
     (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, True, True),
     (StudyActivityFormat.OPEN_ENDED, SubjectType.MATHS, True, True),
-    
     (StudyActivityFormat.FLASHCARDS, SubjectType.ENGLISH, True, False),
     (StudyActivityFormat.FLASHCARDS, SubjectType.ENGLISH, False, False),
     (StudyActivityFormat.FLASHCARDS, SubjectType.VIETNAMESE, True, False),
-    
-    (StudyActivityFormat.GAP_FILL, SubjectType.ENGLISH, True, False),
-    (StudyActivityFormat.GAP_FILL, SubjectType.ENGLISH, False, False),
-    (StudyActivityFormat.GAP_FILL, SubjectType.MATHS, False, False),
 ]
 
 # Test case 1: Counting activities by subject.
@@ -43,7 +41,7 @@ criteria_1 = [
 ]
 validation_1 = [
     (
-        5,
+        4,
         SubjectType.MATHS,
     ),
     (
@@ -51,7 +49,7 @@ validation_1 = [
         SubjectType.VIETNAMESE,
     ),
     (
-        5,
+        3,
         SubjectType.ENGLISH,
     ),
 ]
@@ -71,7 +69,7 @@ validation_2 = [
         StudyActivityType.EXERCISE,
     ),
     (
-        12,
+        6,
         StudyActivityType.REVIEW,
     ),
 ]
@@ -91,9 +89,9 @@ criteria_3 = [
     ),
     Criterion(
         attribute=CriterionAttribute.ACTIVITY_FORMAT,
-        value=StudyActivityFormat.GAP_FILL,
+        value=StudyActivityFormat.FLASHCARDS,
         operator=OperatorType.NE,
-    )
+    ),
 ]
 validation_3 = [
     (
@@ -103,10 +101,6 @@ validation_3 = [
     (
         2,
         StudyActivityFormat.OPEN_ENDED,
-    ),
-    (
-        3,
-        StudyActivityFormat.FLASHCARDS,
     ),
 ]
 
@@ -141,12 +135,7 @@ validation_4 = [
         SubjectType.VIETNAMESE,
     ),
     (
-        1,
-        StudyActivityType.REVIEW,
-        SubjectType.MATHS,
-    ),
-    (
-        4,
+        2,
         StudyActivityType.REVIEW,
         SubjectType.ENGLISH,
     ),

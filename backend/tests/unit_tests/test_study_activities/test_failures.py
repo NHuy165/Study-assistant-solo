@@ -14,42 +14,22 @@ from backend.src.exceptions.core import (
     ExceptionType,
 )
 from backend.src.models_schema.activity.exercise_item import (
-    ExerciseItemOutput,
     ExerciseItemUpdate,
-)
-from backend.src.models_schema.activity.review_item import (
-    ReviewItemOutput,
 )
 from backend.src.models_schema.activity.study_activity import (
     StudyActivity,
     StudyActivityInput,
-    StudyActivityOutputComplete,
 )
 from backend.src.models_schema.interaction.interaction import Interaction
 from backend.src.models_schema.miscellaneous.enums import (
     StudyActivityFormat,
-    StudyActivityType,
     SubjectType,
 )
 from backend.src.models_schema.user.user import User
-from backend.tests.test_data.study_activities.mock_flashcards_data import (
-    mock_flashcards_llm_return_data,
-    validation_flashcards_creation_data,
-)
-from backend.tests.test_data.study_activities.mock_gap_fill_data import (
-    mock_gap_fill_llm_return_data,
-    validation_gap_fill_creation_data,
-)
 from backend.tests.test_data.study_activities.mock_MCQ_data import (
     mock_MCQ_llm_return_data,
-    validation_MCQ_creation_data,
-)
-from backend.tests.test_data.study_activities.mock_open_ended_data import (
-    mock_open_ended_llm_return_data,
-    validation_open_ended_creation_data,
 )
 from backend.tests.utils.validators import (
-    validate_model,
     validate_response_contents,
     validate_response_model,
     validate_status_code,
