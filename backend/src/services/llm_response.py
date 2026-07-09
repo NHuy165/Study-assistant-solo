@@ -100,7 +100,7 @@ async def read_llm_responses(
     query = (
         select(LLMResponse)
         .where(LLMResponse.interaction_id == interaction.id)
-        .order_by(col(LLMResponse.created_at).desc())
+        .order_by(col(LLMResponse.created_at).asc())
     )
     if limit is not None:
         query = query.limit(limit)
