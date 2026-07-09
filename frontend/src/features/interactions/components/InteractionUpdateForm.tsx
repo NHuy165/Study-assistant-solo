@@ -71,6 +71,7 @@ export const InteractionUpdateForm = ({
         {/* Submit button */}
         <Button
           disabled={updateInteraction.isPending}
+          style="mt-3"
           text="Update"
           textDisabled="Updating..."
           type="submit"

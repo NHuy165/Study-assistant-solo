@@ -28,7 +28,7 @@ export const TextArea = <T extends FieldValues>({
     <label className={`${wrapperStyle}`}>
       {label && <span className={`${labelStyle}`}>{label}</span>}
       <textarea
-        className={`textarea ${inputStyle}`}
+        className={`textarea textarea-primary ${inputStyle}`}
         placeholder={placeholder}
         {...register(name)}
         maxLength={2000}

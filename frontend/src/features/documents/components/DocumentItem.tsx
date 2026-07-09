@@ -4,68 +4,162 @@ import { useDeleteDocument } from '@/features/documents/api/useDeleteDocument';
 import { DocumentUpdateForm } from '@/features/documents/components/DocumentUpdateForm';
 import { useGetDocumentComplete } from '@/features/documents/api/useGetDocumentComplete';
 import { capitalizeString } from '@/utils/format-string';
+import { Button } from '@/components/miscellaneous/Button';
+import { DocumentType } from '@/features/documents/types/constants';
+import { ButtonCreateStudyActivity } from '@/features/documents/components/ButtonCreateStudyActivity';
+import { ButtonCreateLLMResponse } from '@/features/documents/components/ButtonCreateLLMResponse';
 
 export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
   // Fetches states
   const [showUpdateForm, setShowUpdateForm] = useState(false);
-  const [showDocumentAnalysis, setShowDocumentAnalysis] = useState(false);
+  const [showDetails, setShowDetails] = useState(false);
   const deleteDocument = useDeleteDocument();
-  const getDocumentComplete = useGetDocumentComplete(
-    document.id,
-    showDocumentAnalysis,
-  );
+  const getDocumentComplete = useGetDocumentComplete(document.id, showDetails);
 
   return (
     <li>
-      <>
-        #{document.id} ({document.created_at}) {document.name} (Subject:{' '}
-        {document.subject_type
-          ? capitalizeString(document.subject_type)
-          : 'Other'}
-        ) (Type: {document.type}):{' '}
-      </>
+      <div>
+        {/* Main document */}
+        <Button
+          style="w-2/3"
+          text={`#${document.id} ${document.name} (${
+            document.subject_type
+              ? capitalizeString(document.subject_type)
+              : 'Other'
+          })`}
+          onClick={() => setShowDetails(!showDetails)}
+        />
+        <Button
+          style="w-1/3"
+          text="Delete"
+          textDisabled="Deleting..."
+          btnError={true}
+          onClick={() => deleteDocument.mutate(document.id)}
+        />
 
-      {/* Analysis button */}
-      <button onClick={() => setShowDocumentAnalysis(!showDocumentAnalysis)}>
-        Analysis
-      </button>
+        {/* More details */}
+        {showDetails && (
+          <div className="card shadow-xl border mt-3 p-6">
+            <h3 className="font-bold text-3xl mb-3">Details</h3>
+            <div className="space-y-2">
+              {/* Normal details */}
+              <p>
+                <span className="font-bold">Uploaded at:</span>{' '}
+                {document.created_at}
+              </p>
+              <p>
+                <span className="font-bold">Document type:</span>{' '}
+                {document.type}
+              </p>
+              {document.type === DocumentType.Pdf && (
+                <p>
+                  <span className="font-bold">Page starts at:</span>{' '}
+                  {document.page_starts_at}
+                </p>
+              )}
 
-      {/* Update button */}
-      <button onClick={() => setShowUpdateForm(!showUpdateForm)}>
-        Show update
-      </button>
+              {/* Document analysis */}
 
-      {/* Delete button */}
-      <button onClick={() => deleteDocument.mutate(document.id)}>Delete</button>
+              {/* Summary */}
+              <p>
+                <span className="font-bold">Document summary:</span>{' '}
+                {getDocumentComplete.isError && 'Failed to fetch data.'}
+                {getDocumentComplete.isPending && 'Fetching data...'}
+                {getDocumentComplete.isError ||
+                  getDocumentComplete.isPending || (
+                    <div className="whitespace-pre-wrap max-h-30 overflow-y-auto">
+                      {getDocumentComplete.data?.[1]?.summary ||
+                        'This document has no content.'}
+                    </div>
+                  )}
+              </p>
 
-      {/* Delete status */}
-      {deleteDocument.isError && <p>{deleteDocument.error.message}</p>}
-      {deleteDocument.isPending && <p>Deleting interaction, please wait.</p>}
+              {/* Recommendations */}
+              <p>
+                <span className="block font-bold">Recommendations:</span>{' '}
+                {getDocumentComplete.isError && 'Failed to fetch data.'}
+                {getDocumentComplete.isPending && 'Fetching data...'}
+                {getDocumentComplete.isError ||
+                  getDocumentComplete.isPending || (
+                    <div className="space-y-8">
+                      {/* Study activity recommendations */}
+                      <div className="mt-4">
+                        <span className="font-bold divider mb-8 divider-primary">
+                          Create study activities
+                        </span>
+                        <div>
+                          {(getDocumentComplete.data?.[1]
+                            ?.material_recommendations?.length ?? 0) > 0 ? (
+                            <div className="space-y-6">
+                              {getDocumentComplete.data?.[1]?.material_recommendations?.map(
+                                (recommendation) => (
+                                  <ButtonCreateStudyActivity
+                                    interactionId={document.interaction_id}
+                                    studyActivityInput={{
+                                      ...recommendation,
+                                      document_id: document.id,
+                                    }}
+                                  />
+                                ),
+                              )}
+                            </div>
+                          ) : (
+                            <span>
+                              Document has no study activity recommendation.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                      {/* LLM chat recommendations */}
+                      <div>
+                        <span className="font-bold divider mb-8 divider-primary">
+                          Chat with LLM
+                        </span>
+                        <div>
+                          {(getDocumentComplete.data?.[1]
+                            ?.question_recommendations?.length ?? 0) > 0 ? (
+                            <div className="space-y-6">
+                              {getDocumentComplete.data?.[1]?.question_recommendations?.map(
+                                (recommendation) => (
+                                  <ButtonCreateLLMResponse
+                                    interactionId={document.interaction_id}
+                                    chatInput={{
+                                      ...recommendation,
+                                      document_id: document.id,
+                                    }}
+                                  />
+                                ),
+                              )}
+                            </div>
+                          ) : (
+                            <span>
+                              Document has no LLM chat recommendation.
+                            </span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  )}
+              </p>
+            </div>
 
-      {/* Document analysis */}
-      {showDocumentAnalysis && (
-        <div>
-          {getDocumentComplete.isError && (
-            <p>{getDocumentComplete.error.message}</p>
-          )}
-          {getDocumentComplete.isPending ? (
-            <p>Fetching document, please wait.</p>
-          ) : (
-            getDocumentComplete.data?.[1]?.summary ||
-            'This document has no content.'
-          )}
-        </div>
-      )}
-
-      {/* Update form */}
-      {showUpdateForm && (
-        <div>
-          <DocumentUpdateForm
-            document={document}
-            onUpdate={() => setShowUpdateForm(false)}
-          />
-        </div>
-      )}
+            {/* Update button & Update form */}
+            <Button
+              style="w-full mt-6"
+              text="Show update"
+              onClick={() => setShowUpdateForm(!showUpdateForm)}
+            />
+            {showUpdateForm && (
+              <div>
+                <DocumentUpdateForm
+                  document={document}
+                  onUpdate={() => setShowUpdateForm(false)}
+                />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
     </li>
   );
 };

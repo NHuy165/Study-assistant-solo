@@ -83,7 +83,7 @@ export const StudyAssessments = () => {
               </div>
 
               {filteredStudyAssessment && filteredStudyAssessment.length > 0 ? (
-                <ul>
+                <ul className="space-y-3 mt-3">
                   {filteredStudyAssessment.map((assessment) => (
                     <StudyAssessmentItem
                       key={assessment.assessment_of}

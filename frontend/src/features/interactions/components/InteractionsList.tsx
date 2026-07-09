@@ -14,13 +14,13 @@ export const InteractionsList = () => {
       {getInteractions.isPending ||
         getInteractions.isError ||
         (getInteractions.data.length > 0 ? (
-          <ul>
+          <ul className="space-y-3">
             {getInteractions.data?.map((interaction) => (
               <InteractionItem key={interaction.id} interaction={interaction} />
             ))}
           </ul>
         ) : (
-          <span>User currently has no Interactions.</span>
+          <span>User has no interaction.</span>
         ))}
     </div>
   );

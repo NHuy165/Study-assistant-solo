@@ -5,10 +5,11 @@ import { useUploadDocument } from '@/features/documents/api/useUploadDocument';
 import {
   DocumentInputSchema,
   type DocumentInput,
+  type DocumentInputForm,
 } from '@/features/documents/types/document';
 import { SubjectType } from '@/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
-import { type SubmitHandler, useForm } from 'react-hook-form';
+import { type FieldError, type SubmitHandler, useForm } from 'react-hook-form';
 
 export const DocumentUploadForm = ({
   interactionId,
@@ -21,13 +22,13 @@ export const DocumentUploadForm = ({
     handleSubmit,
     reset,
     formState: { errors },
-  } = useForm<DocumentInput>({
+  } = useForm<DocumentInputForm, unknown, DocumentInput>({
     resolver: zodResolver(DocumentInputSchema),
     defaultValues: {
       name: null,
       page_starts_at: 1,
       subject_type: '' as unknown as null, // This bypasses the check and gets the select field to default to the nu;l; option (whose initial value is actually '')
-      subject_type_overwrite: false,
+      subject_type_overwrite: 'false' as unknown as boolean,
     },
   });
 
@@ -41,49 +42,50 @@ export const DocumentUploadForm = ({
   };
 
   return (
-    <div>
-      {uploadDocument.isError && <p>{uploadDocument.error.message}</p>}
-      {uploadDocument.isPending && <p>Uploading document, please wait.</p>}
+    <div className="card shadow-xl border py-6 px-10 mx-10 mb-6">
+      <h3 className="font-bold text-2xl mb-3">Upload a document</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         {/* File upload */}
         <FormField
-          label="File"
+          label="File:"
           name="file"
           type="file"
+          inputStyle="file-input file-input-primary w-full p-0"
+          labelStyle="font-semibold block mb-2"
           accept="image/*, text/*, .pdf"
           register={register}
           error={errors.name}
         />
 
-        <br />
-
         {/* Name */}
         <FormField
           label="Name"
           name="name"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           placeholder="Blank for original name"
           register={register}
           error={errors.name}
         />
 
-        <br />
-
         {/* Page starts at */}
         <FormField
           label="Page starts at"
           name="page_starts_at"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.page_starts_at}
           type="number"
         />
 
-        <br />
-
         {/* Subject type */}
         <SelectField
           label="Subject type"
           name="subject_type"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           options={Object.entries(SubjectType).map(([label, value]) => {
             return { label, value };
           })}
@@ -92,24 +94,27 @@ export const DocumentUploadForm = ({
           error={errors.subject_type}
         />
 
-        <br />
-
         {/* Subject type overwrite */}
-        <FormField
-          label="Subject type overwrite"
+        <SelectField
+          label="Allow automatic subject type overwrite"
           name="subject_type_overwrite"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
+          options={[
+            { label: 'Yes', value: 'true' },
+            { label: 'No', value: 'false' },
+          ]}
           register={register}
-          error={errors.subject_type}
-          type="checkbox"
+          error={errors.subject_type_overwrite as FieldError | undefined}
         />
-
-        <br />
 
         {/* Submit button */}
         <Button
           disabled={uploadDocument.isPending}
+          style="mt-6"
           text="Upload"
           textDisabled="Uploading..."
+          type="submit"
         />
       </form>
     </div>

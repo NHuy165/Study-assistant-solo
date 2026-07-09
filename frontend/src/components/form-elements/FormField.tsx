@@ -34,7 +34,7 @@ export const FormField = <T extends FieldValues>({
     <label className={`${wrapperStyle}`}>
       {label && <span className={`${labelStyle}`}>{label}</span>}
       <input
-        className={`input ${inputStyle}`}
+        className={`input input-primary ${inputStyle}`}
         type={type}
         accept={type === 'file' ? accept : undefined}
         placeholder={placeholder}

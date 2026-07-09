@@ -33,7 +33,7 @@ export const SelectField = <T extends FieldValues>({
 
       {/* If any value is "", it's changed to null. */}
       <select
-        className={`select ${inputStyle}`}
+        className={`select select-primary ${inputStyle}`}
         {...register(name, {
           setValueAs: (value) => (value === '' ? null : value),
         })}

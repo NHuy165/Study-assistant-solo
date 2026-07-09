@@ -17,7 +17,7 @@ export const InteractionItem = ({
   const navigate = useNavigate();
 
   return (
-    <li className="mb-3">
+    <li>
       <div className="flex">
         {/* Main interaction */}
         <Button

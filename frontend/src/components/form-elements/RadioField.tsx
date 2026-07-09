@@ -36,12 +36,13 @@ export const RadioGroupField = <T extends FieldValues>({
       {options.map((option) => (
         <label key={option.value}>
           <input
+            className={`radio ${inputStyle}`}
             type="radio"
             value={option.value}
             disabled={disabled}
             {...register(name)}
           />
-          <span className={`input ${inputStyle}`}>{option.label}</span>
+          <span>{option.label}</span>
           {/* If the answer is correct, display a correct sign. Else if the answer is not correct AND the user chose it, display a wrong sign. */}
           {option.isCorrect !== null &&
             (option.isCorrect

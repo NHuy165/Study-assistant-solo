@@ -6,14 +6,22 @@ export const DocumentsList = ({ interactionId }: { interactionId: number }) => {
 
   return (
     <div>
-      {getDocuments.isError && <p>{getDocuments.error.message}</p>}
-      {getDocuments.isPending && <p>Fetching documents, please wait.</p>}
+      <h2 className="font-bold text-4xl mb-6">Documents list:</h2>
 
-      <ul>
-        {getDocuments.data?.map((document) => (
-          <DocumentItem key={document.id} document={document} />
+      {getDocuments.isError && <p>Failed to fetch data.</p>}
+      {getDocuments.isPending && <p>Fetching data...</p>}
+
+      {getDocuments.isPending ||
+        getDocuments.isError ||
+        (getDocuments.data.length > 0 ? (
+          <ul className="space-y-3">
+            {getDocuments.data?.map((document) => (
+              <DocumentItem key={document.id} document={document} />
+            ))}
+          </ul>
+        ) : (
+          <span>User has no uploaded document.</span>
         ))}
-      </ul>
     </div>
   );
 };

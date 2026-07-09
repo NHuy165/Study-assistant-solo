@@ -14,7 +14,7 @@ export const StudyAssessmentItem = ({
   const [showContent, setShowContent] = useState(false);
 
   return (
-    <li className="flex flex-col mb-3">
+    <li className="flex flex-col">
       <Button
         style="w-1/1"
         text={`Assessment date: ${dayjs.utc(assessment.assessment_of).format('YYYY-MM-DD')}`}

@@ -47,37 +47,38 @@ export const DocumentUpdateForm = ({
   };
 
   return (
-    <div>
-      {updateDocument.isError && <p>{updateDocument.error.message}</p>}
-      {updateDocument.isPending && <p>Updating the document, please wait.</p>}
+    <div className="card shadow-xl border mt-3 mb-6 p-6">
+      <h3 className="font-bold text-3xl mb-3">Update</h3>
 
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
         <FormField
-          label="Name"
+          label="New Name"
           name="name"
+          inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.name}
         />
-
-        <br />
 
         {/* Page starts at, only available if document is a PDF */}
         {document.type == DocumentType.Pdf && (
           <FormField
             label="Page starts at"
             name="page_starts_at"
+            inputStyle="w-1/1"
+            labelStyle="font-semibold block mb-2"
             register={register}
             error={errors.page_starts_at}
           />
         )}
 
-        <br />
-
         {/* Subject type */}
         <SelectField
           label="Subject type"
           name="subject_type"
+          inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           options={Object.entries(SubjectType).map(([label, value]) => {
             return { label, value };
           })}
@@ -85,11 +86,10 @@ export const DocumentUpdateForm = ({
           error={errors.subject_type}
         />
 
-        <br />
-
         {/* Submit button */}
         <Button
           disabled={updateDocument.isPending}
+          style="mt-3"
           text="Update"
           textDisabled="Updating..."
         />

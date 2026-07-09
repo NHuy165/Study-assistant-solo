@@ -1,4 +1,4 @@
-import { SubjectType } from '@/types/constants';
+import { StudyActivityFormat, SubjectType } from '@/types/constants';
 import { DocumentType } from '@/features/documents/types/constants';
 import { z } from 'zod';
 
@@ -12,7 +12,10 @@ export const DocumentInputSchema = z
     name: z.string().nullable(),
     page_starts_at: z.int().nullable(),
     subject_type: z.enum(SubjectType).nullable(),
-    subject_type_overwrite: z.boolean().nullable(),
+    subject_type_overwrite: z.preprocess(
+      (value) => (typeof value === 'string' ? value === 'true' : value),
+      z.boolean(),
+    ),
   })
   .refine(
     (data) => {
@@ -27,7 +30,8 @@ export const DocumentInputSchema = z
     },
   );
 
-export type DocumentInput = z.infer<typeof DocumentInputSchema>;
+export type DocumentInput = z.output<typeof DocumentInputSchema>;
+export type DocumentInputForm = z.input<typeof DocumentInputSchema>;
 
 // ----- BACKEND OUTPUT ----- //
 
@@ -49,7 +53,7 @@ export type DocumentOutput = z.infer<typeof DocumentOutputSchema>;
 
 const MaterialRecommendationSchema = z.object({
   prompt: z.string(),
-  activity_format: z.string(),
+  activity_format: z.enum(StudyActivityFormat),
   subject_type: z.enum(SubjectType),
 });
 

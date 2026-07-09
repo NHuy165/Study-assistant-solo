@@ -32,14 +32,14 @@ export const InteractionCreateForm = () => {
 
   return (
     <div className="card shadow-xl border py-6 px-10 mx-10 mb-6">
-      <h3 className="font-bold text-2xl mb-3">Create Interaction</h3>
+      <h3 className="font-bold text-2xl mb-3">Create an interaction</h3>
 
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
         <FormField
           label="Name"
           name="name"
-          inputStyle="w-1/1"
+          inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.name}
@@ -49,7 +49,7 @@ export const InteractionCreateForm = () => {
         <TextArea
           label="Description"
           name="description"
-          inputStyle="w-1/1"
+          inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.description}
@@ -58,6 +58,7 @@ export const InteractionCreateForm = () => {
         {/* Submit button */}
         <Button
           disabled={createInteraction.isPending}
+          style="mt-6"
           text="Create"
           textDisabled="Creating..."
           type="submit"
