@@ -7,9 +7,6 @@ from backend.src.models_schema.miscellaneous.enums import (
 from backend.src.RAG.augmentation.formatters.study_activities.flashcard_item import (
     flashcard_item_formatter,
 )
-from backend.src.RAG.augmentation.formatters.study_activities.gap_fill_item import (
-    gap_fill_item_formatter,
-)
 from backend.src.RAG.augmentation.formatters.study_activities.MCQ_item import (
     MCQ_item_formatter,
 )
@@ -23,7 +20,6 @@ def singular_study_activity_formatter(index: int, study_activity: StudyActivity)
         StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: MCQ_item_formatter,
         StudyActivityFormat.OPEN_ENDED: open_ended_item_formatter,
         StudyActivityFormat.FLASHCARDS: flashcard_item_formatter,
-        StudyActivityFormat.GAP_FILL: gap_fill_item_formatter,
     }
 
     return f"""Study activity #{index} (created at {study_activity.created_at}, in interaction #{study_activity.interaction_id}):

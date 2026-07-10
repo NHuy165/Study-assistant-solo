@@ -246,88 +246,6 @@ def create_dummy_flashcards(
     return study_activity
 
 
-def create_dummy_gap_fill(
-    interaction: Interaction,
-    prompt: str,
-    subject_type: SubjectType,
-    name: str,
-    is_deleted: bool,
-) -> StudyActivity:
-
-    # === Item 1 === #
-
-    text1 = ReviewItemContent(
-        content="Text 1: $!BLANK!$ - $!BLANK!$",
-        type=ReviewItemContentType.GAP_FILL_TEXT,
-    )
-    correct1_1 = ReviewItemContent(
-        content="Correct 1-1",
-        type=ReviewItemContentType.GAP_FILL_CORRECT,
-    )
-    correct1_2 = ReviewItemContent(
-        content="Correct 1-2",
-        type=ReviewItemContentType.GAP_FILL_CORRECT,
-    )
-    distractor1_1 = ReviewItemContent(
-        content="Distractor 1-1",
-        type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-    )
-    distractor1_2 = ReviewItemContent(
-        content="Distractor 1-2",
-        type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-    )
-
-    item1 = ReviewItem(
-        contents=[text1, correct1_1, correct1_2, distractor1_1, distractor1_2],
-        is_deleted=is_deleted,
-    )
-
-    # === Item 2 === #
-
-    text2 = ReviewItemContent(
-        content="Text 2: $!BLANK!$ - $!BLANK!$",
-        type=ReviewItemContentType.GAP_FILL_TEXT,
-    )
-    correct2_1 = ReviewItemContent(
-        content="Correct 2-1",
-        type=ReviewItemContentType.GAP_FILL_CORRECT,
-    )
-    correct2_2 = ReviewItemContent(
-        content="Correct 2-2",
-        type=ReviewItemContentType.GAP_FILL_CORRECT,
-    )
-    distractor2_1 = ReviewItemContent(
-        content="Distractor 2-1",
-        type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-    )
-    distractor2_2 = ReviewItemContent(
-        content="Distractor 2-2",
-        type=ReviewItemContentType.GAP_FILL_DISTRACTOR,
-    )
-
-    item2 = ReviewItem(
-        contents=[text2, correct2_1, correct2_2, distractor2_1, distractor2_2],
-        is_deleted=is_deleted,
-    )
-
-    # === Activity === #
-
-    study_activity = StudyActivity(
-        prompt=prompt,
-        activity_type=StudyActivityType.REVIEW,
-        activity_format=StudyActivityFormat.GAP_FILL,
-        subject_type=subject_type,
-        name=name,
-        description=f"{name}-description",
-        is_deleted=is_deleted,
-        created_at=datetime.now(timezone.utc),
-        interaction=interaction,
-        review_items=[item1, item2],
-    )
-
-    return study_activity
-
-
 @pytest.fixture(name="create_study_activity_custom")
 async def create_study_activity_custom_fixture(
     session: AsyncSession,
@@ -367,16 +285,8 @@ async def create_study_activity_custom_fixture(
                 is_submitted=is_submitted,
                 is_deleted=is_deleted,
             )
-        elif activity_format == StudyActivityFormat.FLASHCARDS:
-            study_activity = create_dummy_flashcards(
-                interaction=interaction,
-                prompt=prompt,
-                subject_type=subject_type,
-                name=name,
-                is_deleted=is_deleted,
-            )
         else:
-            study_activity = create_dummy_gap_fill(
+            study_activity = create_dummy_flashcards(
                 interaction=interaction,
                 prompt=prompt,
                 subject_type=subject_type,

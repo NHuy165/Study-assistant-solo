@@ -101,7 +101,7 @@ async def test_create_study_activity(
     validation_data: list,
 ):
     """
-    Creates an MCQ, open ended, flashcards and gap fill study activity of various subjects.
+    Creates study activity of all format types and various subjects.
     """
 
     # Mock rewrite prompt
