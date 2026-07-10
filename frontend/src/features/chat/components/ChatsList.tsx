@@ -5,13 +5,17 @@ export const ChatsList = ({ interactionId }: { interactionId: number }) => {
   const getChats = useGetChats(interactionId);
 
   return (
-    <div>
-      {getChats.isError && <p>{getChats.error.message}</p>}
-      {getChats.isPending && <p>Fetching conversations, please wait.</p>}
+    <div className="border border-primary min-h-30 max-h-140 p-3 whitespace-pre-wrap overflow-y-auto space-y-8 break-words">
+      {getChats.isError && <p>Failed to fetch data.</p>}
+      {getChats.isPending && <p>Fetching data...</p>}
 
-      {getChats.data?.map((chat) => (
-        <ChatItem chat={chat} />
-      ))}
+      {getChats.isError ||
+        getChats.isPending ||
+        (getChats.data && getChats.data.length > 0 ? (
+          getChats.data.map((chat) => <ChatItem chat={chat} />)
+        ) : (
+          <span>No chat history to show.</span>
+        ))}
     </div>
   );
 };

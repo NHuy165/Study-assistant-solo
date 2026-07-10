@@ -1,4 +1,4 @@
-import { FormField } from '@/components/form-elements/FormField';
+import { TextArea } from '@/components/form-elements/TextArea';
 import { Button } from '@/components/miscellaneous/Button';
 import { useCreateChat } from '@/features/chat/api/useCreateChat';
 import { type ChatInput, ChatInputSchema } from '@/features/chat/types/chat';
@@ -25,24 +25,23 @@ export const ChatForm = ({ interactionId }: { interactionId: number }) => {
   };
 
   return (
-    <div>
-      {createChat.isError && createChat.error.message}
-      {createChat.isPending && 'Generating an answer, please wait.'}
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Prompt */}
-        <FormField
-          label="Chat prompt"
-          name="prompt"
-          register={register}
-          error={errors.prompt}
-        />
-
-        <br />
-
+    <div className="mt-6">
+      <form className="flex items-center" onSubmit={handleSubmit(onSubmit)}>
         <Button
           disabled={createChat.isPending}
+          style="w-1/5 rounded-none h-20"
           text="Send"
           textDisabled="Sending text..."
+          type="submit"
+        />
+        <TextArea
+          label=""
+          name="prompt"
+          wrapperStyle="flex items-center w-full h-20"
+          inputStyle="w-full rounded-none h-20 whitespace-pre-wrap overflow-y-auto"
+          disabled={createChat.isPending}
+          register={register}
+          error={errors.prompt}
         />
       </form>
     </div>

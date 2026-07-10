@@ -51,7 +51,7 @@ export const InteractionItem = ({
       {showDetails && (
         <div className="card shadow-xl border mt-3 p-6">
           <h3 className="font-bold text-3xl mb-3">Details</h3>
-          <div className="max-h-30 overflow-y-auto break-all whitespace-pre-wrap">
+          <div className="max-h-30 overflow-y-auto break-words whitespace-pre-wrap">
             <p>
               <span className="font-bold">Created at:</span>{' '}
               {interaction.created_at}

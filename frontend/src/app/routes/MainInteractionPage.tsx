@@ -30,7 +30,7 @@ export const MainInteractionPage = () => {
               <span className="block font-bold text-xl mb-3">
                 Description:{' '}
               </span>
-              <span className="block max-h-30 overflow-y-auto break-all whitespace-pre-wrap border p-3">
+              <span className="block max-h-30 overflow-y-auto break-words whitespace-pre-wrap border p-3">
                 {interaction?.description}
               </span>
             </p>
@@ -46,8 +46,9 @@ export const MainInteractionPage = () => {
           {/* LLM Chat */}
           <div className="card shadow-xl border p-8">
             <h2 className="text-5xl font-bold text-center mb-10">Chat</h2>
-            <ChatForm interactionId={Number(interactionId)} />
+
             <ChatsList interactionId={Number(interactionId)} />
+            <ChatForm interactionId={Number(interactionId)} />
           </div>
 
           {/* Study activities */}

@@ -11,6 +11,7 @@ export const TextArea = <T extends FieldValues>({
   register,
   error,
   wrapperStyle,
+  disabled = false,
   labelStyle,
   inputStyle,
   placeholder = '',
@@ -20,6 +21,7 @@ export const TextArea = <T extends FieldValues>({
   register: UseFormRegister<T>;
   error?: FieldError;
   wrapperStyle?: string;
+  disabled?: boolean;
   labelStyle?: string;
   inputStyle?: string;
   placeholder?: string;
@@ -32,6 +34,7 @@ export const TextArea = <T extends FieldValues>({
         placeholder={placeholder}
         {...register(name)}
         maxLength={2000}
+        disabled={disabled}
       />
 
       <div className="min-h-6 text-error">{error && error.message}</div>
