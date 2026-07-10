@@ -10,19 +10,25 @@ export const StudyActivityDisplaysList = ({
 
   return (
     <div>
-      {getStudyActivities.isError && <p>{getStudyActivities.error.message}</p>}
-      {getStudyActivities.isPending && (
-        <p>Fetching study activities, please wait.</p>
-      )}
+      <h2 className="font-bold text-4xl mb-6">Study activities list:</h2>
 
-      <ul>
-        {getStudyActivities.data?.map((studyActivity) => (
-          <StudyActivityDisplayItem
-            key={studyActivity.id}
-            studyActivity={studyActivity}
-          />
+      {getStudyActivities.isError && <p>Failed to fetch data.</p>}
+      {getStudyActivities.isPending && <p>Fetching data...</p>}
+
+      {getStudyActivities.isPending ||
+        getStudyActivities.isError ||
+        (getStudyActivities.data.length > 0 ? (
+          <ul className="space-y-3">
+            {getStudyActivities.data?.map((studyActivity) => (
+              <StudyActivityDisplayItem
+                key={studyActivity.id}
+                studyActivity={studyActivity}
+              />
+            ))}
+          </ul>
+        ) : (
+          <span>User has no study activities.</span>
         ))}
-      </ul>
     </div>
   );
 };

@@ -56,9 +56,7 @@ export const MainInteractionPage = () => {
             <h2 className="text-5xl font-bold text-center mb-10">
               Study Activities
             </h2>
-            <h3>Study Activity Generation</h3>
             <StudyActivityCreateForm interactionId={Number(interactionId)} />
-            <h3>Manual Flashcard Creation</h3>{' '}
             <FlashcardsActivityCreateForm
               interactionId={Number(interactionId)}
             />

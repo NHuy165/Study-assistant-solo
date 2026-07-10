@@ -42,39 +42,38 @@ export const FlashcardsActivityCreateForm = ({
   };
 
   return (
-    <div>
-      {createFlashcardsActivity.isError && (
-        <p>{createFlashcardsActivity.error.message}</p>
-      )}
-      {createFlashcardsActivity.isPending && (
-        <p>Creating study activity, please wait.</p>
-      )}
+    <div className="card shadow-xl border py-6 px-10 mx-10 mb-6">
+      <h3 className="font-bold text-2xl mb-3">
+        Create a new blank flashcard activity.
+      </h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
+      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         {/* Name */}
         <FormField
           label="Name"
           name="name"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.name}
         />
-
-        <br />
 
         {/* Description */}
         <FormField
           label="Description"
           name="description"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.description}
         />
-
-        <br />
 
         {/* Subject type */}
         <SelectField
           label="Subject type"
           name="subject_type"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           options={Object.entries(SubjectType).map(([label, value]) => {
             return { label, value };
           })}
@@ -82,12 +81,12 @@ export const FlashcardsActivityCreateForm = ({
           error={errors.subject_type}
         />
 
-        <br />
-
         <Button
           disabled={createFlashcardsActivity.isPending}
+          style="mt-6"
           text="Create"
           textDisabled="Creating..."
+          type="submit"
         />
       </form>
     </div>
