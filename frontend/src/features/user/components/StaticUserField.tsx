@@ -11,7 +11,7 @@ export const StaticUserField = ({
   const getUser = useGetUser();
 
   return (
-    <div className="flex items-center border-b min-h-10">
+    <div className="flex items-center border-b border-primary min-h-10">
       <span className="font-semibold w-1/3">{label}</span>
       <span className="flex-1">
         {getUser.isPending

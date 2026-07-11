@@ -22,7 +22,7 @@ export const MainInteractionPage = () => {
       {getInteractions.isPending || getInteractions.isError || interaction ? (
         <div className="space-y-8">
           {/* Title */}
-          <div className="border-b pb-6">
+          <div>
             <h1 className="text-6xl font-bold text-center">
               {interaction?.name}
             </h1>
@@ -30,21 +30,23 @@ export const MainInteractionPage = () => {
               <span className="block font-bold text-xl mb-3">
                 Description:{' '}
               </span>
-              <span className="block max-h-30 overflow-y-auto break-words whitespace-pre-wrap border p-3">
+              <span className="block max-h-30 overflow-y-auto break-words whitespace-pre-wrap border border-primary p-3">
                 {interaction?.description}
               </span>
             </p>
           </div>
 
+          <span className="divider divider-primary"></span>
+
           {/* Documents */}
-          <div className="card shadow-xl border p-8">
+          <div className="card shadow-xl border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">Documents</h2>
             <DocumentUploadForm interactionId={Number(interactionId)} />
             <DocumentsList interactionId={Number(interactionId)} />
           </div>
 
           {/* LLM Chat */}
-          <div className="card shadow-xl border p-8">
+          <div className="card shadow-xl border border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">Chat</h2>
 
             <ChatsList interactionId={Number(interactionId)} />
@@ -52,7 +54,7 @@ export const MainInteractionPage = () => {
           </div>
 
           {/* Study activities */}
-          <div className="card shadow-xl border p-8">
+          <div className="card shadow-xl border border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">
               Study Activities
             </h2>

@@ -42,7 +42,7 @@ export const DocumentUploadForm = ({
   };
 
   return (
-    <div className="card shadow-xl border py-6 px-10 mx-10 mb-6">
+    <div className="card shadow-xl border border border-primary py-6 px-10 mx-10 mb-6">
       <h3 className="font-bold text-2xl mb-3">Upload a document</h3>
 
       <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>

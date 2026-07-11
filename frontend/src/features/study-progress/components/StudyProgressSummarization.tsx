@@ -124,7 +124,7 @@ export const StudyProgressSummarization = () => {
       {hookList.some((hook) => hook.isError || hook.isPending) || (
         <div>
           <div>
-            <p className="divider font-bold text-2xl my-6">
+            <p className="divider divider-primary font-bold text-2xl my-6">
               Total study activities generated: {totalActivities}
             </p>
 
@@ -162,7 +162,7 @@ export const StudyProgressSummarization = () => {
           </div>
 
           <div>
-            <p className="divider font-bold text-2xl my-6">
+            <p className="divider divider-primary font-bold text-2xl my-6">
               Total study activity items generated: {totalItems}
             </p>
 
@@ -200,7 +200,7 @@ export const StudyProgressSummarization = () => {
           </div>
 
           <div>
-            <p className="divider font-bold text-2xl my-6">
+            <p className="divider divider-primary font-bold text-2xl my-6">
               Exercise average grades:{' '}
               {Number.isNaN(totalUserScore / totalMaximumScore)
                 ? 'No data'

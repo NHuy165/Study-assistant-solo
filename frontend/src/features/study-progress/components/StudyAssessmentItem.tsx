@@ -23,7 +23,7 @@ export const StudyAssessmentItem = ({
       {/* Properly displays dummy assessments without content */}
 
       {showContent && (
-        <span className="mt-3 p-6 border overflow-y-auto max-h-60 whitespace-pre-wrap">
+        <span className="block mt-3 p-6 border border-primary overflow-y-auto min-h-30 max-h-60 whitespace-pre-wrap break-words">
           <h3 className="font-bold text-3xl mb-5">
             Assessment of{' '}
             {`${dayjs.utc(assessment.assessment_of).format('YYYY-MM-DD')}`}

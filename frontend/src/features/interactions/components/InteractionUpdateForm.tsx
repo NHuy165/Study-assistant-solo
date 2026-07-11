@@ -44,7 +44,7 @@ export const InteractionUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border mt-3 mb-6 p-6">
+    <div className="card shadow-xl border border border-primary mt-3 mb-6 p-6">
       <h3 className="font-bold text-3xl mb-3">Update</h3>
 
       <form onSubmit={handleSubmit(onSubmit)}>

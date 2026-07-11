@@ -53,9 +53,9 @@ export const StudyAssessments = () => {
           <div>
             {/* Yesterday assessment */}
             <div className="mb-6">
-              <h3 className="font-bold">Yesterday's assessment:</h3>
+              <h3 className="font-bold mb-3">Yesterday's assessment:</h3>
               {/* Properly displays dummy assessments without content */}
-              <span>
+              <span className="block border border-primary whitespace-pre-wrap p-3 min-h-30 max-h-60 overflow-y-auto break-words">
                 {yesterdayAssessment
                   ? yesterdayAssessment.content ||
                     'Study assessment in progress...'

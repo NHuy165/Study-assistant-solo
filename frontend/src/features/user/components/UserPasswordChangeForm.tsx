@@ -35,7 +35,7 @@ export const UserPasswordChangeForm = () => {
         style="w-full mt-6"
       />
       {showUpdateForm && (
-        <div className="card shadow-xl border mt-6 p-6">
+        <div className="card shadow-xl border border-primary mt-6 p-6">
           {changePassword.isError && changePassword.error.message}
           {changePassword.isPending && 'Updating field, please wait.'}
           <form onSubmit={handleSubmit(onSubmit)}>

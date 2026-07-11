@@ -39,7 +39,7 @@ export const UserFieldUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border mt-3 mb-6 p-6">
+    <div className="card shadow-xl border border-primary mt-3 mb-6 p-6">
       <form onSubmit={handleSubmit(onSubmit)}>
         {field === 'description' ? (
           <TextArea
