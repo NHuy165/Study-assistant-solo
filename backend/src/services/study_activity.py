@@ -471,6 +471,15 @@ async def read_study_activity_complete(
             },
         )
 
+    # Sorting result before returning
+    study_activity.review_items.sort(key=lambda x: x.id if x.id else 0)
+    study_activity.exercise_items.sort(key=lambda x: x.id if x.id else 0)
+
+    for item in study_activity.review_items:
+        item.contents.sort(key=lambda x: x.id if x.id else 0)
+    for item in study_activity.exercise_items:
+        item.contents.sort(key=lambda x: x.id if x.id else 0)
+
     return study_activity
 
 
@@ -800,6 +809,11 @@ async def submit_exercise_activity(
     study_activity.submitted_at = current_datetime
 
     await session.commit()
+
+    study_activity.exercise_items.sort(key=lambda x: x.id if x.id else 0)
+
+    for item in study_activity.exercise_items:
+        item.contents.sort(key=lambda x: x.id if x.id else 0)
 
     return study_activity
 
