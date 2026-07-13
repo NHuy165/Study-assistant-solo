@@ -43,9 +43,9 @@ export const useUpdateFlashcard = () => {
 
   return useMutation({
     mutationFn: updateFlashcardRequest,
-    onSuccess: (data, params) => {
+    onSuccess: (data) => {
       queryClient.invalidateQueries({
-        queryKey: ['study-activity', params.reviewItemId],
+        queryKey: ['study-activity', data.study_activity_id],
       });
     },
   });
