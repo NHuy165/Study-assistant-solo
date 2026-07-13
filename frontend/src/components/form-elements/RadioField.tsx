@@ -13,8 +13,10 @@ export const RadioGroupField = <T extends FieldValues>({
   options,
   register,
   wrapperStyle,
+  optionTextStyle,
+  optionsWrapperStyle,
   labelStyle,
-  inputStyle,
+  optionStyle,
   disabled,
   error,
 }: {
@@ -24,8 +26,10 @@ export const RadioGroupField = <T extends FieldValues>({
   options: RadioOption[];
   register: UseFormRegister<T>;
   wrapperStyle?: string;
+  optionTextStyle?: string;
+  optionsWrapperStyle?: string;
   labelStyle?: string;
-  inputStyle?: string;
+  optionStyle?: string;
   disabled: boolean;
   error?: FieldError;
 }) => {
@@ -33,24 +37,31 @@ export const RadioGroupField = <T extends FieldValues>({
     <div className={`${wrapperStyle}`}>
       {label && <span className={`${labelStyle}`}>{label}</span>}
 
-      {options.map((option) => (
-        <label key={option.value}>
-          <input
-            className={`radio ${inputStyle}`}
-            type="radio"
-            value={option.value}
-            disabled={disabled}
-            {...register(name)}
-          />
-          <span>{option.label}</span>
-          {/* If the answer is correct, display a correct sign. Else if the answer is not correct AND the user chose it, display a wrong sign. */}
-          {option.isCorrect !== null &&
-            (option.isCorrect
-              ? ' (Correct answer)'
-              : currentAnswer === option.value && ' (Wrong answer)')}
-          <br />
-        </label>
-      ))}
+      <div className={`${optionsWrapperStyle}`}>
+        {options.map((option) => (
+          <label className={`block ${optionStyle}`} key={option.value}>
+            <input
+              className={`radio radio-primary`}
+              type="radio"
+              value={option.value}
+              disabled={disabled}
+              {...register(name)}
+            />
+            <span className={`${optionTextStyle}`}>
+              {option.label}{' '}
+              {option.isCorrect !== null &&
+                (option.isCorrect ? (
+                  <span className="text-success ml-3">Correct answer</span>
+                ) : (
+                  currentAnswer === option.value && (
+                    <span className="text-error ml-3">Wrong answer</span>
+                  )
+                ))}
+            </span>
+            {/* If the answer is correct, display a correct sign. Else if the answer is not correct AND the user chose it, display a wrong sign. */}
+          </label>
+        ))}
+      </div>
 
       <div className="min-h-6 text-error">{error && error.message}</div>
     </div>

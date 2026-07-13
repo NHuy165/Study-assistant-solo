@@ -23,7 +23,7 @@ export const ButtonCreateStudyActivity = ({
           createStudyActivity.mutate({ interactionId, studyActivityInput })
         }
       />
-      <div className="shadow-xl border px-3 py-1 h-30 whitespace-pre-wrap overflow-y-auto flex-1">
+      <div className="shadow-xl border border-primary px-3 py-1 h-30 whitespace-pre-wrap overflow-y-auto flex-1">
         <p>
           <span className="font-bold">Prompt: </span>{' '}
           {studyActivityInput.prompt}

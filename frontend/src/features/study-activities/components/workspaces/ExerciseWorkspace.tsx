@@ -1,3 +1,4 @@
+import { Button } from '@/components/miscellaneous/Button';
 import { useSubmitExercise } from '@/features/study-activities/api/useSubmitExercise';
 import { MultipleChoiceQuestionItem } from '@/features/study-activities/components/study-activity-items/MultipleChoiceQuestionItem';
 import { OpenEndedItem } from '@/features/study-activities/components/study-activity-items/OpenEndedItem';
@@ -19,14 +20,15 @@ export const ExerciseWorkspace = ({
   };
 
   return (
-    <div>
-      {studyActivity.items.map((exerciseItem) => {
+    <div className="border border-primary p-4 space-y-6">
+      {studyActivity.items.map((exerciseItem, index) => {
         switch (studyActivity.activity_format) {
           case StudyActivityFormat.MultipleChoiceQuestions:
             return (
               <MultipleChoiceQuestionItem
                 key={exerciseItem.id}
                 exerciseItem={exerciseItem as ExerciseItemOutput}
+                index={index}
               />
             );
           case StudyActivityFormat.OpenEnded:
@@ -34,21 +36,19 @@ export const ExerciseWorkspace = ({
               <OpenEndedItem
                 key={exerciseItem.id}
                 exerciseItem={exerciseItem as ExerciseItemOutput}
+                index={index}
               />
             );
         }
       })}
 
-      <br />
-
-      <button onClick={handleClick} disabled={studyActivity.is_submitted}>
-        {submitExercise.isPending ? 'Submitting...' : 'Submit exercise'}
-      </button>
-
-      {submitExercise.isError && <p>{submitExercise.error.message}</p>}
-      {submitExercise.isPending && (
-        <p>Submitting study activity, please wait.</p>
-      )}
+      <Button
+        style="w-full mt-6"
+        text="Submit"
+        textDisabled={studyActivity.is_submitted ? 'Submitted' : 'Submitting'}
+        disabled={submitExercise.isPending || studyActivity.is_submitted}
+        onClick={handleClick}
+      />
     </div>
   );
 };

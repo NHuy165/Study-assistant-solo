@@ -10,8 +10,10 @@ import { type SubmitHandler, useForm, useWatch } from 'react-hook-form';
 
 export const MultipleChoiceQuestionItem = ({
   exerciseItem,
+  index,
 }: {
   exerciseItem: ExerciseItemOutput;
+  index: number;
 }) => {
   const answerExerciseItem = useAnswerExerciseItem();
 
@@ -40,8 +42,12 @@ export const MultipleChoiceQuestionItem = ({
   return (
     <form onChange={() => handleSubmit(onSubmit)()}>
       <RadioGroupField
-        label={`${exerciseItem.question} (Score: ${exerciseItem.user_score || 'X'}/${exerciseItem.max_score})`}
+        label={`${index + 1}. ${exerciseItem.question}`}
         name="attempt"
+        labelStyle="font-semibold text-xl"
+        optionStyle="m-0"
+        optionTextStyle="ml-3"
+        optionsWrapperStyle="flex flex-col gap-1 mt-2"
         currentAnswer={currentAnswer}
         // The label is the content, the value is the id
         options={exerciseItem.contents.map((exerciseItemContent) => {
@@ -55,8 +61,20 @@ export const MultipleChoiceQuestionItem = ({
         disabled={exerciseItem.user_score !== null}
         error={errors.attempt}
       />
+      {exerciseItem.user_score !== null && (
+        <span className="block text-success font-semibold text-lg mb-3">
+          Score: {`${exerciseItem.user_score}/${exerciseItem.max_score}`}
+        </span>
+      )}
 
-      {exerciseItem.explanation && exerciseItem.explanation}
+      {exerciseItem.explanation && (
+        <div>
+          <span className="block font-bold mb-1">Explanation:</span>
+          <span className="block h-20 border border-primary px-2 py-1 overflow-y-auto break-words whitespace-pre-wrap">
+            {exerciseItem.explanation}
+          </span>
+        </div>
+      )}
     </form>
   );
 };

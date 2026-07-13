@@ -4,5 +4,9 @@ import { useParams } from 'react-router-dom';
 export const StudyActivityPage = () => {
   const { studyActivityId } = useParams();
 
-  return <StudyActivityWorkspace studyActivityId={Number(studyActivityId)} />;
+  return (
+    <div className="max-w-3xl mx-auto py-6">
+      <StudyActivityWorkspace studyActivityId={Number(studyActivityId)} />
+    </div>
+  );
 };

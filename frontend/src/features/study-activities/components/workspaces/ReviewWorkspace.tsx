@@ -1,10 +1,6 @@
 import { FlashcardItem } from '@/features/study-activities/components/study-activity-items/FlashcardItem';
 import { FlashcardsCreateForm } from '@/features/study-activities/components/workspaces/FlashcardsCreateForm';
-import type {
-  ReviewItemOutput,
-  StudyActivityOutputComplete,
-} from '@/features/study-activities/types/study-activity';
-import { StudyActivityFormat } from '@/types/constants';
+import type { StudyActivityOutputComplete } from '@/features/study-activities/types/study-activity';
 
 export const ReviewWorkspace = ({
   studyActivity,
@@ -14,19 +10,10 @@ export const ReviewWorkspace = ({
   return (
     <div>
       {/* Change this if there are more review-type activities in the future. */}
-      <FlashcardsCreateForm reviewActivityId={studyActivity.id} />
 
-      {studyActivity.items.map((reviewItem) => {
-        switch (studyActivity.activity_format) {
-          case StudyActivityFormat.Flashcards:
-            return (
-              <FlashcardItem
-                key={reviewItem.id}
-                reviewItem={reviewItem as ReviewItemOutput}
-              />
-            );
-        }
-      })}
+      <FlashcardItem studyActivity={studyActivity} />
+
+      <FlashcardsCreateForm reviewActivityId={studyActivity.id} />
     </div>
   );
 };

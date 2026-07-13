@@ -1,4 +1,4 @@
-import { FormField } from '@/components/form-elements/FormField';
+import { TextArea } from '@/components/form-elements/TextArea';
 import { useAnswerExerciseItem } from '@/features/study-activities/api/useAnswerExerciseItem';
 import {
   type ExerciseItemAnswer,
@@ -11,8 +11,10 @@ import { type SubmitHandler, useForm, useWatch } from 'react-hook-form';
 
 export const OpenEndedItem = ({
   exerciseItem,
+  index,
 }: {
   exerciseItem: ExerciseItemOutput;
+  index: number;
 }) => {
   const answerExerciseItem = useAnswerExerciseItem();
 
@@ -39,7 +41,7 @@ export const OpenEndedItem = ({
   );
 
   const executeSubmit = useCallback(
-    () => handleSubmit(onSubmit)(), // Handle submit inserts form data for us
+    () => handleSubmit(onSubmit)(),
     [handleSubmit, onSubmit],
   );
 
@@ -61,18 +63,29 @@ export const OpenEndedItem = ({
 
   return (
     <form>
-      <FormField
-        label={`${exerciseItem.question} (Score: ${exerciseItem.user_score || 'X'}/${exerciseItem.max_score})`}
+      <TextArea
+        label={`${index + 1}. ${exerciseItem.question}`}
         name="attempt"
+        wrapperStyle="mb-0"
+        labelStyle="font-semibold text-xl"
+        inputStyle="block border border-primary w-full whitespace-pre-wrap h-30 overflow-y-auto break-words mt-3"
         register={register}
         disabled={exerciseItem.user_score !== null}
         error={errors.attempt}
       />
+      {exerciseItem.user_score !== null && (
+        <span className="block text-success font-semibold text-lg mb-3">
+          Score: {`${exerciseItem.user_score}/${exerciseItem.max_score}`}
+        </span>
+      )}
 
       {exerciseItem.explanation && (
-        <>
-          <br /> {exerciseItem.explanation}
-        </>
+        <div>
+          <span className="block font-bold mb-1">Explanation:</span>
+          <span className="block h-30 border border-primary px-2 py-1 overflow-y-auto break-words whitespace-pre-wrap">
+            {exerciseItem.explanation}
+          </span>
+        </div>
       )}
     </form>
   );

@@ -36,35 +36,35 @@ export const FlashcardsCreateForm = ({
   };
 
   return (
-    <div>
-      {createFlashcards.isError && <p>{createFlashcards.error.message}</p>}
-      {createFlashcards.isPending && <p>Adding flashcard, please wait.</p>}
-
-      <form onSubmit={handleSubmit(onSubmit)}>
+    <div className="card shadow-xl border border border-primary py-6 px-10 mt-6">
+      <h3 className="font-bold text-2xl mb-3">Create a new flashcard.</h3>
+      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
         {/* Front */}
         <FormField
           label="Front"
           name="front"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.front}
         />
-
-        <br />
 
         {/* Back */}
         <FormField
           label="Back"
           name="back"
+          inputStyle="w-full"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.back}
         />
 
-        <br />
-
         <Button
           disabled={createFlashcards.isPending}
+          style="mt-6"
           text="Create"
           textDisabled="Creating..."
+          type="submit"
         />
       </form>
     </div>

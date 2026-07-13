@@ -60,8 +60,8 @@ export const StudyActivityCreateForm = ({
           name="activity_format"
           inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
-          options={Object.entries(StudyActivityFormat).map(([label, value]) => {
-            return { label, value };
+          options={Object.entries(StudyActivityFormat).map((item) => {
+            return { label: item[1], value: item[1] };
           })}
           register={register}
           error={errors.activity_format}
@@ -73,8 +73,8 @@ export const StudyActivityCreateForm = ({
           name="subject_type"
           inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
-          options={Object.entries(SubjectType).map(([label, value]) => {
-            return { label, value };
+          options={Object.entries(SubjectType).map((item) => {
+            return { label: item[1], value: item[1] };
           })}
           register={register}
           error={errors.subject_type}

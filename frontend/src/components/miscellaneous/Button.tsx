@@ -2,6 +2,7 @@ export const Button = ({
   text,
   textDisabled,
   style,
+  textStyle,
   disabled,
   type = 'button',
   btnError = false,
@@ -10,6 +11,7 @@ export const Button = ({
   text: string;
   textDisabled?: string;
   style?: string;
+  textStyle?: string;
   disabled?: boolean;
   type?: React.ButtonHTMLAttributes<HTMLButtonElement>['type'];
   btnError?: boolean;
@@ -22,7 +24,7 @@ export const Button = ({
       disabled={disabled}
       onClick={onClick}
     >
-      {disabled ? textDisabled : text}
+      <span className={`${textStyle}`}>{disabled ? textDisabled : text}</span>
     </button>
   );
 };

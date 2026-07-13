@@ -39,7 +39,7 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
 
         {/* More details */}
         {showDetails && (
-          <div className="card shadow-xl border mt-3 p-6">
+          <div className="card shadow-xl border border-primary mt-3 p-6">
             <h3 className="font-bold text-3xl mb-3">Details</h3>
             <div className="space-y-2">
               {/* Normal details */}

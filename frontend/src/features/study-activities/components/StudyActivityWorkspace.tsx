@@ -15,29 +15,45 @@ export const StudyActivityWorkspace = ({
 
   return (
     <div>
-      <Link to={`/interaction/${studyActivity?.interaction_id}`}>
-        Back to interaction
+      <Link
+        className="link link-primary link-hover"
+        to={`/interaction/${studyActivity?.interaction_id}`}
+      >
+        Back to main interaction
       </Link>
-      {getStudyActivityComplete.isError && (
-        <p>{getStudyActivityComplete.error.message}</p>
-      )}
-      {getStudyActivityComplete.isPending && (
-        <p>Fetching study activity, please wait.</p>
-      )}
 
-      {studyActivity && (
-        <h1>
-          {titleString(replaceUnderscore(studyActivity?.activity_format))}:{' '}
-          {studyActivity.name}
-        </h1>
-      )}
+      {getStudyActivityComplete.isError && <p>Failed to fetch data.</p>}
+      {getStudyActivityComplete.isPending && <p>Fetching data...</p>}
 
-      {studyActivity &&
-        (studyActivity.activity_type === StudyActivityType.Exercise ? (
-          <ExerciseWorkspace studyActivity={studyActivity} />
-        ) : (
-          <ReviewWorkspace studyActivity={studyActivity} />
-        ))}
+      {getStudyActivityComplete.isError ||
+        getStudyActivityComplete.isPending || (
+          <div>
+            {/* Title */}
+            {studyActivity && (
+              <div className="space-y-8 mt-6">
+                <h1 className="text-4xl font-bold text-center">
+                  {studyActivity?.name}
+                </h1>
+                <p className="px-6">
+                  <span className="block font-bold text-xl mb-3">
+                    Description:{' '}
+                  </span>
+                  <span className="block max-h-30 overflow-y-auto break-words whitespace-pre-wrap border border-primary p-3">
+                    {studyActivity?.description}
+                  </span>
+                </p>
+              </div>
+            )}
+
+            <span className="divider divider-primary"></span>
+
+            {studyActivity?.activity_type === StudyActivityType.Exercise ? (
+              <ExerciseWorkspace studyActivity={studyActivity} />
+            ) : (
+              <ReviewWorkspace studyActivity={studyActivity} />
+            )}
+          </div>
+        )}
     </div>
   );
 };

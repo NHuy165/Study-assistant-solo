@@ -1,4 +1,5 @@
 import type { SelectOption } from '@/types/miscellaneous/custom-component-types';
+import { replaceUnderscore, titleString } from '@/utils/format-string';
 import {
   type UseFormRegister,
   type Path,
@@ -42,7 +43,7 @@ export const SelectField = <T extends FieldValues>({
 
         {options.map((option) => (
           <option key={option.value} value={option.value}>
-            {option.label}
+            {titleString(replaceUnderscore(option.label))}
           </option>
         ))}
       </select>

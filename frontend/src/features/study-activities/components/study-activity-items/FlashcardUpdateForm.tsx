@@ -50,30 +50,31 @@ export const FlashcardUpdateForm = ({
   };
 
   return (
-    <div>
-      {updateFlashcard.isError && <p>{updateFlashcard.error.message}</p>}
-      {updateFlashcard.isPending && <p>Updating the flashcard, please wait.</p>}
+    <div className="card shadow-xl border border border-primary mt-3 mb-6 p-6">
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Front */}
         <FormField
           label="Front"
           name="front"
+          inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.front}
         />
-        <br />
         {/* Back */}
         <FormField
           label="Back"
           name="back"
+          inputStyle="w-1/1"
+          labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.back}
         />
-        <br />
         <Button
           disabled={updateFlashcard.isPending}
           text="Update"
-          textDisabled="Updating"
+          textDisabled="Updating..."
+          type="submit"
         />
       </form>
     </div>
