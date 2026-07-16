@@ -3,6 +3,7 @@ from typing import Annotated
 
 from sqlmodel import Column, DateTime, Field, Index, Relationship, SQLModel
 
+from backend.src.models_schema.miscellaneous.enums import StudyAssessmentStatus
 from backend.src.models_schema.user.user import User
 
 # ----- BASE ----- #
@@ -35,6 +36,8 @@ class StudyAssessment(StudyAssessmentBase, table=True):
             sa_column=Column(DateTime(timezone=True)),
         ),
     ]
+
+    status: StudyAssessmentStatus
 
     user: "User" = Relationship(back_populates="assessments")
 

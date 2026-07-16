@@ -1,5 +1,5 @@
 from datetime import date, datetime, timedelta, timezone
-from types import CoroutineType, NoneType
+from types import CoroutineType
 from typing import Any, Callable
 from unittest.mock import AsyncMock, patch
 

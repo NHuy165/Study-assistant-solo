@@ -61,3 +61,8 @@ class OperatorType(str, Enum):
     LT = "LT"
     LE = "LE"
     GROUP_BY = "GROUP_BY"
+
+
+class StudyAssessmentStatus(str, Enum):
+    PENDING = "PENDING"
+    COMPLETED = "COMPLETED"

@@ -1,5 +1,5 @@
 import asyncio
-from datetime import date, datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 from sqlalchemy.dialects.postgresql import insert
@@ -22,6 +22,7 @@ from backend.src.models_schema.miscellaneous.enums import (
     CriterionAttribute,
     OperatorType,
     StudyActivityType,
+    StudyAssessmentStatus,
 )
 from backend.src.models_schema.RAG.augmentation import StudyAssessmentParams
 from backend.src.models_schema.study_progress.assessment import StudyAssessment
@@ -132,8 +133,20 @@ async def create_study_assessment(
 ) -> list[StudyAssessment]:
     today = current_datetime.date()
 
+    # Removes expired assessments
+    timeout = current_datetime - timedelta(
+        seconds=settings.DEFAULT_PENDING_STUDY_ASSESSMENT_EXPIRY_SECONDS
+    )
+    query_delete_expired_assessments = delete(StudyAssessment).where(
+        col(StudyAssessment.user_id) == user.id,
+        col(StudyAssessment.status) == StudyAssessmentStatus.PENDING,
+        col(StudyAssessment.created_at) < timeout,
+    )
+    await session.execute(query_delete_expired_assessments)
+
     # Checks check ins without assessment
-    query_last_check_in = (
+
+    query_check_ins_without_assessment = (
         select(CheckIn)
         .outerjoin(
             StudyAssessment,
@@ -147,7 +160,7 @@ async def create_study_assessment(
         .order_by(col(CheckIn.time).desc())
     )
     check_ins_without_assessment = (
-        (await session.execute(query_last_check_in)).scalars().all()
+        (await session.execute(query_check_ins_without_assessment)).scalars().all()
     )
 
     if not check_ins_without_assessment:
@@ -155,18 +168,25 @@ async def create_study_assessment(
 
     # Preserves space so race conditions don't happen
     study_assessments_preservation = [
-        {
-            "assessment_of": check_in.time,
-            "content": "",  # Dummy text
-            "user_id": user.id,
-            "created_at": current_datetime,
-        }
+        StudyAssessment(
+            assessment_of=check_in.time,
+            content="",
+            user_id=user.id,
+            created_at=current_datetime,
+            status=StudyAssessmentStatus.PENDING,
+        )
         for check_in in check_ins_without_assessment
     ]
 
     query_insert_preservation = (
         insert(StudyAssessment)
-        .values(study_assessments_preservation)
+        .values(
+            [
+                assessment.model_dump(exclude={"id"})
+                for assessment in study_assessments_preservation
+            ]
+        )
+        # Replaces expired preservations
         .on_conflict_do_nothing(index_elements=["user_id", "assessment_of"])
         .returning(StudyAssessment)
     )
@@ -207,6 +227,7 @@ async def create_study_assessment(
 
     for assessment, text in zip(study_assessments_preserved, study_assessment_texts):
         assessment.content = text
+        assessment.status = StudyAssessmentStatus.COMPLETED
 
     session.add_all(study_assessments_preserved)
     await session.commit()
