@@ -40,7 +40,7 @@ export const RegisterForm = () => {
       <form onSubmit={handleSubmit(onSubmit)}>
         {/* Username */}
         <FormField
-          label="Username"
+          label="Username:"
           name="username"
           labelStyle="font-semibold block mb-2"
           register={register}
@@ -49,7 +49,7 @@ export const RegisterForm = () => {
 
         {/* Email */}
         <FormField
-          label="Email"
+          label="Email:"
           name="email"
           labelStyle="font-semibold block mb-2"
           register={register}
@@ -58,8 +58,9 @@ export const RegisterForm = () => {
 
         {/* Password */}
         <FormField
-          label="Password"
+          label="Password:"
           name="password"
+          type="password"
           labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.password}
@@ -67,7 +68,7 @@ export const RegisterForm = () => {
 
         {/* Description */}
         <TextArea
-          label="Description"
+          label="Description:"
           name="description"
           labelStyle="font-semibold block mb-2"
           register={register}

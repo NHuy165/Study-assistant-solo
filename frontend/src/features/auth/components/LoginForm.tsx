@@ -43,6 +43,7 @@ export const LoginForm = () => {
         <FormField
           label="Password:"
           name="password"
+          type="password"
           labelStyle="font-semibold block mb-2"
           register={register}
           error={errors.password}
