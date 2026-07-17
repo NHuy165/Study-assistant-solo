@@ -14,6 +14,11 @@ export class RegisterForm {
   // Link
   readonly loginLink: Locator;
 
+  // Errors
+  readonly usernameError: Locator;
+  readonly emailError: Locator;
+  readonly passwordError: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.formHeader = page.getByRole('heading', { name: 'Register' });
@@ -30,6 +35,20 @@ export class RegisterForm {
 
     // Link
     this.loginLink = page.getByRole('link', { name: 'Log into an account' });
+
+    // Errors
+    this.usernameError = page
+      .locator('label')
+      .filter({ hasText: 'Username:' })
+      .locator('div');
+    this.emailError = page
+      .locator('label')
+      .filter({ hasText: 'Email:' })
+      .locator('div');
+    this.passwordError = page
+      .locator('label')
+      .filter({ hasText: 'Password:' })
+      .locator('div');
   }
 
   checkLoaded = async () => {

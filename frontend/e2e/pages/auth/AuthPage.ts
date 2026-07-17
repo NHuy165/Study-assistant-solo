@@ -10,11 +10,19 @@ export class AuthPage {
   readonly loginForm: LoginForm;
   readonly registerForm: RegisterForm;
 
+  // Errors
+  readonly toastError: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.pageHeader = page.getByRole('heading', { name: 'AUTHENTICATION' });
+
+    // Components
     this.loginForm = new LoginForm(page);
     this.registerForm = new RegisterForm(page);
+
+    // Errors
+    this.toastError = page.getByRole('status').last();
   }
 
   goto = async () => {
