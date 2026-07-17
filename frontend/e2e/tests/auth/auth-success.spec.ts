@@ -20,7 +20,7 @@ test.describe('Authentication - Success tests', () => {
     await authPage.loginForm.checkLoaded();
   });
 
-  test('Switch between registration and login and checking the password field to be censored', async ({
+  test('Switch between the registration and login forms and check if the password field has the correct type', async ({
     page,
   }) => {
     const authPage = new AuthPage(page);
@@ -47,14 +47,14 @@ test.describe('Authentication - Success tests', () => {
     const user = data.user;
 
     // Fills in the registration form
-    await authPage.registerForm.fill(
+    await authPage.registerForm.fillInputs(
       user.username,
       user.email,
       user.password,
       user.description,
     );
 
-    await authPage.registerForm.checkFilled(
+    await authPage.registerForm.checkFilledContents(
       user.username,
       user.email,
       user.password,
@@ -62,16 +62,16 @@ test.describe('Authentication - Success tests', () => {
     );
 
     // Registers
-    await authPage.registerForm.register();
+    await authPage.registerForm.registerButton.click();
     await authPage.loginForm.checkLoaded();
 
     // Fills in the login form
-    await authPage.loginForm.fill(user.email, user.password);
+    await authPage.loginForm.fillInputs(user.email, user.password);
 
-    await authPage.loginForm.checkFilled(user.email, user.password);
+    await authPage.loginForm.checkFilledContents(user.email, user.password);
 
     // Logs in
-    await authPage.loginForm.login();
+    await authPage.loginForm.loginButton.click();
     const homePage = new HomePage(page);
     await homePage.checkLoaded();
   });

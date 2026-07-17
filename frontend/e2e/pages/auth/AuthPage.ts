@@ -5,6 +5,8 @@ import { type Page, type Locator } from '@playwright/test';
 export class AuthPage {
   readonly page: Page;
   readonly pageHeader: Locator;
+
+  // Components
   readonly loginForm: LoginForm;
   readonly registerForm: RegisterForm;
 
