@@ -113,7 +113,9 @@ test.describe('User - Success tests', () => {
     await expect(userProfileSection.emailInfo).toContainText(newEmail);
   });
 
-  test('Update description', async ({ page }) => {
+  test('Update description to a new non-blank description and then to a blank description', async ({
+    page,
+  }) => {
     const user = data.user;
 
     const userProfileSection = new HomePage(page).userProfileSection;
@@ -131,7 +133,7 @@ test.describe('User - Success tests', () => {
       });
     await expect(descriptionUpdateField).toHaveValue(user.description);
 
-    // Updates
+    // Updates to a non-blank description
     const newDescription = 'Updated description';
     await descriptionUpdateField.clear();
     await descriptionUpdateField.fill(newDescription);
@@ -142,6 +144,19 @@ test.describe('User - Success tests', () => {
     await expect(userProfileSection.descriptionUpdateForm).not.toBeVisible();
     await expect(userProfileSection.descriptionInfo).toContainText(
       newDescription,
+    );
+
+    // Updates to a blank description
+    await userProfileSection.descriptionInfo
+      .getByRole('button', { name: 'Update' })
+      .click();
+    await descriptionUpdateField.clear();
+    await userProfileSection.descriptionUpdateForm
+      .getByRole('button', { name: 'Confirm' })
+      .click();
+
+    await expect(userProfileSection.descriptionInfo).toContainText(
+      'No content',
     );
   });
 
