@@ -22,12 +22,17 @@ test.describe('Authentication - Failure tests', () => {
     await authPage.registerForm.emailInput.fill('dummy');
     await authPage.registerForm.registerButton.click();
 
+    await expect(authPage.registerForm.usernameError).toBeVisible();
     await expect(authPage.registerForm.usernameError).toContainText(
       'Too small:',
     );
+
+    await expect(authPage.registerForm.emailError).toBeVisible();
     await expect(authPage.registerForm.emailError).toHaveText(
       'Invalid email address',
     );
+
+    await expect(authPage.registerForm.passwordError).toBeVisible();
     await expect(authPage.registerForm.passwordError).toContainText(
       'Too small:',
     );
@@ -47,6 +52,7 @@ test.describe('Authentication - Failure tests', () => {
     });
     await authPage.registerForm.registerButton.click();
 
+    await expect(authPage.toastError).toBeVisible();
     await expect(authPage.toastError).toHaveText(
       'Another user with this email already exists.',
     );
@@ -57,9 +63,12 @@ test.describe('Authentication - Failure tests', () => {
 
     await authPage.loginForm.loginButton.click();
 
+    await expect(authPage.loginForm.emailError).toBeVisible();
     await expect(authPage.loginForm.emailError).toHaveText(
       'Invalid email address',
     );
+
+    await expect(authPage.loginForm.passwordError).toBeVisible();
     await expect(authPage.loginForm.passwordError).toContainText('Too small:');
   });
 
@@ -74,6 +83,7 @@ test.describe('Authentication - Failure tests', () => {
     });
     await authPage.loginForm.loginButton.click();
 
+    await expect(authPage.toastError).toBeVisible();
     await expect(authPage.toastError).toHaveText('Invalid credentials.');
   });
 
@@ -88,6 +98,7 @@ test.describe('Authentication - Failure tests', () => {
     });
     await authPage.loginForm.loginButton.click();
 
+    await expect(authPage.toastError).toBeVisible();
     await expect(authPage.toastError).toHaveText('Invalid credentials.');
   });
 });
