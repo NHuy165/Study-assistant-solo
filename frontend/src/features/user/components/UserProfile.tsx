@@ -3,7 +3,7 @@ import { StaticUserField } from '@/features/user/components/StaticUserField';
 
 export const UserProfile = () => {
   return (
-    <div>
+    <dl>
       <StaticUserField label="User ID" field="id" />
       <StaticUserField label="Account creation time" field="created_at" />
       <StaticUserField label="Current login streak" field="login_streak" />
@@ -14,6 +14,6 @@ export const UserProfile = () => {
       <ChangeableUserField label="Username" field="username" />
       <ChangeableUserField label="Email" field="email" />
       <ChangeableUserField label="Description" field="description" />
-    </div>
+    </dl>
   );
 };

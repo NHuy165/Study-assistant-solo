@@ -12,14 +12,14 @@ export const StaticUserField = ({
 
   return (
     <div className="flex items-center border-b border-primary min-h-10">
-      <span className="font-semibold w-1/3">{label}</span>
-      <span className="flex-1">
+      <dt className="font-semibold w-1/3">{label}</dt>
+      <dd className="flex-1">
         {getUser.isPending
           ? 'Fetching data...'
           : getUser.isError
             ? 'Failed to fetch data.'
             : getUser.data[field]}
-      </span>
+      </dd>
     </div>
   );
 };

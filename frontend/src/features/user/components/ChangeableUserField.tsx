@@ -17,14 +17,14 @@ export const ChangeableUserField = ({
   return (
     <div className="border-b border-primary">
       <div className="flex items-center min-h-10 max-h-30">
-        <span className="font-semibold w-1/3">{label}</span>
-        <span className="flex-1 max-h-30 overflow-y-auto break-words whitespace-pre-wrap">
+        <dt className="font-semibold w-1/3">{label}</dt>
+        <dl className="flex-1 max-h-30 overflow-y-auto break-words whitespace-pre-wrap">
           {getUser.isPending
             ? 'Fetching data...'
             : getUser.isError
               ? 'Failed to fetch data.'
               : getUser.data[field]}
-        </span>
+        </dl>
         {getUser.isPending || (
           <Button
             text="Update"
@@ -35,7 +35,7 @@ export const ChangeableUserField = ({
       </div>
       {showUpdateForm && (
         <UserFieldUpdateForm
-          label={`New ${label}`}
+          label={`New ${label.toLowerCase()}`}
           field={field}
           onUpdate={() => setShowUpdateForm(false)}
         />

@@ -36,13 +36,12 @@ export const UserPasswordChangeForm = () => {
       />
       {showUpdateForm && (
         <div className="card shadow-xl border border-primary mt-6 p-6">
-          {changePassword.isError && changePassword.error.message}
-          {changePassword.isPending && 'Updating field, please wait.'}
           <form onSubmit={handleSubmit(onSubmit)}>
             <FormField
               label="Old password"
               name="old_password"
               labelStyle="font-semibold block mb-2"
+              type="password"
               register={register}
               error={errors.old_password}
             />
@@ -51,14 +50,16 @@ export const UserPasswordChangeForm = () => {
               label="New password"
               name="new_password"
               labelStyle="font-semibold block mb-2"
+              type="password"
               register={register}
               error={errors.new_password}
             />
 
             <Button
-              text="Confirm"
-              textDisabled="Updating field..."
               disabled={changePassword.isPending}
+              text="Confirm"
+              textDisabled="Updating..."
+              type="submit"
             />
           </form>
         </div>
