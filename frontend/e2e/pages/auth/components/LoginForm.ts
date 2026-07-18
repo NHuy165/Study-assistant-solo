@@ -32,11 +32,11 @@ export class LoginForm {
     this.emailError = page
       .locator('label')
       .filter({ hasText: 'Email:' })
-      .locator('.text-error');
+      .getByRole('alert');
     this.passwordError = page
       .locator('label')
       .filter({ hasText: 'Password:' })
-      .locator('.text-error');
+      .getByRole('alert');
   }
 
   checkLoaded = async () => {
