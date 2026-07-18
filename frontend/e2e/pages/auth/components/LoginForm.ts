@@ -23,10 +23,7 @@ export class LoginForm {
     // Form elements
     this.emailInput = page.getByRole('textbox', { name: 'Email:' });
     this.passwordInput = page.getByRole('textbox', { name: 'Password:' });
-    this.loginButton = page
-      .locator('div')
-      .filter({ hasText: 'Login' })
-      .locator('button[type="submit"]');
+    this.loginButton = page.getByRole('button', { name: 'Log in' });
 
     // Link
     this.registerLink = page.getByRole('link', { name: 'Register an account' });
@@ -35,11 +32,11 @@ export class LoginForm {
     this.emailError = page
       .locator('label')
       .filter({ hasText: 'Email:' })
-      .locator('div');
+      .locator('.text-error');
     this.passwordError = page
       .locator('label')
       .filter({ hasText: 'Password:' })
-      .locator('div');
+      .locator('.text-error');
   }
 
   checkLoaded = async () => {

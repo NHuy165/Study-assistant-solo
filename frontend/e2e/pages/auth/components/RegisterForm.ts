@@ -28,10 +28,7 @@ export class RegisterForm {
     this.emailInput = page.getByRole('textbox', { name: 'Email:' });
     this.passwordInput = page.getByRole('textbox', { name: 'Password:' });
     this.descriptionInput = page.getByRole('textbox', { name: 'Description:' });
-    this.registerButton = page
-      .locator('div')
-      .filter({ hasText: 'Register' })
-      .locator('button[type="submit"]');
+    this.registerButton = page.getByRole('button', { name: 'Register' });
 
     // Link
     this.loginLink = page.getByRole('link', { name: 'Log into an account' });
@@ -40,15 +37,15 @@ export class RegisterForm {
     this.usernameError = page
       .locator('label')
       .filter({ hasText: 'Username:' })
-      .locator('div');
+      .locator('.text-error');
     this.emailError = page
       .locator('label')
       .filter({ hasText: 'Email:' })
-      .locator('div');
+      .locator('.text-error');
     this.passwordError = page
       .locator('label')
       .filter({ hasText: 'Password:' })
-      .locator('div');
+      .locator('.text-error');
   }
 
   checkLoaded = async () => {

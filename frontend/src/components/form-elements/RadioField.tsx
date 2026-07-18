@@ -63,7 +63,7 @@ export const RadioGroupField = <T extends FieldValues>({
         ))}
       </div>
 
-      <div className="min-h-6 text-error">{error && error.message}</div>
+      <p className="min-h-6 text-error">{error && error.message}</p>
     </div>
   );
 };

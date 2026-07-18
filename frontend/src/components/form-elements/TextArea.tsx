@@ -37,7 +37,7 @@ export const TextArea = <T extends FieldValues>({
         disabled={disabled}
       />
 
-      <div className="min-h-6 text-error">{error && error.message}</div>
+      <p className="min-h-6 text-error">{error && error.message}</p>
     </label>
   );
 };

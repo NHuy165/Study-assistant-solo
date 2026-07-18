@@ -50,7 +50,7 @@ export const FormField = <T extends FieldValues>({
         })}
       />
 
-      <div className="min-h-6 text-error">{error && error.message}</div>
+      <p className="min-h-6 text-error">{error && error.message}</p>
     </label>
   );
 };
