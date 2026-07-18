@@ -59,7 +59,9 @@ test.describe('User - Success tests', () => {
     const userProfileSection = new HomePage(page).userProfileSection;
 
     // Opens form
-    await userProfileSection.usernameInfo.getByRole('button').click();
+    await userProfileSection.usernameInfo
+      .getByRole('button', { name: 'Update' })
+      .click();
 
     // Checks displayed information
     await expect(userProfileSection.usernameUpdateForm).toBeVisible();
@@ -73,7 +75,9 @@ test.describe('User - Success tests', () => {
     const newUsername = 'Updated username';
     await usernameUpdateField.clear();
     await usernameUpdateField.fill(newUsername);
-    await userProfileSection.usernameUpdateForm.getByRole('button').click();
+    await userProfileSection.usernameUpdateForm
+      .getByRole('button', { name: 'Confirm' })
+      .click();
 
     await expect(userProfileSection.usernameUpdateForm).not.toBeVisible();
     await expect(userProfileSection.usernameInfo).toContainText(newUsername);
@@ -85,7 +89,9 @@ test.describe('User - Success tests', () => {
     const userProfileSection = new HomePage(page).userProfileSection;
 
     // Opens form
-    await userProfileSection.emailInfo.getByRole('button').click();
+    await userProfileSection.emailInfo
+      .getByRole('button', { name: 'Update' })
+      .click();
 
     // Checks displayed information
     await expect(userProfileSection.emailUpdateForm).toBeVisible();
@@ -99,7 +105,9 @@ test.describe('User - Success tests', () => {
     const newEmail = 'updated@gmail.com';
     await emailUpdateField.clear();
     await emailUpdateField.fill(newEmail);
-    await userProfileSection.emailUpdateForm.getByRole('button').click();
+    await userProfileSection.emailUpdateForm
+      .getByRole('button', { name: 'Confirm' })
+      .click();
 
     await expect(userProfileSection.emailUpdateForm).not.toBeVisible();
     await expect(userProfileSection.emailInfo).toContainText(newEmail);
@@ -111,7 +119,9 @@ test.describe('User - Success tests', () => {
     const userProfileSection = new HomePage(page).userProfileSection;
 
     // Opens form
-    await userProfileSection.descriptionInfo.getByRole('button').click();
+    await userProfileSection.descriptionInfo
+      .getByRole('button', { name: 'Update' })
+      .click();
 
     // Checks displayed information
     await expect(userProfileSection.descriptionUpdateForm).toBeVisible();
@@ -125,7 +135,9 @@ test.describe('User - Success tests', () => {
     const newDescription = 'Updated description';
     await descriptionUpdateField.clear();
     await descriptionUpdateField.fill(newDescription);
-    await userProfileSection.descriptionUpdateForm.getByRole('button').click();
+    await userProfileSection.descriptionUpdateForm
+      .getByRole('button', { name: 'Confirm' })
+      .click();
 
     await expect(userProfileSection.descriptionUpdateForm).not.toBeVisible();
     await expect(userProfileSection.descriptionInfo).toContainText(
@@ -159,7 +171,7 @@ test.describe('User - Success tests', () => {
     await oldPasswordField.fill(user.password);
     await newPasswordField.fill(newPassword);
     await homePage.userProfileSection.passwordUpdateForm
-      .getByRole('button')
+      .getByRole('button', { name: 'Confirm' })
       .click();
 
     await expect(

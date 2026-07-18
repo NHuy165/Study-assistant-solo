@@ -14,6 +14,9 @@ export class HomePage {
   readonly interactionsSection: InteractionsSection;
   readonly studyProgressSection: StudyProgressSection;
 
+  // Errors
+  readonly toastError: Locator;
+
   constructor(page: Page) {
     this.page = page;
     this.pageHeader = page.getByRole('heading', { name: 'HOME PAGE' });
@@ -50,6 +53,9 @@ export class HomePage {
     this.studyProgressSection = new StudyProgressSection(
       page.locator('section').filter({ has: studyProgressHeader }),
     );
+
+    // Errors
+    this.toastError = page.getByRole('status').last();
   }
 
   goto = async () => {
