@@ -15,6 +15,7 @@ export const loginUser = async ({
   page: Page;
 }) => {
   const authPage = new AuthPage(page);
+  await authPage.goto();
 
   await authPage.loginForm.fillInputs({ ...user });
   await authPage.loginForm.loginButton.click();

@@ -40,7 +40,7 @@ test.describe('Authentication - Success tests', () => {
     );
   });
 
-  test('Register and login', async ({ page }) => {
+  test('Register, login and logout', async ({ page }) => {
     const authPage = new AuthPage(page);
     await authPage.loginForm.registerLink.click();
 
@@ -64,5 +64,9 @@ test.describe('Authentication - Success tests', () => {
     await authPage.loginForm.loginButton.click();
     const homePage = new HomePage(page);
     await homePage.checkLoaded();
+
+    // Logs out
+    await homePage.userProfileSection.logOutButton.click();
+    await authPage.loginForm.checkLoaded();
   });
 });
