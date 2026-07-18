@@ -56,12 +56,16 @@ export const apiFetchProtected = async (
   // If status code is 401
   if (response.status === 401) {
     // If exception type is AUTHENTICATION (user authentication problems)
-    const rawData = await response.json();
+    const clonedResponse = response.clone();
+
+    const rawData = await clonedResponse.json();
     const validatedError = ResponseErrorSchema.parse(rawData);
 
     if (validatedError.exception_type === 'AUTHENTICATION') {
       useTokenStore.getState().setToken(null);
       window.location.href = '/auth/login';
+
+      // Returns a frozen promise so more code doesn't execute when being redirected
       return new Promise(() => {});
     }
   }

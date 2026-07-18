@@ -14,10 +14,10 @@ const changePasswordRequest = async (
   };
 
   const response = await apiFetchProtected('/user/change-password', options);
-  const rawData = await response.json();
 
   // Catches backend response errors
   if (!response.ok) {
+    const rawData = await response.json();
     const validatedError = ResponseErrorSchema.parse(rawData);
     throw new Error(validatedError.message);
   }
