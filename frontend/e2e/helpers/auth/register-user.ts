@@ -1,7 +1,7 @@
 /// <reference types="node" />
 import { type APIRequestContext } from '@playwright/test';
 
-type UserType = {
+type UserRegisterType = {
   username: string;
   email: string;
   password: string;
@@ -13,7 +13,7 @@ export const registerUser = async ({
   user,
 }: {
   request: APIRequestContext;
-  user: UserType;
+  user: UserRegisterType;
 }) => {
   try {
     const response = await request.post(

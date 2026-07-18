@@ -12,34 +12,34 @@ export const HomePage = () => {
       <h1 className="text-6xl font-bold text-center">HOME PAGE</h1>
 
       {/* User info */}
-      <div className="card shadow-xl border border border-primary p-8">
+      <section className="card shadow-xl border border border-primary p-8">
         <h2 className="text-5xl font-bold text-center mb-10">User profile</h2>
 
         <UserProfile />
         <UserPasswordChangeForm />
         <LogoutButton />
-      </div>
+      </section>
 
       {/* Study assessments */}
-      <div className="card shadow-xl border border border-primary p-8">
+      <section className="card shadow-xl border border border-primary p-8">
         <h2 className="text-5xl font-bold text-center mb-10">
           Study assessments
         </h2>
         <StudyAssessments />
-      </div>
+      </section>
 
       {/* Interactions */}
-      <div className="card shadow-xl border border border-primary p-8">
+      <section className="card shadow-xl border border border-primary p-8">
         <h2 className="text-5xl font-bold text-center mb-10">Interactions</h2>
         <InteractionCreateForm />
         <InteractionsList />
-      </div>
+      </section>
 
       {/* Study progress */}
-      <div className="card shadow-xl border border border-primary p-8">
+      <section className="card shadow-xl border border border-primary p-8">
         <h2 className="text-5xl font-bold text-center mb-10">Study progress</h2>
         <StudyProgressSummarization />
-      </div>
+      </section>
     </div>
   );
 };
