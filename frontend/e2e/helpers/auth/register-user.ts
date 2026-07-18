@@ -8,10 +8,13 @@ type UserType = {
   description: string;
 };
 
-export const registerUser = async (
-  request: APIRequestContext,
-  user: UserType,
-) => {
+export const registerUser = async ({
+  request,
+  user,
+}: {
+  request: APIRequestContext;
+  user: UserType;
+}) => {
   try {
     const response = await request.post(
       `${process.env.VITE_API_URL}/user/register`,

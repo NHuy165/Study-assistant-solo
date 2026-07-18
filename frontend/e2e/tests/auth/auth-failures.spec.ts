@@ -9,7 +9,7 @@ test.describe('Authentication - Failure tests', () => {
     await resetDatabase(request);
 
     const user = data.user;
-    await registerUser(request, user);
+    await registerUser({ request, user });
 
     const authPage = new AuthPage(page);
     await authPage.goto();
@@ -39,12 +39,12 @@ test.describe('Authentication - Failure tests', () => {
 
     const user = data.user;
 
-    await authPage.registerForm.fillInputs(
-      'different username',
-      user.email,
-      'different password',
-      'different description',
-    );
+    await authPage.registerForm.fillInputs({
+      username: 'different username',
+      email: user.email,
+      password: 'different password',
+      description: 'different description',
+    });
     await authPage.registerForm.registerButton.click();
 
     await expect(authPage.toastError).toHaveText(
@@ -68,7 +68,10 @@ test.describe('Authentication - Failure tests', () => {
 
     const user = data.user;
 
-    await authPage.loginForm.fillInputs('wrong-email@gmail.com', user.password);
+    await authPage.loginForm.fillInputs({
+      email: 'wrong-email@gmail.com',
+      password: user.password,
+    });
     await authPage.loginForm.loginButton.click();
 
     await expect(authPage.toastError).toHaveText('Invalid credentials.');
@@ -79,7 +82,10 @@ test.describe('Authentication - Failure tests', () => {
 
     const user = data.user;
 
-    await authPage.loginForm.fillInputs(user.email, 'Wrong password');
+    await authPage.loginForm.fillInputs({
+      email: user.email,
+      password: 'Wrong password',
+    });
     await authPage.loginForm.loginButton.click();
 
     await expect(authPage.toastError).toHaveText('Invalid credentials.');

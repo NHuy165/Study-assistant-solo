@@ -47,12 +47,24 @@ export class LoginForm {
     await expect(this.formHeader).toBeVisible();
   };
 
-  fillInputs = async (email: string, password: string) => {
+  fillInputs = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
   };
 
-  checkFilledContents = async (email: string, password: string) => {
+  checkFilledContents = async ({
+    email,
+    password,
+  }: {
+    email: string;
+    password: string;
+  }) => {
     await expect(this.emailInput).toHaveValue(email);
     await expect(this.passwordInput).toHaveValue(password);
   };

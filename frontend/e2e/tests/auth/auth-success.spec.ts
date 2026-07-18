@@ -47,28 +47,18 @@ test.describe('Authentication - Success tests', () => {
     const user = data.user;
 
     // Fills in the registration form
-    await authPage.registerForm.fillInputs(
-      user.username,
-      user.email,
-      user.password,
-      user.description,
-    );
+    await authPage.registerForm.fillInputs({ ...user });
 
-    await authPage.registerForm.checkFilledContents(
-      user.username,
-      user.email,
-      user.password,
-      user.description,
-    );
+    await authPage.registerForm.checkFilledContents({ ...user });
 
     // Registers
     await authPage.registerForm.registerButton.click();
     await authPage.loginForm.checkLoaded();
 
     // Fills in the login form
-    await authPage.loginForm.fillInputs(user.email, user.password);
+    await authPage.loginForm.fillInputs({ ...user });
 
-    await authPage.loginForm.checkFilledContents(user.email, user.password);
+    await authPage.loginForm.checkFilledContents({ ...user });
 
     // Logs in
     await authPage.loginForm.loginButton.click();

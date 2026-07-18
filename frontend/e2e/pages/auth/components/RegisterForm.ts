@@ -56,24 +56,34 @@ export class RegisterForm {
     await expect(this.formHeader).toBeVisible();
   };
 
-  fillInputs = async (
-    username: string,
-    email: string,
-    password: string,
-    description: string,
-  ) => {
+  fillInputs = async ({
+    username,
+    email,
+    password,
+    description,
+  }: {
+    username: string;
+    email: string;
+    password: string;
+    description: string;
+  }) => {
     await this.usernameInput.fill(username);
     await this.emailInput.fill(email);
     await this.passwordInput.fill(password);
     await this.descriptionInput.fill(description);
   };
 
-  checkFilledContents = async (
-    username: string,
-    email: string,
-    password: string,
-    description: string,
-  ) => {
+  checkFilledContents = async ({
+    username,
+    email,
+    password,
+    description,
+  }: {
+    username: string;
+    email: string;
+    password: string;
+    description: string;
+  }) => {
     await expect(this.usernameInput).toHaveValue(username);
     await expect(this.emailInput).toHaveValue(email);
     await expect(this.passwordInput).toHaveValue(password);
