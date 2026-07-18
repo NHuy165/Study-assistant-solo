@@ -20,7 +20,7 @@ export type UserOutput = z.infer<typeof UserOutputSchema>;
 
 export const UserUpdateSchema = z.object({
   username: z.string().min(1),
-  email: z.email(),
+  email: z.email().min(1),
   description: z.string(),
 });
 

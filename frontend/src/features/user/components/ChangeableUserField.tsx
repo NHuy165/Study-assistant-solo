@@ -23,7 +23,9 @@ export const ChangeableUserField = ({
             ? 'Fetching data...'
             : getUser.isError
               ? 'Failed to fetch data.'
-              : getUser.data[field]}
+              : getUser.data[field]
+                ? getUser.data[field]
+                : 'No content'}
         </dl>
         {getUser.isPending || (
           <Button

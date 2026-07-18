@@ -51,8 +51,8 @@ class UserUpdate(UserBase):
 
 
 class UserPasswordChange(SQLModel):
-    old_password: str
-    new_password: str
+    old_password: Annotated[str, Field(min_length=1)]
+    new_password: Annotated[str, Field(min_length=1)]
 
 
 # ----- TABLE MODEL ----- #
