@@ -17,23 +17,71 @@ from backend.tests.utils.validators import (
 # ----- CREATE ----- #
 
 
-async def test_register_user(client: AsyncClient, register_user_test: User):
+@pytest.mark.parametrize(
+    "username, email, password, status_code, exception_type",
+    [
+        (
+            "",
+            "test2@gmail.com",
+            "test2-password",
+            400,
+            ExceptionType.REQUEST_VALIDATION,
+        ),
+        (
+            "test2-username",
+            "",
+            "test2-password",
+            400,
+            ExceptionType.REQUEST_VALIDATION,
+        ),
+        (
+            "test2-username",
+            "test2@gmail.com",
+            "",
+            400,
+            ExceptionType.REQUEST_VALIDATION,
+        ),
+        (
+            "test2-username",
+            "wrong-format",
+            "test2-password",
+            400,
+            ExceptionType.REQUEST_VALIDATION,
+        ),
+        (
+            "test-username",
+            "test@gmail.com",
+            "test-password",
+            409,
+            ExceptionType.TAKEN_INFO,
+        ),
+    ],
+)
+async def test_register_user(
+    client: AsyncClient,
+    register_user_test: User,
+    username: str,
+    email: str,
+    password: str,
+    status_code: int,
+    exception_type: ExceptionType,
+):
     """
-    Fails to register a user with overlapping email.
+    Fails to register a user with empty inputs, invalid email and overlapping email with another user.
     """
-
-    user = UserInput(username="test", email="test@gmail.com", password="test-password")
-
     response = await client.post(
         "/api/user/register",
-        json=user.model_dump(),
+        json={
+            "username": username,
+            "email": email,
+            "description": "test-description",
+            "password": password,
+        },
     )
 
-    validate_status_code(response, 409)
+    validate_status_code(response, status_code)
     validate_response_model(response, ExceptionResponse)
-    validate_response_contents(
-        response, {"exception_type": ExceptionType.TAKEN_INFO.value}
-    )
+    validate_response_contents(response, {"exception_type": exception_type})
 
 
 # ----- AUTH ----- #
@@ -66,7 +114,7 @@ async def test_login_user(
     validate_status_code(response, 401)
     validate_response_model(response, ExceptionResponse)
     validate_response_contents(
-        response, {"exception_type": ExceptionType.AUTHENTICATION.value}
+        response, {"exception_type": ExceptionType.AUTHENTICATION}
     )
 
 
@@ -95,9 +143,7 @@ async def test_update_user(
 
     validate_status_code(response, 409)
     validate_response_model(response, ExceptionResponse)
-    validate_response_contents(
-        response, {"exception_type": ExceptionType.TAKEN_INFO.value}
-    )
+    validate_response_contents(response, {"exception_type": ExceptionType.TAKEN_INFO})
 
 
 async def test_change_password(

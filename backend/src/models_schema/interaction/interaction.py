@@ -17,7 +17,7 @@ if TYPE_CHECKING:
 
 
 class InteractionBase(SQLModel):
-    name: str
+    name: Annotated[str, Field(min_length=1)]
     description: str = ""
 
 
@@ -41,7 +41,9 @@ class InteractionOutput(InteractionBase):
 
 class InteractionUpdate(SQLModel):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
-    description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    description: Annotated[str | None, BeforeValidator(beva_forbid_none), Field()] = (
+        None
+    )
 
 
 # ----- TABLE MODEL ----- #
