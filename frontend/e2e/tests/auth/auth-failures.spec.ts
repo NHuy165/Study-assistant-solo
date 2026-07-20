@@ -1,14 +1,14 @@
 import { test, expect } from '@playwright/test';
 import { resetDatabase } from '@e2e/helpers/database';
 import { AuthPage } from '@e2e/pages/auth/AuthPage';
-import data from '@e2e/data/user.json' with { type: 'json' };
+import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { registerUser } from '@e2e/helpers/auth/register-user';
 
 test.describe('Authentication - Failure tests', () => {
   test.beforeEach(async ({ page, request }) => {
     await resetDatabase(request);
 
-    const user = data.user;
+    const user = userData.user;
     await registerUser({ request, user });
 
     const authPage = new AuthPage(page);
@@ -42,7 +42,7 @@ test.describe('Authentication - Failure tests', () => {
     const authPage = new AuthPage(page);
     await authPage.loginForm.registerLink.click();
 
-    const user = data.user;
+    const user = userData.user;
 
     await authPage.registerForm.fillInputs({
       username: 'different username',
@@ -75,7 +75,7 @@ test.describe('Authentication - Failure tests', () => {
   test('Log in with wrong email', async ({ page }) => {
     const authPage = new AuthPage(page);
 
-    const user = data.user;
+    const user = userData.user;
 
     await authPage.loginForm.fillInputs({
       email: 'wrong-email@gmail.com',
@@ -90,7 +90,7 @@ test.describe('Authentication - Failure tests', () => {
   test('Log in with wrong password', async ({ page }) => {
     const authPage = new AuthPage(page);
 
-    const user = data.user;
+    const user = userData.user;
 
     await authPage.loginForm.fillInputs({
       email: user.email,

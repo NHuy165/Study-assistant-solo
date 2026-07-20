@@ -1,7 +1,7 @@
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { resetDatabase } from '@e2e/helpers/database';
 import test, { expect } from '@playwright/test';
-import data from '@e2e/data/user.json' with { type: 'json' };
+import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { loginUser } from '@e2e/helpers/auth/login-user';
 import { HomePage } from '@e2e/pages/home/HomePage';
 
@@ -9,7 +9,7 @@ test.describe('User - Failure tests', () => {
   test.beforeEach(async ({ page, request }) => {
     await resetDatabase(request);
 
-    const user = data.user;
+    const user = userData.user;
 
     await registerUser({ request, user });
     await loginUser({ user, page });

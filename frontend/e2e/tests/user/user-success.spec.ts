@@ -1,8 +1,8 @@
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { expect, test } from '@playwright/test';
-import data from '@e2e/data/user.json' with { type: 'json' };
 import { loginUser } from '@e2e/helpers/auth/login-user';
 import { resetDatabase } from '@e2e/helpers/database';
+import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { HomePage } from '@e2e/pages/home/HomePage';
 import { AuthPage } from '@e2e/pages/auth/AuthPage';
 
@@ -10,7 +10,7 @@ test.describe('User - Success tests', () => {
   test.beforeEach(async ({ page, request }) => {
     await resetDatabase(request);
 
-    const user = data.user;
+    const user = userData.user;
 
     await registerUser({ request, user });
     await loginUser({ user, page });
@@ -18,7 +18,7 @@ test.describe('User - Success tests', () => {
 
   test('Check if all fields are properly loaded', async ({ page }) => {
     const userProfileSection = new HomePage(page).userProfileSection;
-    const user = data.user;
+    const user = userData.user;
 
     // User ID
     await expect(userProfileSection.userIdInfo).toBeVisible();
@@ -54,7 +54,7 @@ test.describe('User - Success tests', () => {
   });
 
   test('Update username', async ({ page }) => {
-    const user = data.user;
+    const user = userData.user;
 
     const userProfileSection = new HomePage(page).userProfileSection;
 
@@ -84,7 +84,7 @@ test.describe('User - Success tests', () => {
   });
 
   test('Update email', async ({ page }) => {
-    const user = data.user;
+    const user = userData.user;
 
     const userProfileSection = new HomePage(page).userProfileSection;
 
@@ -116,7 +116,7 @@ test.describe('User - Success tests', () => {
   test('Update description to a new non-blank description and then to a blank description', async ({
     page,
   }) => {
-    const user = data.user;
+    const user = userData.user;
 
     const userProfileSection = new HomePage(page).userProfileSection;
 
@@ -161,7 +161,7 @@ test.describe('User - Success tests', () => {
   });
 
   test('Update password', async ({ page }) => {
-    const user = data.user;
+    const user = userData.user;
 
     const homePage = new HomePage(page);
 
