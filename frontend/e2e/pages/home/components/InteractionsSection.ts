@@ -10,9 +10,6 @@ export class InteractionsSection {
   readonly creationDescriptionInput: Locator;
   readonly creationButton: Locator;
 
-  // Errors
-  readonly creationNameError: Locator;
-
   // Interactions list
   readonly listHeader: Locator;
   readonly infoNoItem: Locator;
@@ -38,12 +35,6 @@ export class InteractionsSection {
     this.creationButton = this.creationForm.getByRole('button', {
       name: 'Create',
     });
-
-    // Errors
-    this.creationNameError = rootLocator
-      .locator('label')
-      .filter({ hasText: 'Name:' })
-      .getByRole('alert');
 
     // Interactions list
     this.listHeader = rootLocator.getByRole('heading', {
