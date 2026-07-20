@@ -44,39 +44,40 @@ export const InteractionUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border border-primary mt-3 mb-6 p-6">
+    <form
+      className="card shadow-xl border border border-primary mt-3 mb-6 p-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <h3 className="font-bold text-3xl mb-3">Update</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Name */}
-        <FormField
-          label="New Name"
-          name="name"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.name}
-        />
+      {/* Name */}
+      <FormField
+        label="New name"
+        name="name"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.name}
+      />
 
-        {/* Description */}
-        <TextArea
-          label="New Description"
-          name="description"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.description}
-        />
+      {/* Description */}
+      <TextArea
+        label="New description"
+        name="description"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.description}
+      />
 
-        {/* Submit button */}
-        <Button
-          disabled={updateInteraction.isPending}
-          style="mt-3"
-          text="Update"
-          textDisabled="Updating..."
-          type="submit"
-        />
-      </form>
-    </div>
+      {/* Submit button */}
+      <Button
+        disabled={updateInteraction.isPending}
+        style="mt-3"
+        text="Update"
+        textDisabled="Updating..."
+        type="submit"
+      />
+    </form>
   );
 };

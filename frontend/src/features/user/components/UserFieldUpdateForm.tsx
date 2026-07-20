@@ -39,38 +39,39 @@ export const UserFieldUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border-primary mt-3 mb-6 p-6">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {field === 'description' ? (
-          <TextArea
-            label={label}
-            name={field}
-            wrapperStyle="w-full"
-            labelStyle="font-semibold block mb-2"
-            inputStyle="w-full"
-            register={register}
-            placeholder="Tell us a few things about yourself (academic background, achievements...)"
-            error={errors.description}
-          />
-        ) : (
-          <FormField
-            label={label}
-            name={field}
-            wrapperStyle="w-full"
-            labelStyle="font-semibold block mb-2"
-            inputStyle="w-full"
-            register={register}
-            error={errors[field]}
-          />
-        )}
-
-        <Button
-          disabled={updateUser.isPending}
-          text="Confirm"
-          textDisabled="Updating..."
-          type="submit"
+    <form
+      className="card shadow-xl border border-primary mt-3 mb-6 p-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      {field === 'description' ? (
+        <TextArea
+          label={label}
+          name={field}
+          wrapperStyle="w-full"
+          labelStyle="font-semibold block mb-2"
+          inputStyle="w-full"
+          register={register}
+          placeholder="Tell us a few things about yourself (academic background, achievements...)"
+          error={errors.description}
         />
-      </form>
-    </div>
+      ) : (
+        <FormField
+          label={label}
+          name={field}
+          wrapperStyle="w-full"
+          labelStyle="font-semibold block mb-2"
+          inputStyle="w-full"
+          register={register}
+          error={errors[field]}
+        />
+      )}
+
+      <Button
+        disabled={updateUser.isPending}
+        text="Confirm"
+        textDisabled="Updating..."
+        type="submit"
+      />
+    </form>
   );
 };

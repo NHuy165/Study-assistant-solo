@@ -49,7 +49,7 @@ export const InteractionItem = ({
 
       {/* Details */}
       {showDetails && (
-        <div className="card shadow-xl border mt-3 p-6">
+        <section className="card shadow-xl border mt-3 p-6">
           <h3 className="font-bold text-3xl mb-3">Details</h3>
           <div className="max-h-30 overflow-y-auto break-words whitespace-pre-wrap">
             <p>
@@ -61,17 +61,15 @@ export const InteractionItem = ({
               {interaction.description}
             </p>
           </div>
-        </div>
+        </section>
       )}
 
       {/* Update form */}
       {showUpdateForm && (
-        <div>
-          <InteractionUpdateForm
-            interaction={interaction}
-            onUpdate={() => setShowUpdateForm(false)}
-          />
-        </div>
+        <InteractionUpdateForm
+          interaction={interaction}
+          onUpdate={() => setShowUpdateForm(false)}
+        />
       )}
     </li>
   );
