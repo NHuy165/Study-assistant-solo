@@ -39,22 +39,22 @@ export const MainInteractionPage = () => {
           <span className="divider divider-primary"></span>
 
           {/* Documents */}
-          <div className="card shadow-xl border border-primary p-8">
+          <section className="card shadow-xl border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">Documents</h2>
             <DocumentUploadForm interactionId={Number(interactionId)} />
             <DocumentsList interactionId={Number(interactionId)} />
-          </div>
+          </section>
 
           {/* LLM Chat */}
-          <div className="card shadow-xl border border border-primary p-8">
+          <section className="card shadow-xl border border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">Chat</h2>
 
             <ChatsList interactionId={Number(interactionId)} />
             <ChatForm interactionId={Number(interactionId)} />
-          </div>
+          </section>
 
           {/* Study activities */}
-          <div className="card shadow-xl border border border-primary p-8">
+          <section className="card shadow-xl border border border-primary p-8">
             <h2 className="text-5xl font-bold text-center mb-10">
               Study Activities
             </h2>
@@ -63,7 +63,7 @@ export const MainInteractionPage = () => {
               interactionId={Number(interactionId)}
             />
             <StudyActivityDisplaysList interactionId={Number(interactionId)} />
-          </div>
+          </section>
         </div>
       ) : (
         <Link to="/home" className="link link-primary link-hover">
