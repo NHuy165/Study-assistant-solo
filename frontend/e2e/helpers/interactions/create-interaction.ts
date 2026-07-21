@@ -13,7 +13,7 @@ export const createInteraction = async ({
   page: Page;
   request: APIRequestContext;
   interaction: InteractionCreationType;
-}) => {
+}): Promise<number> => {
   try {
     const token = await page.evaluate(() => {
       const storageData = window.localStorage.getItem('token-storage');
@@ -37,6 +37,10 @@ export const createInteraction = async ({
       const errorBody = await response.text();
       throw new Error(`Failed to create interaction: ${errorBody}`);
     }
+
+    const body = await response.json();
+
+    return body.id as number;
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     throw new Error(`Failed to connect to server: ${errorMessage}`, {

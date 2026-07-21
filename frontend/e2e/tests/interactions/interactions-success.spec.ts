@@ -6,6 +6,7 @@ import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { loginUser } from '@e2e/helpers/auth/login-user';
+import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
 
 test.describe('Interactions - Success tests', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -66,6 +67,28 @@ test.describe('Interactions - Success tests', () => {
     // Click show details button again
     await detailsButton.click();
     await expect(detailsPanel).not.toBeVisible();
+  });
+
+  test('Go inside an interaction page', async ({ page, request }) => {
+    const interaction = interactionData.interaction;
+
+    const interactionId = await createInteraction({
+      page,
+      request,
+      interaction,
+    });
+    await page.reload();
+
+    const interactionSection = new HomePage(page).interactionsSection;
+
+    await interactionSection.interactionItem
+      .getByRole('button', {
+        name: `#${interactionId} ${interaction.name}`,
+      })
+      .click();
+
+    const interactionPage = new InteractionPage(page);
+    await interactionPage.checkLoaded(interactionId);
   });
 
   test('Update an interaction', async ({ page, request }) => {
