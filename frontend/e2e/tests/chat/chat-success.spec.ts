@@ -37,25 +37,24 @@ test.describe('Chat - Success tests', () => {
   }) => {
     const chatSection = new InteractionPage(page).chatSection;
 
-    // Builds mock data
-    const prompt1 = 'Test prompt 1';
-    const prompt2 = 'Test prompt 2';
-
     const interactionId = Number(page.url().split('/').pop());
 
+    // Builds mock data
     const responses = [
-      { ...mockChatData[0], prompt: prompt1, interaction_id: interactionId },
-      { ...mockChatData[1], prompt: prompt2, interaction_id: interactionId },
+      {
+        ...mockChatData[0],
+        prompt: 'Test prompt 1',
+        interaction_id: interactionId,
+      },
+      {
+        ...mockChatData[1],
+        prompt: 'Test prompt 2',
+        interaction_id: interactionId,
+      },
     ];
 
     const staticResponses = [...responses];
-    const history: {
-      prompt: string;
-      interaction_id: number;
-      id: number;
-      answer: string;
-      created_at: string;
-    }[] = [];
+    const history: unknown[] = [];
 
     // Mocks response
     await page.route(`**/api/llm-response/${interactionId}`, async (route) => {
@@ -81,11 +80,13 @@ test.describe('Chat - Success tests', () => {
             ...mockResponse,
           },
         });
+      } else {
+        await route.continue();
       }
     });
 
+    // Real test
     for (let i = 0; i < mockChatData.length; i++) {
-      // Chats
       await chatSection.chatInput.fill(staticResponses[i].prompt);
       await chatSection.chatButton.click();
 

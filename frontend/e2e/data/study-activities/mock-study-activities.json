@@ -1,0 +1,174 @@
+[
+  {
+    "activity_format": "MULTIPLE_CHOICE_QUESTIONS",
+    "id": 1,
+    "name": "Test activity 1 name (MCQ)",
+    "description": "Test activity 1 description",
+    "activity_type": "EXERCISE",
+    "created_at": "2026-01-01T00:00:00.000Z",
+    "is_submitted": false,
+    "submitted_at": null,
+    "items": [
+      {
+        "max_score": 50,
+        "question": "Test question 1-1:",
+        "id": 1,
+        "study_activity_id": 1,
+        "user_score": null,
+        "explanation": null,
+        "attempt": null,
+        "contents": [
+          {
+            "content": "Test choice 1-1-1",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 1,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-1-2",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 2,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-1-3",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 3,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-1-4",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 4,
+            "is_correct": null
+          }
+        ]
+      },
+      {
+        "max_score": 50,
+        "question": "Test question 1-2:",
+        "id": 2,
+        "study_activity_id": 1,
+        "user_score": null,
+        "explanation": null,
+        "attempt": null,
+        "contents": [
+          {
+            "content": "Test choice 1-2-1",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 5,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-2-2",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 6,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-2-3",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 7,
+            "is_correct": null
+          },
+          {
+            "content": "Test choice 1-2-4",
+            "type": "MULTIPLE_CHOICE_QUESTIONS_CHOICE",
+            "id": 8,
+            "is_correct": null
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "activity_format": "OPEN_ENDED",
+    "id": 2,
+    "name": "Test activity 2 name (OPEN_ENDED)",
+    "description": "Test activity 2 description",
+    "activity_type": "EXERCISE",
+    "created_at": "2026-01-01T00:01:00.000Z",
+    "is_submitted": false,
+    "submitted_at": null,
+    "items": [
+      {
+        "max_score": 50,
+        "question": "Test question 2-1:",
+        "id": 3,
+        "study_activity_id": 2,
+        "user_score": null,
+        "explanation": null,
+        "attempt": null,
+        "contents": [
+          {
+            "content": null,
+            "type": "OPEN_ENDED_CORRECT",
+            "id": 9,
+            "is_correct": true
+          }
+        ]
+      },
+      {
+        "max_score": 50,
+        "question": "Test question 2-2:",
+        "id": 4,
+        "study_activity_id": 2,
+        "user_score": null,
+        "explanation": null,
+        "attempt": null,
+        "contents": [
+          {
+            "content": null,
+            "type": "OPEN_ENDED_CORRECT",
+            "id": 10,
+            "is_correct": true
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "activity_format": "FLASHCARDS",
+    "id": 3,
+    "name": "Test activity 3 name (FLASHCARDS)",
+    "description": "Test activity 3 description",
+    "activity_type": "REVIEW",
+    "created_at": "2026-01-01T00:02:00.000Z",
+    "is_submitted": false,
+    "submitted_at": null,
+    "items": [
+      {
+        "id": 1,
+        "study_activity_id": 3,
+        "contents": [
+          {
+            "content": "Test front 3-1",
+            "type": "FLASHCARDS_FRONT",
+            "id": 1
+          },
+          {
+            "content": "Test back 3-1",
+            "type": "FLASHCARDS_BACK",
+            "id": 2
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "study_activity_id": 3,
+        "contents": [
+          {
+            "content": "Test front 3-2",
+            "type": "FLASHCARDS_FRONT",
+            "id": 3
+          },
+          {
+            "content": "Test back 3-2",
+            "type": "FLASHCARDS_BACK",
+            "id": 4
+          }
+        ]
+      }
+    ]
+  }
+]

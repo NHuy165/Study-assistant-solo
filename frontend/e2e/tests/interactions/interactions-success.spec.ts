@@ -21,15 +21,14 @@ test.describe('Interactions - Success tests', () => {
   test('Create an interaction and view its details.', async ({ page }) => {
     const interactionSection = new HomePage(page).interactionsSection;
 
+    const interaction = interactionData.interaction;
+
     // Creates the interaction
-    await interactionSection.fillCreationInputs({
-      name: 'test-interaction-1',
-      description: 'test-description-1',
-    });
+    await interactionSection.fillCreationInputs({ ...interaction });
     await interactionSection.creationButton.click();
 
     await expect(interactionSection.interactionItem).toContainText(
-      'test-interaction-1',
+      interaction.name,
     );
 
     // Click show details button
@@ -113,18 +112,16 @@ test.describe('Interactions - Success tests', () => {
 
     // Updates
     const newName = 'Updated name';
-    await nameUpdateField.clear();
     await nameUpdateField.fill(newName);
 
     const newDescription = 'Updated description';
-    await descriptionUpdateField.clear();
     await descriptionUpdateField.fill(newDescription);
 
     await updatePanel.getByRole('button', { name: 'Update' }).click();
 
     // Verifies result
-    expect(updatePanel).not.toBeVisible();
-    expect(interactionSection.interactionItem).toContainText(newName);
+    await expect(updatePanel).not.toBeVisible();
+    await expect(interactionSection.interactionItem).toContainText(newName);
 
     await interactionSection.interactionItem
       .getByRole('button', {
