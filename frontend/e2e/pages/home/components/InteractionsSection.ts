@@ -4,7 +4,6 @@ export class InteractionsSection {
   readonly rootLocator: Locator;
 
   // Creation form
-  readonly creationFormHeader: Locator;
   readonly creationForm: Locator;
   readonly creationNameInput: Locator;
   readonly creationDescriptionInput: Locator;
@@ -21,11 +20,7 @@ export class InteractionsSection {
     // Creation form
     this.creationForm = rootLocator
       .locator('form')
-      .filter({ hasText: 'Name' })
-      .filter({ hasText: 'Description' });
-    this.creationFormHeader = this.creationForm.getByRole('heading', {
-      name: 'Create an interaction',
-    });
+      .filter({ hasText: 'Create an interaction' });
     this.creationNameInput = this.creationForm.getByRole('textbox', {
       name: 'Name',
     });
@@ -48,7 +43,6 @@ export class InteractionsSection {
     await expect(this.rootLocator).toBeVisible();
 
     // Creation form
-    await expect(this.creationFormHeader).toBeVisible();
     await expect(this.creationForm).toBeVisible();
     await expect(this.creationNameInput).toBeVisible();
     await expect(this.creationDescriptionInput).toBeVisible();
