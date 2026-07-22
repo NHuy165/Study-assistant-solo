@@ -51,6 +51,13 @@ export class RegisterForm {
   checkLoaded = async () => {
     await expect(this.page).toHaveURL('/auth/register');
     await expect(this.formHeader).toBeVisible();
+
+    await expect(this.usernameInput).toBeVisible();
+    await expect(this.emailInput).toBeVisible();
+    await expect(this.passwordInput).toBeVisible();
+    await expect(this.descriptionInput).toBeVisible();
+    await expect(this.registerButton).toBeVisible();
+    await expect(this.loginLink).toBeVisible();
   };
 
   fillInputs = async ({

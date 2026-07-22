@@ -97,5 +97,17 @@ export class UserProfileSection {
 
   checkLoaded = async () => {
     await expect(this.rootLocator).toBeVisible();
+
+    // User info
+    await expect(this.userIdInfo).toBeVisible();
+    await expect(this.createdAtInfo).toBeVisible();
+    await expect(this.currentLoginStreakInfo).toBeVisible();
+    await expect(this.longestLoginStreakInfo).toBeVisible();
+    await expect(this.usernameInfo).toBeVisible();
+    await expect(this.emailInfo).toBeVisible();
+    await expect(this.descriptionInfo).toBeVisible();
+
+    await expect(this.passwordUpdateShowButton).toBeVisible();
+    await expect(this.logOutButton).toBeVisible();
   };
 }

@@ -42,6 +42,11 @@ export class LoginForm {
   checkLoaded = async () => {
     await expect(this.page).toHaveURL('/auth/login');
     await expect(this.formHeader).toBeVisible();
+
+    await expect(this.emailInput).toBeVisible();
+    await expect(this.passwordInput).toBeVisible();
+    await expect(this.loginButton).toBeVisible();
+    await expect(this.registerLink).toBeVisible();
   };
 
   fillInputs = async ({

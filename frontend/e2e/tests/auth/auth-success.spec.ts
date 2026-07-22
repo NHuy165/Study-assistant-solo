@@ -16,7 +16,7 @@ test.describe('Authentication - Success tests', () => {
     const authPage = new AuthPage(page);
 
     // Default destination is login form
-    await expect(authPage.pageHeader).toBeVisible();
+    await authPage.checkLoaded();
     await authPage.loginForm.checkLoaded();
   });
 

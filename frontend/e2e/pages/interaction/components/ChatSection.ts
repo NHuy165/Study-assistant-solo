@@ -28,5 +28,10 @@ export class ChatSection {
 
   checkLoaded = async () => {
     await expect(this.rootLocator).toBeVisible();
+
+    await expect(this.chatButton).toBeVisible();
+    await expect(this.chatInput).toBeVisible();
+    await expect(this.chatWindow).toBeVisible();
+    await expect(this.infoNoChat).toBeVisible();
   };
 }

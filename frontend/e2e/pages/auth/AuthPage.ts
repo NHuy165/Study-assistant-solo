@@ -1,6 +1,6 @@
 import { LoginForm } from '@e2e/pages/auth/components/LoginForm';
 import { RegisterForm } from '@e2e/pages/auth/components/RegisterForm';
-import { type Page, type Locator } from '@playwright/test';
+import { type Page, type Locator, expect } from '@playwright/test';
 
 export class AuthPage {
   readonly page: Page;
@@ -27,5 +27,10 @@ export class AuthPage {
 
   goto = async () => {
     await this.page.goto('/auth');
+  };
+
+  checkLoaded = async () => {
+    await expect(this.page).toHaveURL(/\/auth\/.+/);
+    await expect(this.pageHeader).toBeVisible();
   };
 }

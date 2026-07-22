@@ -18,15 +18,6 @@ test.describe('Interactions - Success tests', () => {
     await loginUser({ user, page });
   });
 
-  test('Check if components are properly loaded.', async ({ page }) => {
-    const interactionsSection = new HomePage(page).interactionsSection;
-
-    await expect(interactionsSection.creationFormHeader).toBeVisible();
-    await expect(interactionsSection.creationForm).toBeVisible();
-    await expect(interactionsSection.listHeader).toBeVisible();
-    await expect(interactionsSection.infoNoItem).toBeVisible();
-  });
-
   test('Create an interaction and view its details.', async ({ page }) => {
     const interactionSection = new HomePage(page).interactionsSection;
 

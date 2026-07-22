@@ -21,33 +21,26 @@ test.describe('User - Success tests', () => {
     const user = userData.user;
 
     // User ID
-    await expect(userProfileSection.userIdInfo).toBeVisible();
     await expect(userProfileSection.userIdInfo).toContainText('1');
 
     // Created at
-    await expect(userProfileSection.createdAtInfo).toBeVisible();
     await expect(userProfileSection.createdAtInfo).not.toContainText(
       'Fetching data...',
     );
 
     // Current login streak
-    await expect(userProfileSection.currentLoginStreakInfo).toBeVisible();
     await expect(userProfileSection.currentLoginStreakInfo).toContainText('1');
 
     // Longest login streak
-    await expect(userProfileSection.longestLoginStreakInfo).toBeVisible();
     await expect(userProfileSection.longestLoginStreakInfo).toContainText('1');
 
     // Username
-    await expect(userProfileSection.usernameInfo).toBeVisible();
     await expect(userProfileSection.usernameInfo).toContainText(user.username);
 
     // Email
-    await expect(userProfileSection.emailInfo).toBeVisible();
     await expect(userProfileSection.emailInfo).toContainText(user.email);
 
     // Description
-    await expect(userProfileSection.descriptionInfo).toBeVisible();
     await expect(userProfileSection.descriptionInfo).toContainText(
       user.description,
     );

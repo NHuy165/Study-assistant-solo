@@ -46,6 +46,17 @@ export class InteractionsSection {
 
   checkLoaded = async () => {
     await expect(this.rootLocator).toBeVisible();
+
+    // Creation form
+    await expect(this.creationFormHeader).toBeVisible();
+    await expect(this.creationForm).toBeVisible();
+    await expect(this.creationNameInput).toBeVisible();
+    await expect(this.creationDescriptionInput).toBeVisible();
+    await expect(this.creationButton).toBeVisible();
+
+    // Interactions list
+    await expect(this.listHeader).toBeVisible();
+    await expect(this.infoNoItem).toBeVisible();
   };
 
   fillCreationInputs = async ({

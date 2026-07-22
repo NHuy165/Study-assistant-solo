@@ -32,15 +32,6 @@ test.describe('Chat - Success tests', () => {
     await interactionPage.goto(interactionId);
   });
 
-  test('Check if components are properly loaded.', async ({ page }) => {
-    const chatSection = new InteractionPage(page).chatSection;
-
-    await expect(chatSection.chatButton).toBeVisible();
-    await expect(chatSection.chatInput).toBeVisible();
-    await expect(chatSection.chatWindow).toBeVisible();
-    await expect(chatSection.infoNoChat).toBeVisible();
-  });
-
   test('Make multiple conversations and check if they are all properly loaded', async ({
     page,
   }) => {
