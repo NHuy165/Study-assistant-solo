@@ -25,25 +25,23 @@ export const ChatForm = ({ interactionId }: { interactionId: number }) => {
   };
 
   return (
-    <div className="mt-6">
-      <form className="flex items-center" onSubmit={handleSubmit(onSubmit)}>
-        <Button
-          disabled={createChat.isPending}
-          style="w-1/5 rounded-none h-20"
-          text="Send"
-          textDisabled="Sending text..."
-          type="submit"
-        />
-        <TextArea
-          label=""
-          name="prompt"
-          wrapperStyle="flex items-center w-full h-20"
-          inputStyle="w-full rounded-none h-20 whitespace-pre-wrap overflow-y-auto"
-          disabled={createChat.isPending}
-          register={register}
-          error={errors.prompt}
-        />
-      </form>
-    </div>
+    <form className="flex items-center mt-6" onSubmit={handleSubmit(onSubmit)}>
+      <Button
+        disabled={createChat.isPending}
+        style="w-1/5 rounded-none h-20"
+        text="Send"
+        textDisabled="Sending text..."
+        type="submit"
+      />
+      <TextArea
+        label=""
+        name="prompt"
+        wrapperStyle="flex items-center w-full h-20"
+        inputStyle="w-full rounded-none h-20 whitespace-pre-wrap overflow-y-auto"
+        disabled={createChat.isPending}
+        register={register}
+        error={errors.prompt}
+      />
+    </form>
   );
 };

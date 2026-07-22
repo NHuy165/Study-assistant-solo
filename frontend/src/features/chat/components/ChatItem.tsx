@@ -2,15 +2,16 @@ import type { ChatOutput } from '@/features/chat/types/chat';
 
 export const ChatItem = ({ chat }: { chat: ChatOutput }) => {
   return (
-    <div className="space-y-3">
-      <span className="block">
+    <li className="space-y-3">
+      <div>
         <span className="font-bold">User: </span>
-        {chat.prompt}
-      </span>
-      <span className="block">
+        <span>{chat.prompt}</span>
+      </div>
+      <div>
         <span className="font-bold">Chatbot: </span>
-        {chat.answer}
-      </span>
-    </div>
+        <span>{chat.answer}</span>
+      </div>
+      <span className="divider divider-primary"></span>
+    </li>
   );
 };
