@@ -50,7 +50,7 @@ export const StudyActivityDisplayItem = ({
 
       {/* Details */}
       {showDetails && (
-        <div className="card shadow-xl border mt-3 p-6">
+        <section className="card shadow-xl border mt-3 p-6">
           <h3 className="font-bold text-3xl mb-3">Details</h3>
           <div className="max-h-50 overflow-y-auto break-words whitespace-pre-wrap">
             <p>
@@ -73,7 +73,11 @@ export const StudyActivityDisplayItem = ({
             </p>
             <p>
               <span className="font-bold">Creation prompt:</span>{' '}
-              {studyActivity.prompt}
+              {studyActivity.prompt || (
+                <span className="text-error">
+                  This activity has no creation prompt.
+                </span>
+              )}
             </p>
             {studyActivity.activity_type === StudyActivityType.Exercise && (
               <>
@@ -88,17 +92,15 @@ export const StudyActivityDisplayItem = ({
               </>
             )}
           </div>
-        </div>
+        </section>
       )}
 
       {/* Update form */}
       {showUpdateForm && (
-        <div>
-          <StudyActivityUpdateForm
-            studyActivity={studyActivity}
-            onUpdate={() => setShowUpdateForm(false)}
-          />
-        </div>
+        <StudyActivityUpdateForm
+          studyActivity={studyActivity}
+          onUpdate={() => setShowUpdateForm(false)}
+        />
       )}
     </li>
   );

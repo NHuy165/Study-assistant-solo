@@ -40,54 +40,55 @@ export const StudyActivityCreateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border border-primary py-6 px-10 mx-10 mb-6">
+    <form
+      className="card flex flex-col shadow-xl border border border-primary py-6 px-10 mx-10 mb-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <h3 className="font-bold text-2xl mb-3">Create a study activity</h3>
 
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        {/* Prompt */}
-        <TextArea
-          label="Prompt"
-          name="prompt"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.prompt}
-        />
+      {/* Prompt */}
+      <TextArea
+        label="Prompt"
+        name="prompt"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.prompt}
+      />
 
-        {/* Activity Format */}
-        <SelectField
-          label="Activity format"
-          name="activity_format"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          options={Object.entries(StudyActivityFormat).map((item) => {
-            return { label: item[1], value: item[1] };
-          })}
-          register={register}
-          error={errors.activity_format}
-        />
+      {/* Activity Format */}
+      <SelectField
+        label="Activity format"
+        name="activity_format"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        options={Object.entries(StudyActivityFormat).map((item) => {
+          return { label: item[1], value: item[1] };
+        })}
+        register={register}
+        error={errors.activity_format}
+      />
 
-        {/* Subject Type */}
-        <SelectField
-          label="Subject Type"
-          name="subject_type"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          options={Object.entries(SubjectType).map((item) => {
-            return { label: item[1], value: item[1] };
-          })}
-          register={register}
-          error={errors.subject_type}
-        />
+      {/* Subject Type */}
+      <SelectField
+        label="Subject type"
+        name="subject_type"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        options={Object.entries(SubjectType).map((item) => {
+          return { label: item[1], value: item[1] };
+        })}
+        register={register}
+        error={errors.subject_type}
+      />
 
-        <Button
-          disabled={createStudyActivity.isPending}
-          style="mt-6"
-          text="Create"
-          textDisabled="Creating..."
-          type="submit"
-        />
-      </form>
-    </div>
+      <Button
+        disabled={createStudyActivity.isPending}
+        style="mt-6"
+        text="Create"
+        textDisabled="Creating..."
+        type="submit"
+      />
+    </form>
   );
 };

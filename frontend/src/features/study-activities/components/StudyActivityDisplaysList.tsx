@@ -27,7 +27,7 @@ export const StudyActivityDisplaysList = ({
             ))}
           </ul>
         ) : (
-          <span>User has no study activities.</span>
+          <span>User has no study activity.</span>
         ))}
     </div>
   );
