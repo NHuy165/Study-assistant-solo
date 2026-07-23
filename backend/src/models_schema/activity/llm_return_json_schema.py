@@ -13,7 +13,7 @@ from backend.src.models_schema.activity.llm_request_json_schema import (
 
 
 class StudyActivityValidationBase(SQLModel):
-    name: str
+    name: Annotated[str, Field(min_length=1)]
     description: str
     activity_items: list[Any]
 

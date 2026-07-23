@@ -20,7 +20,7 @@ export type StudyActivityInput = z.infer<typeof StudyActivityInputSchema>;
 
 export const FlashcardsActivityInputSchema = z.object({
   subject_type: z.enum(SubjectType),
-  name: z.string(),
+  name: z.string().min(1),
   description: z.string(),
 });
 
@@ -114,7 +114,7 @@ export type StudyActivityOutputComplete = z.infer<
 // ----- UPDATE ----- //
 
 export const StudyActivityUpdateSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   description: z.string(),
 });
 

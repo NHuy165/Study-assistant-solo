@@ -42,7 +42,7 @@ class StudyActivityInput(StudyActivityBase):
 
 class FlashcardsActivityInput(SQLModel):
     subject_type: SubjectType
-    name: str
+    name: Annotated[str, Field(min_length=1)]
     description: str
 
 
@@ -69,7 +69,9 @@ class StudyActivityOutputComplete(StudyActivityOutput):
 
 
 class StudyActivityUpdate(SQLModel):
-    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    name: Annotated[
+        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
+    ] = None
     description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
