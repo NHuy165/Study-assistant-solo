@@ -209,17 +209,15 @@ test.describe('Study activities - Success tests', () => {
     });
     await page.reload();
 
-    const studyActivity1 = studyActivitiesSection.studyActivity.first();
-
     // Clicks update button
-    await studyActivity1
+    await studyActivitiesSection.studyActivity
       .getByRole('button', {
         name: 'Update',
       })
       .click();
 
     // Verifies display
-    const updatePanel = studyActivity1
+    const updatePanel = studyActivitiesSection.studyActivity
       .locator('form')
       .filter({ hasText: 'Update' });
     const nameUpdateField = updatePanel.getByRole('textbox', {
@@ -246,15 +244,15 @@ test.describe('Study activities - Success tests', () => {
 
     // Verifies result
     await expect(updatePanel).not.toBeVisible();
-    await expect(studyActivity1).toContainText(newName);
+    await expect(studyActivitiesSection.studyActivity).toContainText(newName);
 
-    await studyActivity1
+    await studyActivitiesSection.studyActivity
       .getByRole('button', {
         name: 'Details',
       })
       .click();
 
-    const descriptionInfo = studyActivity1
+    const descriptionInfo = studyActivitiesSection.studyActivity
       .locator('section')
       .filter({ hasText: 'Details' })
       .locator('p')
