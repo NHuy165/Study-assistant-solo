@@ -78,7 +78,11 @@ test.describe('Interactions - Success tests', () => {
       .click();
 
     const interactionPage = new InteractionPage(page);
-    await interactionPage.checkLoaded(interactionId);
+    await interactionPage.checkLoaded({
+      interactionId,
+      headerText: interaction.name,
+      descriptionText: interaction.description,
+    });
   });
 
   test('Update an interaction', async ({ page, request }) => {

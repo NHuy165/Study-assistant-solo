@@ -21,7 +21,7 @@ export class InteractionPage {
     this.pageHeader = page.getByRole('heading').first();
     this.pageDescription = page
       .locator('p')
-      .filter({ has: page.getByText('Description', { exact: true }) });
+      .filter({ has: page.getByText('Description:', { exact: true }).first() });
 
     // Components
     const chatSectionHeader = page.getByRole('heading', {
@@ -56,9 +56,20 @@ export class InteractionPage {
     await this.page.goto(`/interaction/${interactionId}`);
   };
 
-  checkLoaded = async (interactionId: number) => {
+  checkLoaded = async ({
+    interactionId,
+    headerText,
+    descriptionText,
+  }: {
+    interactionId: number;
+    headerText: string;
+    descriptionText: string;
+  }) => {
     await expect(this.page).toHaveURL(`/interaction/${interactionId}`);
     await expect(this.pageHeader).toBeVisible();
+
+    await expect(this.pageHeader).toContainText(headerText);
+    await expect(this.pageDescription).toContainText(descriptionText);
 
     // Checks loaded components
     await this.chatSection.checkLoaded();
