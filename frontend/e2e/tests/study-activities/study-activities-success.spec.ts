@@ -8,7 +8,7 @@ import { loginUser } from '@e2e/helpers/auth/login-user';
 import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
 import mockStudyActivitiesData from '@e2e/data/study-activities/mock-study-activities.json' with { type: 'json' };
 import { replaceUnderscore, titleString } from '@/utils/format-string';
-import { createStudyActivities } from '@e2e/helpers/study-activities/create-study-activity';
+import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
 
 test.describe('Study activities - Success tests', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -195,17 +195,20 @@ test.describe('Study activities - Success tests', () => {
 
     const interactionId = Number(page.url().split('/').pop());
 
-    const flashcardActivity = {
+    const studyActivity = {
+      prompt: 'test-prompt',
+      activity_format: 'MULTIPLE_CHOICE_QUESTIONS',
+      subject_type: 'MATHS',
       name: 'test-name',
       description: 'test-description',
-      subject_type: 'MATHS',
+      n_items: 5,
     };
 
-    await createStudyActivities({
+    await createStudyActivity({
       page,
       request,
       interactionId,
-      flashcard: flashcardActivity,
+      studyActivity,
     });
     await page.reload();
 
@@ -228,10 +231,8 @@ test.describe('Study activities - Success tests', () => {
     });
 
     await expect(updatePanel).toBeVisible();
-    await expect(nameUpdateField).toHaveValue(flashcardActivity.name);
-    await expect(descriptionUpdateField).toHaveValue(
-      flashcardActivity.description,
-    );
+    await expect(nameUpdateField).toHaveValue(studyActivity.name);
+    await expect(descriptionUpdateField).toHaveValue(studyActivity.description);
 
     // Updates
     const newName = 'Updated name';
@@ -266,17 +267,20 @@ test.describe('Study activities - Success tests', () => {
 
     const interactionId = Number(page.url().split('/').pop());
 
-    const flashcardActivity = {
+    const studyActivity = {
+      prompt: 'test-prompt',
+      activity_format: 'MULTIPLE_CHOICE_QUESTIONS',
+      subject_type: 'MATHS',
       name: 'test-name',
       description: 'test-description',
-      subject_type: 'MATHS',
+      n_items: 5,
     };
 
-    await createStudyActivities({
+    await createStudyActivity({
       page,
       request,
       interactionId,
-      flashcard: flashcardActivity,
+      studyActivity,
     });
     await page.reload();
 

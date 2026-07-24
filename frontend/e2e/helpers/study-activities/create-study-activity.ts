@@ -1,21 +1,24 @@
 import { type Page, type APIRequestContext } from '@playwright/test';
 
-type FlashcardCreationType = {
+type StudyActivityCreationType = {
+  prompt: string;
+  activity_format: string;
+  subject_type: string;
   name: string;
   description: string;
-  subject_type: string;
+  n_items: number;
 };
 
-export const createStudyActivities = async ({
+export const createStudyActivity = async ({
   page,
   request,
   interactionId,
-  flashcard,
+  studyActivity,
 }: {
   page: Page;
   request: APIRequestContext;
   interactionId: number;
-  flashcard: FlashcardCreationType;
+  studyActivity: StudyActivityCreationType;
 }) => {
   try {
     const token = await page.evaluate(() => {
@@ -29,15 +32,15 @@ export const createStudyActivities = async ({
     }
 
     const response = await request.post(
-      `${process.env.VITE_API_URL}/study-activity/${interactionId}/flashcards`,
+      `${process.env.VITE_API_URL}/dev/study-activity/${interactionId}`,
       {
-        data: { ...flashcard },
+        data: { ...studyActivity },
         headers: { Authorization: `Bearer ${token}` },
       },
     );
     if (!response.ok()) {
       const errorBody = await response.text();
-      throw new Error(`Failed to create flashcard activity: ${errorBody}`);
+      throw new Error(`Failed to create study activity: ${errorBody}`);
     }
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);

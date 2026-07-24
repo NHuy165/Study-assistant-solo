@@ -6,7 +6,7 @@ import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { loginUser } from '@e2e/helpers/auth/login-user';
 import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
-import { createStudyActivities } from '@e2e/helpers/study-activities/create-study-activity';
+import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
 
 test.describe('Interactions - Failure tests', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -56,17 +56,20 @@ test.describe('Interactions - Failure tests', () => {
 
     const interactionId = Number(page.url().split('/').pop());
 
-    const flashcardActivity = {
+    const studyActivity = {
+      prompt: 'test-prompt',
+      activity_format: 'MULTIPLE_CHOICE_QUESTIONS',
+      subject_type: 'MATHS',
       name: 'test-name',
       description: 'test-description',
-      subject_type: 'MATHS',
+      n_items: 5,
     };
 
-    await createStudyActivities({
+    await createStudyActivity({
       page,
       request,
       interactionId,
-      flashcard: flashcardActivity,
+      studyActivity,
     });
     await page.reload();
 
