@@ -31,7 +31,7 @@ class MCQItemSchema(SQLModel):
     correct: Annotated[int, Field(ge=0, le=3)]
 
 
-class MCQSchema(StudyActivityValidationBase):
+class MCQCreationSchema(StudyActivityValidationBase):
     activity_items: list[MCQItemSchema]
 
 
@@ -57,7 +57,7 @@ class FlashcardItemSchema(SQLModel):
     back: str
 
 
-class FlashcardsSchema(StudyActivityValidationBase):
+class FlashcardsCreationSchema(StudyActivityValidationBase):
     activity_items: list[FlashcardItemSchema]
 
 

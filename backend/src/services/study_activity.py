@@ -1,5 +1,5 @@
 import json
-from datetime import datetime, timezone
+from datetime import datetime
 from typing import Callable
 
 from pydantic import ValidationError
@@ -25,12 +25,12 @@ from backend.src.models_schema.activity.llm_request_json_schema import (
     OpenEndedForGradingSchema,
 )
 from backend.src.models_schema.activity.llm_return_json_schema import (
-    FlashcardsSchema,
+    FlashcardsCreationSchema,
     GradedItemSchema,
     GradedSchema,
+    MCQCreationSchema,
     MCQGradedCrossValidation,
     MCQGradedSchema,
-    MCQSchema,
     OpenEndedCreationSchema,
     OpenEndedGradedCrossValidation,
     OpenEndedGradedSchema,
@@ -87,9 +87,12 @@ format_schema_map: dict[
 ] = {
     StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS: (
         MCQ_format_prompt,
-        MCQSchema,
+        MCQCreationSchema,
     ),
-    StudyActivityFormat.FLASHCARDS: (flashcards_format_prompt, FlashcardsSchema),
+    StudyActivityFormat.FLASHCARDS: (
+        flashcards_format_prompt,
+        FlashcardsCreationSchema,
+    ),
     StudyActivityFormat.OPEN_ENDED: (open_ended_format_prompt, OpenEndedCreationSchema),
 }
 
@@ -98,7 +101,7 @@ def save_multiple_choice_questions(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, MCQSchema)
+    assert isinstance(activity_data, MCQCreationSchema)
 
     question_score = settings.DEFAULT_EXERCISE_TOTAL_SCORE / len(
         activity_data.activity_items
@@ -167,7 +170,7 @@ def save_flashcards(
     activity_data: StudyActivityValidationBase,
     study_activity: StudyActivity,
 ) -> None:
-    assert isinstance(activity_data, FlashcardsSchema)
+    assert isinstance(activity_data, FlashcardsCreationSchema)
 
     # Begins saving
     review_items = []
@@ -802,7 +805,6 @@ async def submit_exercise_activity(
 
         # Updates score and / or explanation
         exercise_item.sqlmodel_update(graded_result.model_dump(exclude={"id"}))
-        session.add(exercise_item)
 
     # === Updates status and returns === #
     study_activity.is_submitted = True

@@ -35,6 +35,12 @@ class StudyActivityBase(SQLModel):
 # ----- INPUT ----- #
 
 
+class MockStudyActivityInput(StudyActivityBase):
+    name: Annotated[str, Field(min_length=1)]
+    description: str
+    n_items: int
+
+
 class StudyActivityInput(StudyActivityBase):
     prompt: str
     document_id: int | None = None
