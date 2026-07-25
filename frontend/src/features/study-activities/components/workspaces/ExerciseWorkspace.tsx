@@ -7,6 +7,7 @@ import type {
   StudyActivityOutputComplete,
 } from '@/features/study-activities/types/study-activity';
 import { StudyActivityFormat } from '@/types/constants';
+import { titleString, replaceUnderscore } from '@/utils/format-string';
 
 export const ExerciseWorkspace = ({
   studyActivity,
@@ -20,35 +21,40 @@ export const ExerciseWorkspace = ({
   };
 
   return (
-    <div className="border border-primary p-4 space-y-6">
-      {studyActivity.items.map((exerciseItem, index) => {
-        switch (studyActivity.activity_format) {
-          case StudyActivityFormat.MultipleChoiceQuestions:
-            return (
-              <MultipleChoiceQuestionItem
-                key={exerciseItem.id}
-                exerciseItem={exerciseItem as ExerciseItemOutput}
-                index={index}
-              />
-            );
-          case StudyActivityFormat.OpenEnded:
-            return (
-              <OpenEndedItem
-                key={exerciseItem.id}
-                exerciseItem={exerciseItem as ExerciseItemOutput}
-                index={index}
-              />
-            );
-        }
-      })}
+    <section className="border border-primary p-4 space-y-6">
+      <h2 className="font-bold text-4xl text-center mb-6">
+        {titleString(replaceUnderscore(studyActivity.activity_format))}
+      </h2>
+      <ol>
+        {studyActivity.items.map((exerciseItem, index) => {
+          switch (studyActivity.activity_format) {
+            case StudyActivityFormat.MultipleChoiceQuestions:
+              return (
+                <MultipleChoiceQuestionItem
+                  key={exerciseItem.id}
+                  exerciseItem={exerciseItem as ExerciseItemOutput}
+                  index={index}
+                />
+              );
+            case StudyActivityFormat.OpenEnded:
+              return (
+                <OpenEndedItem
+                  key={exerciseItem.id}
+                  exerciseItem={exerciseItem as ExerciseItemOutput}
+                  index={index}
+                />
+              );
+          }
+        })}
+      </ol>
 
       <Button
-        style="w-full mt-6"
+        style="w-full"
         text="Submit"
         textDisabled={studyActivity.is_submitted ? 'Submitted' : 'Submitting'}
         disabled={submitExercise.isPending || studyActivity.is_submitted}
         onClick={handleClick}
       />
-    </div>
+    </section>
   );
 };

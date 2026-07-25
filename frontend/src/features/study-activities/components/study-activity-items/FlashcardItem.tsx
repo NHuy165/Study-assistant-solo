@@ -33,86 +33,94 @@ export const FlashcardItem = ({
     )?.content as string | undefined;
 
   return (
-    <div className="w-full">
+    <>
       {studyActivity.items.length > 0 ? (
-        <div>
-          <span className="block mb-1 font-bold text-center">
-            Current card index: {currentIndex + 1}
-          </span>
-          <div className="flex">
-            <Button
-              text="Previous"
-              style="h-100 w-1/6 rounded-none"
-              textStyle="font-bold text-2xl"
-              onClick={() => {
-                setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : 0);
-                setShowBack(false);
-              }}
-              disabled={currentIndex === 0}
-              textDisabled="Previous"
-            />
+        <>
+          <section>
+            <span className="block mb-1 font-bold text-center">
+              Current card index: {currentIndex + 1}/
+              {studyActivity.items.length}
+            </span>
+            <div className="flex max-w-full">
+              <Button
+                text="Previous"
+                style="h-100 w-1/6 rounded-none"
+                textStyle="font-bold text-2xl"
+                onClick={() => {
+                  setCurrentIndex(currentIndex > 0 ? currentIndex - 1 : 0);
+                  setShowBack(false);
+                }}
+                disabled={currentIndex === 0}
+                textDisabled="Previous"
+              />
 
+              <Button
+                text={
+                  showBack ? (backContent as string) : (frontContent as string)
+                }
+                onClick={() => setShowBack(!showBack)}
+                style={`block flex-1 h-100 mx-auto whitespace-pre-wrap overflow-y-auto break-words rounded-none ${showBack ? 'bg-red-300' : 'bg-green-300'}`}
+                textStyle="block text-2xl"
+              />
+
+              <Button
+                text="Next"
+                style="h-100 w-1/6 rounded-none"
+                textStyle="font-bold text-2xl"
+                onClick={() => {
+                  setCurrentIndex(
+                    currentIndex < studyActivity.items.length - 1
+                      ? currentIndex + 1
+                      : studyActivity.items.length - 1,
+                  );
+                  setShowBack(false);
+                }}
+                disabled={currentIndex === studyActivity.items.length - 1}
+                textDisabled="Next"
+              />
+            </div>
+          </section>
+          <section>
             <Button
-              text={
-                showBack ? (backContent as string) : (frontContent as string)
+              text="Update current flashcard"
+              style="w-full mt-4"
+              onClick={() => setShowUpdateForm(!showUpdateForm)}
+            ></Button>
+
+            {showUpdateForm && (
+              <FlashcardUpdateForm
+                reviewItem={
+                  studyActivity.items[currentIndex] as ReviewItemOutput
+                }
+                onUpdate={() => setShowUpdateForm(false)}
+              />
+            )}
+            <Button
+              text="Delete current flashcard"
+              textDisabled="Deleting..."
+              style="w-full mt-2"
+              btnError={true}
+              disabled={deleteFlashcard.isPending}
+              onClick={() =>
+                deleteFlashcard.mutate(studyActivity.items[currentIndex].id, {
+                  onSuccess: () => {
+                    setShowUpdateForm(false);
+                    if (currentIndex === studyActivity.items.length - 1) {
+                      setCurrentIndex(
+                        Math.max(studyActivity.items.length - 2, 0),
+                      );
+                    }
+                  },
+                })
               }
-              onClick={() => setShowBack(!showBack)}
-              style="block flex-1 h-100 mx-auto overflow-y-auto break-works rounded-none"
-              textStyle="text-lg"
             />
-
-            <Button
-              text="Next"
-              style="h-100 w-1/6 rounded-none"
-              textStyle="font-bold text-2xl"
-              onClick={() => {
-                setCurrentIndex(
-                  currentIndex < studyActivity.items.length - 1
-                    ? currentIndex + 1
-                    : studyActivity.items.length - 1,
-                );
-                setShowBack(false);
-              }}
-              disabled={currentIndex === studyActivity.items.length - 1}
-              textDisabled="Next"
-            />
-          </div>
-        </div>
+          </section>
+        </>
       ) : (
-        <div className="flex justify-center items-center border border-primary w-2/3 h-100 mx-auto s rounded-none">
+        <section className="flex justify-center items-center border border-primary w-2/3 h-100 mx-auto s rounded-none">
           <span className="font-bold text-3xl">No flashcard to show</span>
-        </div>
+        </section>
       )}
-
-      <Button
-        text="Update current flashcard"
-        style="w-full mt-4"
-        onClick={() => setShowUpdateForm(!showUpdateForm)}
-      ></Button>
-
-      {showUpdateForm && (
-        <FlashcardUpdateForm
-          reviewItem={studyActivity.items[currentIndex] as ReviewItemOutput}
-          onUpdate={() => setShowUpdateForm(false)}
-        />
-      )}
-      <Button
-        text="Delete current flashcard"
-        textDisabled="Deleting..."
-        style="w-full mt-2"
-        btnError={true}
-        disabled={deleteFlashcard.isPending}
-        onClick={() =>
-          deleteFlashcard.mutate(studyActivity.items[currentIndex].id, {
-            onSuccess: () => {
-              setShowUpdateForm(false);
-              if (currentIndex === studyActivity.items.length - 1) {
-                setCurrentIndex(Math.max(studyActivity.items.length - 2, 0));
-              }
-            },
-          })
-        }
-      />
-    </div>
+    </>
   );
 };

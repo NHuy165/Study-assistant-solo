@@ -40,41 +40,43 @@ export const MultipleChoiceQuestionItem = ({
   const currentAnswer = Number(useWatch({ control, name: 'attempt' }));
 
   return (
-    <form onChange={() => handleSubmit(onSubmit)()}>
-      <RadioGroupField
-        label={`${index + 1}. ${exerciseItem.question}`}
-        name="attempt"
-        labelStyle="font-semibold text-xl"
-        optionStyle="m-0"
-        optionTextStyle="ml-3"
-        optionsWrapperStyle="flex flex-col gap-1 mt-2"
-        currentAnswer={currentAnswer}
-        // The label is the content, the value is the id
-        options={exerciseItem.contents.map((exerciseItemContent) => {
-          return {
-            label: exerciseItemContent.content as string,
-            value: exerciseItemContent.id,
-            isCorrect: exerciseItemContent.is_correct,
-          };
-        })}
-        register={register}
-        disabled={exerciseItem.user_score !== null}
-        error={errors.attempt}
-      />
-      {exerciseItem.user_score !== null && (
-        <span className="block text-success font-semibold text-lg mb-3">
-          Score: {`${exerciseItem.user_score}/${exerciseItem.max_score}`}
-        </span>
-      )}
+    <li>
+      <form onChange={() => handleSubmit(onSubmit)()}>
+        <RadioGroupField
+          label={`${index + 1}. ${exerciseItem.question}`}
+          name="attempt"
+          labelStyle="font-semibold text-xl"
+          optionStyle="m-0"
+          optionTextStyle="ml-3"
+          optionsWrapperStyle="flex flex-col gap-1 mt-2"
+          currentAnswer={currentAnswer}
+          // The label is the content, the value is the id
+          options={exerciseItem.contents.map((exerciseItemContent) => {
+            return {
+              label: exerciseItemContent.content as string,
+              value: exerciseItemContent.id,
+              isCorrect: exerciseItemContent.is_correct,
+            };
+          })}
+          register={register}
+          disabled={exerciseItem.user_score !== null}
+          error={errors.attempt}
+        />
+        {exerciseItem.user_score !== null && (
+          <span className="block text-success font-semibold text-lg mb-3">
+            Score: {`${exerciseItem.user_score}/${exerciseItem.max_score}`}
+          </span>
+        )}
+      </form>
 
       {exerciseItem.explanation && (
-        <div>
+        <p>
           <span className="block font-bold mb-1">Explanation:</span>
           <span className="block h-20 border border-primary px-2 py-1 overflow-y-auto break-words whitespace-pre-wrap">
             {exerciseItem.explanation}
           </span>
-        </div>
+        </p>
       )}
-    </form>
+    </li>
   );
 };

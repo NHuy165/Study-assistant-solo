@@ -2,7 +2,6 @@ import { useGetStudyActivityComplete } from '@/features/study-activities/api/use
 import { ExerciseWorkspace } from '@/features/study-activities/components/workspaces/ExerciseWorkspace';
 import { ReviewWorkspace } from '@/features/study-activities/components/workspaces/ReviewWorkspace';
 import { StudyActivityType } from '@/types/constants';
-import { replaceUnderscore, titleString } from '@/utils/format-string';
 import { Link } from 'react-router-dom';
 
 export const StudyActivityWorkspace = ({
@@ -47,11 +46,12 @@ export const StudyActivityWorkspace = ({
 
             <span className="divider divider-primary"></span>
 
-            {studyActivity?.activity_type === StudyActivityType.Exercise ? (
-              <ExerciseWorkspace studyActivity={studyActivity} />
-            ) : (
-              <ReviewWorkspace studyActivity={studyActivity} />
-            )}
+            {studyActivity &&
+              (studyActivity.activity_type === StudyActivityType.Exercise ? (
+                <ExerciseWorkspace studyActivity={studyActivity} />
+              ) : (
+                <ReviewWorkspace studyActivity={studyActivity} />
+              ))}
           </div>
         )}
     </div>

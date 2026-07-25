@@ -36,37 +36,39 @@ export const FlashcardsCreateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border border-primary py-6 px-10 mt-6">
+    <form
+      className="card flex flex-col shadow-xl border border border-primary py-6 px-10 mt-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <h3 className="font-bold text-2xl mb-3">Create a new flashcard.</h3>
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        {/* Front */}
-        <FormField
-          label="Front"
-          name="front"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.front}
-        />
 
-        {/* Back */}
-        <FormField
-          label="Back"
-          name="back"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.back}
-        />
+      {/* Front */}
+      <FormField
+        label="Front"
+        name="front"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.front}
+      />
 
-        <Button
-          disabled={createFlashcards.isPending}
-          style="mt-6"
-          text="Create"
-          textDisabled="Creating..."
-          type="submit"
-        />
-      </form>
-    </div>
+      {/* Back */}
+      <FormField
+        label="Back"
+        name="back"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.back}
+      />
+
+      <Button
+        disabled={createFlashcards.isPending}
+        style="mt-6"
+        text="Create"
+        textDisabled="Creating..."
+        type="submit"
+      />
+    </form>
   );
 };

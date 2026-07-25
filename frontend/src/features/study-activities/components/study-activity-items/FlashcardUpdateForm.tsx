@@ -50,33 +50,34 @@ export const FlashcardUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border border-primary mt-3 mb-6 p-6">
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Front */}
-        <FormField
-          label="Front"
-          name="front"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.front}
-        />
-        {/* Back */}
-        <FormField
-          label="Back"
-          name="back"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.back}
-        />
-        <Button
-          disabled={updateFlashcard.isPending}
-          text="Update"
-          textDisabled="Updating..."
-          type="submit"
-        />
-      </form>
-    </div>
+    <form
+      className="card shadow-xl border border border-primary mt-3 mb-6 p-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
+      {/* Front */}
+      <FormField
+        label="New front content"
+        name="front"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.front}
+      />
+      {/* Back */}
+      <FormField
+        label="New back content"
+        name="back"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.back}
+      />
+      <Button
+        disabled={updateFlashcard.isPending}
+        text="Update"
+        textDisabled="Updating..."
+        type="submit"
+      />
+    </form>
   );
 };
