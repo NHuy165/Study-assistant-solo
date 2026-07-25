@@ -9,6 +9,7 @@ import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
 import mockStudyActivitiesData from '@e2e/data/study-activities/mock-study-activities.json' with { type: 'json' };
 import { replaceUnderscore, titleString } from '@/utils/format-string';
 import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
+import { StudyActivityPage } from '@e2e/pages/study-activity/StudyActivityPage';
 
 test.describe('Study activities - Success tests', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -187,6 +188,122 @@ test.describe('Study activities - Success tests', () => {
 
     await expect(studyActivitiesSection.studyActivity).toBeVisible();
     await expect(studyActivitiesSection.studyActivity).toContainText(name);
+  });
+
+  test.describe('Go inside a study activity page for each of the activity type', () => {
+    test('Go inside an MCQ page', async ({ page, request }) => {
+      const studyActivitiesSection = new InteractionPage(page)
+        .studyActivitiesSection;
+
+      const interactionId = Number(page.url().split('/').pop());
+
+      const studyActivity = {
+        prompt: 'test-prompt',
+        activity_format: 'MULTIPLE_CHOICE_QUESTIONS',
+        subject_type: 'MATHS',
+        name: 'test-name',
+        description: 'test-description',
+        n_items: 5,
+      };
+
+      const studyActivityId = await createStudyActivity({
+        page,
+        request,
+        interactionId,
+        studyActivity,
+      });
+      await page.reload();
+
+      await studyActivitiesSection.studyActivity
+        .getByRole('button', {
+          name: studyActivity.name,
+        })
+        .click();
+
+      const studyActivityPage = new StudyActivityPage(page);
+      await studyActivityPage.checkLoadedMCQ({
+        studyActivityId,
+        headerText: studyActivity.name,
+        descriptionText: studyActivity.description,
+        numberItems: studyActivity.n_items,
+      });
+    });
+
+    test('Go inside an Open Ended page', async ({ page, request }) => {
+      const studyActivitiesSection = new InteractionPage(page)
+        .studyActivitiesSection;
+
+      const interactionId = Number(page.url().split('/').pop());
+
+      const studyActivity = {
+        prompt: 'test-prompt',
+        activity_format: 'OPEN_ENDED',
+        subject_type: 'VIETNAMESE',
+        name: 'test-name',
+        description: 'test-description',
+        n_items: 4,
+      };
+
+      const studyActivityId = await createStudyActivity({
+        page,
+        request,
+        interactionId,
+        studyActivity,
+      });
+      await page.reload();
+
+      await studyActivitiesSection.studyActivity
+        .getByRole('button', {
+          name: studyActivity.name,
+        })
+        .click();
+
+      const studyActivityPage = new StudyActivityPage(page);
+      await studyActivityPage.checkLoadedOpenEnded({
+        studyActivityId,
+        headerText: studyActivity.name,
+        descriptionText: studyActivity.description,
+        numberItems: studyActivity.n_items,
+      });
+    });
+
+    test('Go inside a Flashcards page', async ({ page, request }) => {
+      const studyActivitiesSection = new InteractionPage(page)
+        .studyActivitiesSection;
+
+      const interactionId = Number(page.url().split('/').pop());
+
+      const studyActivity = {
+        prompt: 'test-prompt',
+        activity_format: 'FLASHCARDS',
+        subject_type: 'MATHS',
+        name: 'test-name',
+        description: 'test-description',
+        n_items: 6,
+      };
+
+      const studyActivityId = await createStudyActivity({
+        page,
+        request,
+        interactionId,
+        studyActivity,
+      });
+      await page.reload();
+
+      await studyActivitiesSection.studyActivity
+        .getByRole('button', {
+          name: studyActivity.name,
+        })
+        .click();
+
+      const studyActivityPage = new StudyActivityPage(page);
+      await studyActivityPage.checkLoadedFlashcards({
+        studyActivityId,
+        headerText: studyActivity.name,
+        descriptionText: studyActivity.description,
+        numberItems: studyActivity.n_items,
+      });
+    });
   });
 
   test('Update a study activity', async ({ page, request }) => {

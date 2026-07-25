@@ -1,25 +1,15 @@
 import { type Page, type APIRequestContext } from '@playwright/test';
+import { type StudyActivityOutputComplete } from '@/features/study-activities/types/study-activity';
 
-type StudyActivityCreationType = {
-  prompt: string;
-  activity_format: string;
-  subject_type: string;
-  name: string;
-  description: string;
-  n_items: number;
-};
-
-export const createStudyActivity = async ({
+export const mockSubmitStudyActivity = async ({
   page,
   request,
-  interactionId,
-  studyActivity,
+  studyActivityId,
 }: {
   page: Page;
   request: APIRequestContext;
-  interactionId: number;
-  studyActivity: StudyActivityCreationType;
-}): Promise<number> => {
+  studyActivityId: number;
+}): Promise<StudyActivityOutputComplete> => {
   try {
     const token = await page.evaluate(() => {
       const storageData = window.localStorage.getItem('token-storage');
@@ -31,10 +21,9 @@ export const createStudyActivity = async ({
       throw new Error('Could not find token in Playwright store state.');
     }
 
-    const response = await request.post(
-      `${process.env.VITE_API_URL}/dev/study-activity/${interactionId}`,
+    const response = await request.patch(
+      `${process.env.VITE_API_URL}/dev/study-activity/${studyActivityId}/submit`,
       {
-        data: { ...studyActivity },
         headers: { Authorization: `Bearer ${token}` },
       },
     );
@@ -46,7 +35,7 @@ export const createStudyActivity = async ({
 
     const body = await response.json();
 
-    return body.id as number;
+    return body;
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     throw new Error(`Failed to connect to server: ${errorMessage}`, {
