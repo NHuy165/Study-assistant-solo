@@ -14,6 +14,13 @@ class StudyAssessmentBase(SQLModel):
     content: str
 
 
+# ----- INPUT ----- #
+
+
+class MockStudyAssessmentInput(StudyAssessmentBase):
+    pass
+
+
 # ----- OUTPUT ----- #
 
 

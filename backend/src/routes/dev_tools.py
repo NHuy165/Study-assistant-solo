@@ -13,7 +13,11 @@ from backend.src.models_schema.activity.study_activity import (
     MockStudyActivityInput,
     StudyActivityOutputComplete,
 )
-from backend.src.services.dev_tools import study_activity
+from backend.src.models_schema.study_progress.assessment import (
+    MockStudyAssessmentInput,
+    StudyAssessmentOutput,
+)
+from backend.src.services.dev_tools import study_activity, study_assessment
 
 router = APIRouter()
 
@@ -86,3 +90,27 @@ async def mock_submit_exercise_activity(
     )
 
     return study_activity_output_complete
+
+
+@router.post(
+    "/study-assessment",
+    tags=["study-progress"],
+    response_model=StudyAssessmentOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+    },
+)
+async def create_study_assessment(
+    user: UserDep,
+    session: SessionDep,
+    current_datetime: DatetimeDep,
+    mock_study_assessment_input: MockStudyAssessmentInput,
+):
+    result = await study_assessment.mock_create_study_assessment(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        mock_study_assessment_input=mock_study_assessment_input,
+    )
+
+    return result
