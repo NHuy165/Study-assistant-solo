@@ -15,7 +15,7 @@ from backend.src.models_schema.activity.llm_request_json_schema import (
 class StudyActivityValidationBase(SQLModel):
     name: Annotated[str, Field(min_length=1)]
     description: str
-    activity_items: list[Any]
+    activity_items: Annotated[list[Any], Field(min_length=1)]
 
 
 # ----- ACTIVITY CREATION SCHEMAS ----- #
@@ -32,7 +32,7 @@ class MCQItemSchema(SQLModel):
 
 
 class MCQCreationSchema(StudyActivityValidationBase):
-    activity_items: list[MCQItemSchema]
+    activity_items: Annotated[list[MCQItemSchema], Field(min_length=1)]
 
 
 # ++ Open Ended ++ #
@@ -44,7 +44,7 @@ class OpenEndedItemSchema(SQLModel):
 
 
 class OpenEndedCreationSchema(StudyActivityValidationBase):
-    activity_items: list[OpenEndedItemSchema]
+    activity_items: Annotated[list[OpenEndedItemSchema], Field(min_length=1)]
 
 
 # === Review === #
@@ -58,7 +58,7 @@ class FlashcardItemSchema(SQLModel):
 
 
 class FlashcardsCreationSchema(StudyActivityValidationBase):
-    activity_items: list[FlashcardItemSchema]
+    activity_items: Annotated[list[FlashcardItemSchema], Field(min_length=1)]
 
 
 # ----- GRADING SCHEMAS ----- #
