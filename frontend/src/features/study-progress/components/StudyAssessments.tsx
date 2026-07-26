@@ -50,10 +50,12 @@ export const StudyAssessments = () => {
         getStudyAssessments.isError ||
         createStudyAssessment.isPending ||
         createStudyAssessment.isError || (
-          <div>
+          <>
             {/* Yesterday assessment */}
-            <div className="mb-6">
-              <h3 className="font-bold mb-3">Yesterday's assessment:</h3>
+            <section className="mb-6">
+              <h3 className="font-bold mb-3 text-2xl">
+                Yesterday's assessment:
+              </h3>
               {/* Properly displays dummy assessments without content */}
               <span className="block border border-primary whitespace-pre-wrap p-3 min-h-30 max-h-60 overflow-y-auto break-words">
                 {yesterdayAssessment
@@ -61,11 +63,13 @@ export const StudyAssessments = () => {
                     'Study assessment in progress...'
                   : "User didn't log in yesterday."}
               </span>
-            </div>
+            </section>
 
             {/* Assessments history */}
-            <div>
-              <h3 className="font-bold">Study assessments history:</h3>
+            <section>
+              <h3 className="font-bold mb-3 text-2xl">
+                Study assessments history:
+              </h3>
               <div className="flex mt-3 h-12">
                 <FormField
                   label=""
@@ -76,7 +80,7 @@ export const StudyAssessments = () => {
                   type="date"
                 />
                 <Button
-                  text="All"
+                  text="Show all"
                   style="w-1/8"
                   onClick={() => setValue('date', '')}
                 />
@@ -94,8 +98,8 @@ export const StudyAssessments = () => {
               ) : (
                 <span>No study assessment found.</span>
               )}
-            </div>
-          </div>
+            </section>
+          </>
         )}
     </div>
   );
