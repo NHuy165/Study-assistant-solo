@@ -100,7 +100,7 @@ async def mock_submit_exercise_activity(
         401: Responses.RESPONSE_401_UNAUTHORIZED,
     },
 )
-async def create_study_assessment(
+async def mock_create_study_assessment(
     user: UserDep,
     session: SessionDep,
     current_datetime: DatetimeDep,
