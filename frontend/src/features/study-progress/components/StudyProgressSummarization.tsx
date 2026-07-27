@@ -123,128 +123,170 @@ export const StudyProgressSummarization = () => {
 
       {hookList.some((hook) => hook.isError || hook.isPending) || (
         <div>
-          <div>
-            <p className="divider divider-primary font-bold text-2xl my-6">
-              Total study activities generated: {totalActivities}
-            </p>
+          {/* Study activities count */}
+          <section>
+            <h2 className="divider divider-primary font-bold text-2xl my-6">
+              <span>Total study activities generated:</span>
+              <span className="-ml-2">{totalActivities}</span>
+            </h2>
 
             {/* Activities by format */}
-            <p className="font-bold text-lg my-2">
-              Study activities count grouped by format:
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchActivitiesByFormat.data ?? {}).map(
-                ([format, count]) => {
-                  return (
-                    <li key={format}>
-                      {titleString(replaceUnderscore(format))}: {count}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Study activities count grouped by format:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchActivitiesByFormat.data ?? {}).map(
+                  ([format, count]) => {
+                    return (
+                      <div key={format}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(format))}:
+                        </dt>
+                        <dd className="inline ml-1">{count}</dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
 
             {/* Activities by subject */}
-            <p className="font-bold text-lg my-2">
-              Study activities count grouped by subject:
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchActivitiesBySubject.data ?? {}).map(
-                ([subject, count]) => {
-                  return (
-                    <li key={subject}>
-                      {titleString(replaceUnderscore(subject))}: {count}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
-          </div>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Study activities count grouped by subject:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchActivitiesBySubject.data ?? {}).map(
+                  ([subject, count]) => {
+                    return (
+                      <div key={subject}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(subject))}:
+                        </dt>
+                        <dd className="inline ml-1">{count}</dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
+          </section>
 
-          <div>
-            <p className="divider divider-primary font-bold text-2xl my-6">
-              Total study activity items generated: {totalItems}
-            </p>
+          {/* Study activity items count */}
+          <section>
+            <h2 className="divider divider-primary font-bold text-2xl my-6">
+              <span>Total study activity items generated:</span>
+              <span className="-ml-2">{totalItems}</span>
+            </h2>
 
             {/* Items by format */}
-            <p className="font-bold text-lg my-2">
-              Study activity items count grouped by format:
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchItemsByFormat.data ?? {}).map(
-                ([format, count]) => {
-                  return (
-                    <li key={format}>
-                      {titleString(replaceUnderscore(format))}: {count}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Study activity items count grouped by format:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchItemsByFormat.data ?? {}).map(
+                  ([format, count]) => {
+                    return (
+                      <div key={format}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(format))}:
+                        </dt>
+                        <dd className="inline ml-1">{count}</dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
 
             {/* Items by subject */}
-            <p className="font-bold text-lg my-2">
-              Study activity items count grouped by subject:
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchItemsBySubject.data ?? {}).map(
-                ([subject, count]) => {
-                  return (
-                    <li key={subject}>
-                      {titleString(replaceUnderscore(subject))}: {count}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
-          </div>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Study activity items count grouped by subject:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchItemsBySubject.data ?? {}).map(
+                  ([subject, count]) => {
+                    return (
+                      <div key={subject}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(subject))}:
+                        </dt>
+                        <dd className="inline ml-1">{count}</dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
+          </section>
 
-          <div>
-            <p className="divider divider-primary font-bold text-2xl my-6">
-              Exercise average grades:{' '}
-              {Number.isNaN(totalUserScore / totalMaximumScore)
-                ? 'No data'
-                : (totalUserScore / totalMaximumScore) * 10 + ' out of 10'}{' '}
-            </p>
+          {/* Study activity score */}
+          <section>
+            <h2 className="divider divider-primary font-bold text-2xl my-6">
+              <span>Exercise average grades:</span>
+              <span className="-ml-2">
+                {Number.isNaN(totalUserScore / totalMaximumScore)
+                  ? 'No data'
+                  : ((totalUserScore / totalMaximumScore) * 10).toFixed(2) +
+                    ' out of 10'}
+              </span>
+            </h2>
 
             {/* Scores by format */}
-            <p className="font-bold text-lg my-2">
-              <b>Exercise average grades grouped by format:</b>
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchScoresByFormat.data ?? {}).map(
-                ([format, scores]) => {
-                  return (
-                    <li key={format}>
-                      {titleString(replaceUnderscore(format))}:{' '}
-                      {Number.isNaN(scores[0] / scores[1])
-                        ? 'No data'
-                        : (scores[0] / scores[1]) * 10 + ' out of 10'}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Exercise average grades grouped by format:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchScoresByFormat.data ?? {}).map(
+                  ([format, scores]) => {
+                    return (
+                      <div key={format}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(format))}:
+                        </dt>
+                        <dd className="inline ml-1">
+                          {Number.isNaN(scores[0] / scores[1])
+                            ? 'No data'
+                            : ((scores[0] / scores[1]) * 10).toFixed(2) +
+                              ' out of 10'}
+                        </dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
 
             {/* Scores by subject */}
-            <p className="font-bold text-lg my-2">
-              <b>Exercise average grades grouped by subject:</b>
-            </p>
-            <ul className="list-disc ml-12 space-y-1">
-              {Object.entries(fetchScoresBySubject.data ?? {}).map(
-                ([subject, scores]) => {
-                  return (
-                    <li key={subject}>
-                      {titleString(replaceUnderscore(subject))}:{' '}
-                      {Number.isNaN(scores[0] / scores[1])
-                        ? 'No data'
-                        : (scores[0] / scores[1]) * 10 + ' out of 10'}
-                    </li>
-                  );
-                },
-              )}
-            </ul>
-          </div>
+            <section>
+              <h3 className="font-bold text-lg my-2">
+                Exercise average grades grouped by subject:
+              </h3>
+              <dl className="list-disc ml-12 space-y-1">
+                {Object.entries(fetchScoresBySubject.data ?? {}).map(
+                  ([subject, scores]) => {
+                    return (
+                      <div key={subject}>
+                        <dt className="inline">
+                          {titleString(replaceUnderscore(subject))}:
+                        </dt>
+                        <dd className="inline ml-1">
+                          {Number.isNaN(scores[0] / scores[1])
+                            ? 'No data'
+                            : ((scores[0] / scores[1]) * 10).toFixed(2) +
+                              ' out of 10'}
+                        </dd>
+                      </div>
+                    );
+                  },
+                )}
+              </dl>
+            </section>
+          </section>
         </div>
       )}
     </div>
