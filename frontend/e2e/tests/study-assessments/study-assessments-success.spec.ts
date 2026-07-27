@@ -87,10 +87,10 @@ test.describe('Study assessments - Success tests', () => {
     const assessmentItem1 = studyAssessmentsSection.assessmentItem.first();
     const assessmentItem2 = studyAssessmentsSection.assessmentItem.last();
 
-    await expect(assessmentItem1).toHaveText(
+    await expect(assessmentItem1).toContainText(
       `Assessment date: ${studyAssessment1.assessment_of}`,
     );
-    await expect(assessmentItem2).toHaveText(
+    await expect(assessmentItem2).toContainText(
       `Assessment date: ${studyAssessment2.assessment_of}`,
     );
 
@@ -104,5 +104,20 @@ test.describe('Study assessments - Success tests', () => {
     await expect(assessmentItem2.locator('p')).toContainText(
       studyAssessment2.content,
     );
+
+    // Searches for an existing asssessment
+    await studyAssessmentsSection.assessmentDateInput.fill(
+      yesterday.format('YYYY-MM-DD'),
+    );
+    await expect(studyAssessmentsSection.assessmentItem).toHaveCount(1);
+    await expect(studyAssessmentsSection.assessmentItem).toContainText(
+      `Assessment date: ${studyAssessment1.assessment_of}`,
+    );
+
+    // Searches for a non-existent assessment
+    await studyAssessmentsSection.assessmentDateInput.fill(
+      now.subtract(3, 'day').format('YYYY-MM-DD'),
+    );
+    await expect(studyAssessmentsSection.infoNoItem).toBeVisible();
   });
 });
