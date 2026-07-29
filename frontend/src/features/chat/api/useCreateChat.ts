@@ -43,7 +43,7 @@ export const useCreateChat = () => {
 
   return useMutation({
     mutationFn: createChatRequest,
-    onSuccess: (data, variables) =>
+    onSuccess: (_data, variables) =>
       queryClient.invalidateQueries({
         queryKey: ['chats', variables.interactionId],
       }),

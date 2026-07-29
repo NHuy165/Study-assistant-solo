@@ -122,70 +122,69 @@ test.describe('Study progress - Success tests', () => {
           (criterion) =>
             criterion.attribute === 'created_at' && criterion.operator === 'GE',
         );
+
+        const removeLastYear = () => {
+          // Removes 1 English Flashcard
+          // Removes 1 Vietnamese Open Ended (40/100)
+
+          activityByFormat.FLASHCARDS -= 1;
+          activityBySubject.ENGLISH -= 1;
+
+          activityByFormat.OPEN_ENDED -= 1;
+          activityBySubject.VIETNAMESE -= 1;
+
+          gradeByFormat.OPEN_ENDED = [
+            gradeByFormat.OPEN_ENDED[0] - 40,
+            gradeByFormat.OPEN_ENDED[1] - 100,
+          ];
+          gradeBySubject.VIETNAMESE = [
+            gradeBySubject.VIETNAMESE[0] - 40,
+            gradeBySubject.VIETNAMESE[1] - 100,
+          ];
+        };
+
+        const removeLastMonth = () => {
+          // Removes 1 Maths Open Ended (70/100)
+
+          activityByFormat.OPEN_ENDED -= 1;
+          activityBySubject.MATHS -= 1;
+
+          gradeByFormat.OPEN_ENDED = [
+            gradeByFormat.OPEN_ENDED[0] - 70,
+            gradeByFormat.OPEN_ENDED[1] - 100,
+          ];
+          gradeBySubject.MATHS = [
+            gradeBySubject.MATHS[0] - 70,
+            gradeBySubject.MATHS[1] - 100,
+          ];
+        };
+
+        const removeLastWeek = () => {
+          // Removes 1 English MCQ (100/100)
+
+          activityByFormat.MULTIPLE_CHOICE_QUESTIONS -= 1;
+          activityBySubject.ENGLISH -= 1;
+
+          gradeByFormat.MULTIPLE_CHOICE_QUESTIONS = [
+            gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[0] - 100,
+            gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[1] - 100,
+          ];
+          gradeBySubject.ENGLISH = [
+            gradeBySubject.ENGLISH[0] - 100,
+            gradeBySubject.ENGLISH[1] - 100,
+          ];
+        };
+
         if (timeRestraint) {
-          switch (timeRestraint.value) {
-            case lastWeek:
-              // Removes 1 English MCQ (100/100)
-              activityByFormat.MULTIPLE_CHOICE_QUESTIONS -= 1;
-              activityBySubject.ENGLISH -= 1;
-
-              gradeByFormat.MULTIPLE_CHOICE_QUESTIONS = [
-                gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[0] - 100,
-                gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[1] - 100,
-              ];
-              gradeBySubject.ENGLISH = [
-                gradeBySubject.ENGLISH[0] - 100,
-                gradeBySubject.ENGLISH[1] - 100,
-              ];
-
-            // Data after change:
-            // MultipleChoiceQuestions: 4, [300, 400]
-            // English: 4, [200, 200]
-
-            // eslint-disable-next-line no-fallthrough
-            case lastMonth:
-              // Removes 1 Maths Open Ended (70/100)
-              activityByFormat.OPEN_ENDED -= 1;
-              activityBySubject.MATHS -= 1;
-
-              gradeByFormat.OPEN_ENDED = [
-                gradeByFormat.OPEN_ENDED[0] - 70,
-                gradeByFormat.OPEN_ENDED[1] - 100,
-              ];
-              gradeBySubject.MATHS = [
-                gradeBySubject.MATHS[0] - 70,
-                gradeBySubject.MATHS[1] - 100,
-              ];
-
-            // Data after change:
-            // OpenEnded: 3, [130, 300]
-            // Maths: 2, [130, 200]
-
-            // eslint-disable-next-line no-fallthrough
-            case lastYear:
-              // Removes 1 English Flashcard
-              // Removes 1 Vietnamese Open Ended (40/100)
-              activityByFormat.FLASHCARDS -= 1;
-              activityBySubject.ENGLISH -= 1;
-
-              activityByFormat.OPEN_ENDED -= 1;
-              activityBySubject.VIETNAMESE -= 1;
-
-              gradeByFormat.OPEN_ENDED = [
-                gradeByFormat.OPEN_ENDED[0] - 40,
-                gradeByFormat.OPEN_ENDED[1] - 100,
-              ];
-              gradeBySubject.VIETNAMESE = [
-                gradeBySubject.VIETNAMESE[0] - 40,
-                gradeBySubject.VIETNAMESE[1] - 100,
-              ];
-
-              // Data after change:
-              // Flashcards: 2
-              // OpenEnded: 2, [90, 200]
-              // English: 3, [200, 200]
-              // Vietnamese: 3, [60, 200]
-              break;
+          if (timeRestraint.value === lastWeek) {
+            removeLastWeek();
+            removeLastMonth();
+            removeLastYear();
+          } else if (timeRestraint.value === lastMonth) {
+            removeLastMonth();
+            removeLastYear();
+          } else if (timeRestraint.value === lastYear) {
+            removeLastYear();
           }
         }
 

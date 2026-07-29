@@ -25,7 +25,7 @@ export const useDeleteDocument = () => {
 
   return useMutation({
     mutationFn: deleteDocumentRequest,
-    onSuccess: (data, param) => {
+    onSuccess: (_data, param) => {
       queryClient.invalidateQueries({
         queryKey: ['documents', Number(interactionId)],
       });

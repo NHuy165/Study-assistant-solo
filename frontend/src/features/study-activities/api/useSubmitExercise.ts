@@ -36,7 +36,7 @@ export const useSubmitExercise = () => {
 
   return useMutation({
     mutationFn: submitExerciseRequest,
-    onSuccess: (data, param) => {
+    onSuccess: (_data, param) => {
       queryClient.invalidateQueries({
         queryKey: ['study-activity', param],
       });
