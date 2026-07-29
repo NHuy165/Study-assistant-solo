@@ -11,6 +11,7 @@ RUN npm ci
 # Copies the rest of the files
 COPY . .
 
+RUN npm run lint
 RUN npm run build
 
 # ----- Serve stage ----- #
