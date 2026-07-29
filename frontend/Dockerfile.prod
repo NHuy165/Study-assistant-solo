@@ -1,0 +1,19 @@
+# ----- Build stage ----- #
+FROM node:24-alpine AS build-stage
+
+WORKDIR /app
+
+# Installs dependencies
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+# Copies the rest of the files
+COPY . .
+
+RUN npm run build
+
+# ----- Serve stage ----- #
+FROM nginx:1.30-alpine
+
+COPY --from=build-stage /app/dist /usr/share/nginx/html

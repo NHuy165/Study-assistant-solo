@@ -205,11 +205,7 @@ marimo/_static/
 marimo/_lsp/
 __marimo__/
 
-# Custom:
-structure.txt
-to_do.txt
-bugs_fixed.txt
-copy_paste.txt
-notes.txt
-info.txt
-frontend/.vite/
+# Docker ignore
+Dockerfile.dev
+Dockerfile.prod
+.dockerignore

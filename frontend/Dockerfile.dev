@@ -1,0 +1,17 @@
+FROM node:24-alpine
+
+WORKDIR /app
+
+# Installs dependencies
+COPY --chown=node:node package.json package-lock.json ./
+
+RUN npm ci
+
+RUN chown -R node:node /app/node_modules
+
+# Copies the rest of the files
+COPY --chown=node:node . .
+
+USER node
+
+CMD ["npm", "run", "dev", "--", "--host"]

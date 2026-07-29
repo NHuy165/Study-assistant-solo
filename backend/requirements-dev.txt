@@ -3,8 +3,5 @@ pytest
 pytest_asyncio
 time-machine
 
-# Debugging
-debugpy
-
 # Stress test
 locust
