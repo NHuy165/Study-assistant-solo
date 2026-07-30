@@ -45,9 +45,11 @@ from backend.tests.utils.validators import (
 )
 @patch.object(GlobalAPI, "generate_document_analysis")
 @patch.object(GlobalAPI, "mass_embed")
+@patch.object(GlobalAPI, "embed")
 @patch.object(GlobalAPI, "caption_image")
 async def test_create_document(
     mock_GlobalAPI_caption_image: AsyncMock,
+    mock_GlobalAPI_embed: AsyncMock,
     mock_GlobalAPI_mass_embed: AsyncMock,
     mock_GlobalAPI_generate_document_analysis: AsyncMock,
     client: AsyncClient,
@@ -67,6 +69,9 @@ async def test_create_document(
     mock_GlobalAPI_mass_embed.return_value = [
         [0.1] * settings.DEFAULT_EMBED_DIMENSIONALITY_CLOUDFLARE,
     ]
+    mock_GlobalAPI_embed.return_value = [
+        0.1
+    ] * settings.DEFAULT_EMBED_DIMENSIONALITY_CLOUDFLARE
 
     # Mock document analysis
     mock_summary = "Mock document analysis."
