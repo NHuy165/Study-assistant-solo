@@ -6,12 +6,20 @@ services:
       - '5432:5432'
     environment:
       - POSTGRES_USER=postgres
-      - POSTGRES_PASSWORD=Q6L0N2H0LQS5016SQL5888
+      - POSTGRES_PASSWORD=main-password
       - POSTGRES_DB=study_assistant
-    env_file:
-      - ./backend/.env
     volumes:
       - postgres_data:/var/lib/postgresql/data
+
+  # Test database
+  db-test:
+    image: pgvector/pgvector:pg16
+    ports:
+      - '5433:5432'
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test-password
+      - POSTGRES_DB=test_study_assistant
 
   # Backend
   backend:
