@@ -1,0 +1,13 @@
+FROM python:3.14-slim
+
+WORKDIR /app
+
+# Installs dependencies
+COPY requirements.txt requirements-dev.txt ./backend/
+
+RUN pip install --no-cache-dir -r backend/requirements.txt -r backend/requirements-dev.txt
+
+# Copies the rest of the files
+COPY . ./backend/
+
+CMD ["pytest", "backend/tests", "-c", "backend/tests/pytest.ini", "-v"]

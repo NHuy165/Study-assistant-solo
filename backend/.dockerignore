@@ -209,3 +209,5 @@ __marimo__/
 Dockerfile.dev
 Dockerfile.prod
 .dockerignore
+.env.ci
+.env.example

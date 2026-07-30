@@ -16,3 +16,13 @@ jobs:
 
       - name: Build frontend docker image
         run: docker build -t frontend-prod -f ./frontend/Dockerfile.prod ./frontend
+
+  backend-pytest:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Run Pytest using compose file
+        run: docker compose -f docker-compose.test.yml up --build --abort-on-container-exit --exit-code-from pytest-runner

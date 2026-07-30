@@ -1,0 +1,18 @@
+services:
+  # Test database
+  db-test:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test-password
+      - POSTGRES_DB=test_study_assistant
+
+  # Pytest runner
+  pytest-runner:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.test
+    env_file:
+      - ./backend/.env.ci
+    depends_on:
+      - db-test
