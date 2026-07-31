@@ -1,0 +1,13 @@
+FROM mcr.microsoft.com/playwright:v1.61.1-jammy
+
+WORKDIR /app
+
+# Installs dependencies
+COPY package.json package-lock.json ./
+
+RUN npm ci
+
+# Copies the rest of the files
+COPY . .
+
+CMD ["npm", "run", "test"]

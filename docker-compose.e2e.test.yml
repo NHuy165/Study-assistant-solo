@@ -1,0 +1,64 @@
+services:
+  # Test database
+  db-test:
+    image: pgvector/pgvector:pg16
+    environment:
+      - POSTGRES_USER=postgres
+      - POSTGRES_PASSWORD=test-password
+      - POSTGRES_DB=test_study_assistant
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d test_study_assistant']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Backend
+  backend:
+    image: backend:e2e-test
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.prod
+    env_file:
+      - ./backend/.env.ci
+    depends_on:
+      db-test:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8000/docs'')" || exit 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Frontend
+  frontend:
+    image: frontend:e2e-test
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.prod
+    depends_on:
+      - backend
+    healthcheck:
+      test: ['CMD-SHELL', 'wget -qO- http://127.0.0.1:80 || exit 1']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
+
+  # Playwright
+  playwright-runner:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile.e2e
+    env_file:
+      - ./frontend/.env.ci
+    depends_on:
+      backend:
+        condition: service_healthy
+      frontend:
+        condition: service_healthy
