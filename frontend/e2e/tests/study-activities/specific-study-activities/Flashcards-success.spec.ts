@@ -179,9 +179,15 @@ test.describe('Flashcards - Success tests', () => {
     const studyActivityPage = new StudyActivityPage(page);
     const flashcardsActivity = studyActivityPage.FlashcardsActivity;
 
-    await flashcardsActivity.deleteButton.click();
-    await flashcardsActivity.deleteButton.click();
-    await flashcardsActivity.deleteButton.click();
+    const numDelete = 3;
+
+    for (let i = 0; i < numDelete; i++) {
+      const currentFlashcard = await flashcardsActivity.cardButton.innerText();
+      await flashcardsActivity.deleteButton.click();
+      await expect(
+        flashcardsActivity.cardButton.filter({ hasText: currentFlashcard }),
+      ).not.toBeVisible();
+    }
 
     const studyActivityId = Number(page.url().split('/').pop());
 
