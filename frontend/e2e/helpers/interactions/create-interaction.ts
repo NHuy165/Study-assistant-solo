@@ -26,7 +26,7 @@ export const createInteraction = async ({
     }
 
     const response = await request.post(
-      `${process.env.VITE_API_URL}/interaction`,
+      `${process.env.BASE_URL}/api/interaction`,
       {
         data: { ...interaction },
         headers: { Authorization: `Bearer ${token}` },

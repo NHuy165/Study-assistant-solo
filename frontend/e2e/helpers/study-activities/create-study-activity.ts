@@ -32,7 +32,7 @@ export const createStudyActivity = async ({
     }
 
     const response = await request.post(
-      `${process.env.VITE_API_URL}/dev/study-activity/${interactionId}`,
+      `${process.env.BASE_URL}/api/dev/study-activity/${interactionId}`,
       {
         data: { ...studyActivity },
         headers: { Authorization: `Bearer ${token}` },

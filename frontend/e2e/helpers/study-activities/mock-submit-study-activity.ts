@@ -22,7 +22,7 @@ export const mockSubmitStudyActivity = async ({
     }
 
     const response = await request.patch(
-      `${process.env.VITE_API_URL}/dev/study-activity/${studyActivityId}/submit`,
+      `${process.env.BASE_URL}/api/dev/study-activity/${studyActivityId}/submit`,
       {
         headers: { Authorization: `Bearer ${token}` },
       },

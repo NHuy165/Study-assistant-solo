@@ -1,8 +1,6 @@
 import { useTokenStore } from '@/features/auth/stores/useTokenStore';
 import { ResponseErrorSchema } from '@/types/error';
 
-const API_URL: string = import.meta.env.VITE_API_URL;
-
 export const apiFetch = async (
   url: string,
   options?: RequestInit,
@@ -11,7 +9,7 @@ export const apiFetch = async (
 
   // Tries connecting to the server
   try {
-    response = await fetch(`${API_URL}${url}`, options);
+    response = await fetch(`/api${url}`, options);
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     throw new Error(`Failed to connect to server: ${errorMessage}`, {

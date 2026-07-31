@@ -26,7 +26,7 @@ export const mockCreateStudyAssessment = async ({
     }
 
     const response = await request.post(
-      `${process.env.VITE_API_URL}/dev/study-assessment`,
+      `${process.env.BASE_URL}/api/dev/study-assessment`,
       {
         data: { ...studyAssessment },
         headers: { Authorization: `Bearer ${token}` },

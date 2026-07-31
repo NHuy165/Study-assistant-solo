@@ -17,7 +17,7 @@ export const registerUser = async ({
 }) => {
   try {
     const response = await request.post(
-      `${process.env.VITE_API_URL}/user/register`,
+      `${process.env.BASE_URL}/api/user/register`,
       {
         data: { ...user },
       },

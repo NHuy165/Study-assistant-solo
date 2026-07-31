@@ -4,7 +4,7 @@ import { type APIRequestContext } from '@playwright/test';
 export const resetDatabase = async (request: APIRequestContext) => {
   try {
     const response = await request.post(
-      `${process.env.VITE_API_URL}/dev/wipe-db`,
+      `${process.env.BASE_URL}/api/dev/wipe-db`,
     );
     if (!response.ok()) {
       const errorBody = await response.text();
