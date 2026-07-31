@@ -6,6 +6,12 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=test-password
       - POSTGRES_DB=test_study_assistant
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d test_study_assistant']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Pytest runner
   pytest-runner:
@@ -15,4 +21,5 @@ services:
     env_file:
       - ./backend/.env.ci
     depends_on:
-      - db-test
+      db-test:
+        condition: service_healthy

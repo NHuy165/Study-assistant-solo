@@ -10,6 +10,12 @@ services:
       - POSTGRES_DB=study_assistant
     volumes:
       - postgres_data:/var/lib/postgresql/data
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d study_assistant']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Test database
   db-test:
@@ -20,9 +26,16 @@ services:
       - POSTGRES_USER=postgres
       - POSTGRES_PASSWORD=test-password
       - POSTGRES_DB=test_study_assistant
+    healthcheck:
+      test: ['CMD-SHELL', 'pg_isready -U postgres -d test_study_assistant']
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Backend
   backend:
+    image: backend:dev
     build:
       context: ./backend
       dockerfile: Dockerfile.dev
@@ -33,10 +46,24 @@ services:
     volumes:
       - ./backend:/app/backend
     depends_on:
-      - db
+      db:
+        condition: service_healthy
+      db-test:
+        condition: service_healthy
+    healthcheck:
+      test:
+        [
+          'CMD-SHELL',
+          'python -c "import urllib.request; urllib.request.urlopen(''http://localhost:8000/docs'')" || exit 1',
+        ]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+      start_period: 5s
 
   # Frontend
   frontend:
+    image: frontend:dev
     build:
       context: ./frontend
       dockerfile: Dockerfile.dev
@@ -48,7 +75,8 @@ services:
       - ./frontend:/app
       - /app/node_modules # Anonymous volume so host files don't overwrite
     depends_on:
-      - backend
+      backend:
+        condition: service_healthy
 
 volumes:
   postgres_data:
