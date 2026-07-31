@@ -6,6 +6,9 @@ import {
   QueryClientProvider,
 } from '@tanstack/react-query';
 import toast, { Toaster } from 'react-hot-toast';
+import * as z from 'zod';
+
+z.config(z.locales.en());
 
 const queryClient = new QueryClient({
   queryCache: new QueryCache({
