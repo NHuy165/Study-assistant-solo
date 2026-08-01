@@ -54,13 +54,13 @@ test.describe('Study activities - Success tests', () => {
       {
         ...mockStudyActivitiesData[1],
         prompt: 'Test prompt 2',
-        subject_type: 'VIETNAMESE',
+        subject_type: 'LANGUAGES',
         interaction_id: interactionId,
       },
       {
         ...mockStudyActivitiesData[2],
         prompt: 'Test prompt 3',
-        subject_type: 'ENGLISH',
+        subject_type: 'LITERATURE',
         interaction_id: interactionId,
       },
     ];
@@ -171,7 +171,7 @@ test.describe('Study activities - Success tests', () => {
 
     const name = 'test-name';
     const description = 'test-description';
-    const subjectType = 'English';
+    const subjectType = 'Literature';
 
     await studyActivitiesSection.fillFlashcardCreationInputs({
       name,
@@ -238,7 +238,7 @@ test.describe('Study activities - Success tests', () => {
       const studyActivity = {
         prompt: 'test-prompt',
         activity_format: 'OPEN_ENDED',
-        subject_type: 'VIETNAMESE',
+        subject_type: 'LANGUAGES',
         name: 'test-name',
         description: 'test-description',
         n_items: 4,

@@ -32,7 +32,7 @@ test.describe('Flashcards - Success tests', () => {
     const studyActivity = {
       prompt: 'test-Flashcards-prompt',
       activity_format: 'FLASHCARDS',
-      subject_type: 'ENGLISH',
+      subject_type: 'LITERATURE',
       name: 'test-Flashcards-name',
       description: 'test-Flashcards-description',
       n_items: 3,

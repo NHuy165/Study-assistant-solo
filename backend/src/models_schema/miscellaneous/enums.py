@@ -9,8 +9,15 @@ class DocumentType(str, Enum):
 
 class SubjectType(str, Enum):
     MATHS = "MATHS"
-    ENGLISH = "ENGLISH"
-    VIETNAMESE = "VIETNAMESE"
+    LITERATURE = "LITERATURE"
+    LANGUAGES = "LANGUAGES"
+    ARTS = "ARTS"
+    HISTORY = "HISTORY"
+    GEOGRAPHY = "GEOGRAPHY"
+    PHYSICS = "PHYSICS"
+    CHEMISTRY = "CHEMISTRY"
+    BIOLOGY = "BIOLOGY"
+    OTHER = "OTHER"
 
 
 class StudyActivityType(str, Enum):

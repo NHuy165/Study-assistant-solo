@@ -2,8 +2,15 @@
 
 export const SubjectType = {
   Maths: 'MATHS',
-  Vietnamese: 'VIETNAMESE',
-  English: 'ENGLISH',
+  Literature: 'LITERATURE',
+  Languages: 'LANGUAGES',
+  Arts: 'ARTS',
+  History: 'HISTORY',
+  Geography: 'GEOGRAPHY',
+  Physics: 'PHYSICS',
+  Chemistry: 'CHEMISTRY',
+  Biology: 'BIOLOGY',
+  Other: 'OTHER',
 } as const;
 
 export type SubjectType = (typeof SubjectType)[keyof typeof SubjectType];

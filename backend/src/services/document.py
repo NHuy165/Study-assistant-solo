@@ -16,7 +16,7 @@ from backend.src.models_schema.document.document import (
 )
 from backend.src.models_schema.document.document_analysis import DocumentAnalysis
 from backend.src.models_schema.interaction.interaction import Interaction
-from backend.src.models_schema.miscellaneous.enums import DocumentType
+from backend.src.models_schema.miscellaneous.enums import DocumentType, SubjectType
 from backend.src.models_schema.user.user import User
 from backend.src.RAG.chunking.base import DocumentExtractor
 from backend.src.RAG.chunking.image import ImageExtractor
@@ -73,7 +73,9 @@ async def save_document(
         interaction=interaction,
         page_starts_at=page_starts_at,
         type=selected_type,
-        subject_type=document_input.subject_type,
+        subject_type=document_input.subject_type
+        if document_input.subject_type
+        else SubjectType.OTHER,  # Temporary
         text=None,  # Will get updated in extract function
         created_at=current_datetime,
     )

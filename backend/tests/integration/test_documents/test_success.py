@@ -24,8 +24,13 @@ from backend.tests.utils.validators import (
     "filename, subject_type, document_type, MIME_type",
     [
         ("test_file_pdf.pdf", SubjectType.MATHS, DocumentType.PDF, "application/pdf"),
-        ("test_file_txt.txt", SubjectType.VIETNAMESE, DocumentType.TEXT, "text/plain"),
-        ("test_file_image.webp", SubjectType.ENGLISH, DocumentType.IMAGE, "image/webp"),
+        ("test_file_txt.txt", SubjectType.LANGUAGES, DocumentType.TEXT, "text/plain"),
+        (
+            "test_file_image.webp",
+            SubjectType.LITERATURE,
+            DocumentType.IMAGE,
+            "image/webp",
+        ),
     ],
 )
 async def test_create_document(

@@ -23,7 +23,7 @@ if TYPE_CHECKING:
 class DocumentBase(SQLModel):
     name: str
     page_starts_at: int = 1
-    subject_type: SubjectType | None
+    subject_type: SubjectType
 
 
 # ----- INPUT ----- #

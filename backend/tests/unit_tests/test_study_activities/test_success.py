@@ -75,13 +75,13 @@ from backend.tests.utils.validators import (
         ),
         (
             StudyActivityFormat.OPEN_ENDED,
-            SubjectType.VIETNAMESE,
+            SubjectType.LANGUAGES,
             mock_open_ended_llm_return_data,
             validation_open_ended_creation_data,
         ),
         (
             StudyActivityFormat.FLASHCARDS,
-            SubjectType.ENGLISH,
+            SubjectType.LITERATURE,
             mock_flashcards_llm_return_data,
             validation_flashcards_creation_data,
         ),
@@ -165,7 +165,7 @@ async def test_create_add_flashcards_activity(
 
     # === Creates the activity === #
     flashcards_activity_input = FlashcardsActivityInput(
-        subject_type=SubjectType.ENGLISH,
+        subject_type=SubjectType.LITERATURE,
         name="Flashcards name",
         description="Flashcards description",
     )
@@ -266,7 +266,7 @@ async def test_read_all_study_activities(
     open_ended_dummy = {
         "prompt": "Open ended prompt",
         "activity_format": StudyActivityFormat.OPEN_ENDED,
-        "subject_type": SubjectType.VIETNAMESE,
+        "subject_type": SubjectType.LANGUAGES,
         "name": "Open ended",
         "is_submitted": True,
     }
@@ -274,7 +274,7 @@ async def test_read_all_study_activities(
     flashcards_dummy = {
         "prompt": "Flashcards prompt",
         "activity_format": StudyActivityFormat.FLASHCARDS,
-        "subject_type": SubjectType.ENGLISH,
+        "subject_type": SubjectType.LITERATURE,
         "name": "Flashcards",
         "is_submitted": False,
     }
@@ -324,13 +324,13 @@ async def test_read_all_study_activities(
         ),
         (
             StudyActivityFormat.OPEN_ENDED,
-            SubjectType.VIETNAMESE,
+            SubjectType.LANGUAGES,
             True,
             validation_open_ended_read_data,
         ),
         (
             StudyActivityFormat.FLASHCARDS,
-            SubjectType.ENGLISH,
+            SubjectType.LITERATURE,
             False,
             validation_flashcards_read_data,
         ),
@@ -450,7 +450,7 @@ async def test_update_flashcard(
         create_interaction_test,
         "Study activity creation prompt",
         StudyActivityFormat.FLASHCARDS,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
         "Study activity name",
         False,
         False,
@@ -748,7 +748,7 @@ async def test_delete_flashcard(
         create_interaction_test,
         "Study activity creation prompt",
         StudyActivityFormat.FLASHCARDS,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
         "Study activity name",
         False,
         False,

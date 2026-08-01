@@ -24,61 +24,44 @@ test.describe('Study progress - Success tests', () => {
 
     // Activities count section
     await expect(studyProgressSection.totalActivityCount).toHaveText('0');
-    await studyProgressSection.checkContent({
-      section: 'activityCountByFormat',
-      contents: {
-        'Multiple Choice Questions:': '0',
-        'Open Ended:': '0',
-        'Flashcards:': '0',
-      },
-    });
-    await studyProgressSection.checkContent({
-      section: 'activityCountBySubject',
-      contents: {
-        'Maths:': '0',
-        'Vietnamese:': '0',
-        'English:': '0',
-      },
-    });
+    await expect(
+      studyProgressSection.activityCountByFormat
+        .locator('dd')
+        .filter({ hasNotText: '0' }),
+    ).not.toBeVisible();
+    await expect(
+      studyProgressSection.activityCountBySubject
+        .locator('dd')
+        .filter({ hasNotText: '0' }),
+    ).not.toBeVisible();
 
     // Activitiy items count section
     await expect(studyProgressSection.totalActivityItemsCount).toHaveText('0');
-    await studyProgressSection.checkContent({
-      section: 'activityItemsCountByFormat',
-      contents: {
-        'Multiple Choice Questions:': '0',
-        'Open Ended:': '0',
-        'Flashcards:': '0',
-      },
-    });
-    await studyProgressSection.checkContent({
-      section: 'activityItemsCountBySubject',
-      contents: {
-        'Maths:': '0',
-        'Vietnamese:': '0',
-        'English:': '0',
-      },
-    });
+    await expect(
+      studyProgressSection.activityItemsCountByFormat
+        .locator('dd')
+        .filter({ hasNotText: '0' }),
+    ).not.toBeVisible();
+    await expect(
+      studyProgressSection.activityItemsCountBySubject
+        .locator('dd')
+        .filter({ hasNotText: '0' }),
+    ).not.toBeVisible();
 
     // Activity score section
     await expect(studyProgressSection.averageActivityScore).toHaveText(
       'No data',
     );
-    await studyProgressSection.checkContent({
-      section: 'averageActivityScoreByFormat',
-      contents: {
-        'Multiple Choice Questions:': 'No data',
-        'Open Ended:': 'No data',
-      },
-    });
-    await studyProgressSection.checkContent({
-      section: 'averageActivityScoreBySubject',
-      contents: {
-        'Maths:': 'No data',
-        'Vietnamese:': 'No data',
-        'English:': 'No data',
-      },
-    });
+    await expect(
+      studyProgressSection.averageActivityScoreByFormat
+        .locator('dd')
+        .filter({ hasNotText: 'No data' }),
+    ).not.toBeVisible();
+    await expect(
+      studyProgressSection.averageActivityScoreBySubject
+        .locator('dd')
+        .filter({ hasNotText: 'No data' }),
+    ).not.toBeVisible();
   });
 
   test.describe('View study progress with data', () => {
@@ -92,8 +75,8 @@ test.describe('Study progress - Success tests', () => {
         };
         const activityBySubject = {
           MATHS: 3,
-          VIETNAMESE: 4,
-          ENGLISH: 5,
+          LANGUAGES: 4,
+          LITERATURE: 5,
         };
 
         const gradeByFormat = {
@@ -102,8 +85,8 @@ test.describe('Study progress - Success tests', () => {
         };
         const gradeBySubject = {
           MATHS: [200, 300],
-          VIETNAMESE: [100, 300],
-          ENGLISH: [300, 300],
+          LANGUAGES: [100, 300],
+          LITERATURE: [300, 300],
         };
 
         const now = dayjs.utc();
@@ -124,22 +107,22 @@ test.describe('Study progress - Success tests', () => {
         );
 
         const removeLastYear = () => {
-          // Removes 1 English Flashcard
-          // Removes 1 Vietnamese Open Ended (40/100)
+          // Removes 1 Literature Flashcard
+          // Removes 1 Languages Open Ended (40/100)
 
           activityByFormat.FLASHCARDS -= 1;
-          activityBySubject.ENGLISH -= 1;
+          activityBySubject.LITERATURE -= 1;
 
           activityByFormat.OPEN_ENDED -= 1;
-          activityBySubject.VIETNAMESE -= 1;
+          activityBySubject.LANGUAGES -= 1;
 
           gradeByFormat.OPEN_ENDED = [
             gradeByFormat.OPEN_ENDED[0] - 40,
             gradeByFormat.OPEN_ENDED[1] - 100,
           ];
-          gradeBySubject.VIETNAMESE = [
-            gradeBySubject.VIETNAMESE[0] - 40,
-            gradeBySubject.VIETNAMESE[1] - 100,
+          gradeBySubject.LANGUAGES = [
+            gradeBySubject.LANGUAGES[0] - 40,
+            gradeBySubject.LANGUAGES[1] - 100,
           ];
         };
 
@@ -160,18 +143,18 @@ test.describe('Study progress - Success tests', () => {
         };
 
         const removeLastWeek = () => {
-          // Removes 1 English MCQ (100/100)
+          // Removes 1 Literature MCQ (100/100)
 
           activityByFormat.MULTIPLE_CHOICE_QUESTIONS -= 1;
-          activityBySubject.ENGLISH -= 1;
+          activityBySubject.LITERATURE -= 1;
 
           gradeByFormat.MULTIPLE_CHOICE_QUESTIONS = [
             gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[0] - 100,
             gradeByFormat.MULTIPLE_CHOICE_QUESTIONS[1] - 100,
           ];
-          gradeBySubject.ENGLISH = [
-            gradeBySubject.ENGLISH[0] - 100,
-            gradeBySubject.ENGLISH[1] - 100,
+          gradeBySubject.LITERATURE = [
+            gradeBySubject.LITERATURE[0] - 100,
+            gradeBySubject.LITERATURE[1] - 100,
           ];
         };
 
@@ -348,8 +331,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityCountBySubject',
         contents: {
           'Maths:': '3',
-          'Vietnamese:': '4',
-          'English:': '5',
+          'Languages:': '4',
+          'Literature:': '5',
         },
       });
 
@@ -369,8 +352,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityItemsCountBySubject',
         contents: {
           'Maths:': '30',
-          'Vietnamese:': '40',
-          'English:': '50',
+          'Languages:': '40',
+          'Literature:': '50',
         },
       });
 
@@ -389,8 +372,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'averageActivityScoreBySubject',
         contents: {
           'Maths:': '6.67 out of 10',
-          'Vietnamese:': '3.33 out of 10',
-          'English:': '10.00 out of 10',
+          'Languages:': '3.33 out of 10',
+          'Literature:': '10.00 out of 10',
         },
       });
     });
@@ -416,8 +399,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityCountBySubject',
         contents: {
           'Maths:': '3',
-          'Vietnamese:': '3',
-          'English:': '4',
+          'Languages:': '3',
+          'Literature:': '4',
         },
       });
 
@@ -437,8 +420,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityItemsCountBySubject',
         contents: {
           'Maths:': '30',
-          'Vietnamese:': '30',
-          'English:': '40',
+          'Languages:': '30',
+          'Literature:': '40',
         },
       });
 
@@ -457,8 +440,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'averageActivityScoreBySubject',
         contents: {
           'Maths:': '6.67 out of 10',
-          'Vietnamese:': '3.00 out of 10',
-          'English:': '10.00 out of 10',
+          'Languages:': '3.00 out of 10',
+          'Literature:': '10.00 out of 10',
         },
       });
     });
@@ -484,8 +467,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityCountBySubject',
         contents: {
           'Maths:': '2',
-          'Vietnamese:': '3',
-          'English:': '4',
+          'Languages:': '3',
+          'Literature:': '4',
         },
       });
 
@@ -505,8 +488,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityItemsCountBySubject',
         contents: {
           'Maths:': '20',
-          'Vietnamese:': '30',
-          'English:': '40',
+          'Languages:': '30',
+          'Literature:': '40',
         },
       });
 
@@ -525,8 +508,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'averageActivityScoreBySubject',
         contents: {
           'Maths:': '6.50 out of 10',
-          'Vietnamese:': '3.00 out of 10',
-          'English:': '10.00 out of 10',
+          'Languages:': '3.00 out of 10',
+          'Literature:': '10.00 out of 10',
         },
       });
     });
@@ -552,8 +535,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityCountBySubject',
         contents: {
           'Maths:': '2',
-          'Vietnamese:': '3',
-          'English:': '3',
+          'Languages:': '3',
+          'Literature:': '3',
         },
       });
 
@@ -573,8 +556,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'activityItemsCountBySubject',
         contents: {
           'Maths:': '20',
-          'Vietnamese:': '30',
-          'English:': '30',
+          'Languages:': '30',
+          'Literature:': '30',
         },
       });
 
@@ -593,8 +576,8 @@ test.describe('Study progress - Success tests', () => {
         section: 'averageActivityScoreBySubject',
         contents: {
           'Maths:': '6.50 out of 10',
-          'Vietnamese:': '3.00 out of 10',
-          'English:': '10.00 out of 10',
+          'Languages:': '3.00 out of 10',
+          'Literature:': '10.00 out of 10',
         },
       });
     });

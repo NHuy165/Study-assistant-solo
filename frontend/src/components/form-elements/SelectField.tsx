@@ -1,5 +1,6 @@
 import type { SelectOption } from '@/types/miscellaneous/custom-component-types';
 import { replaceUnderscore, titleString } from '@/utils/format-string';
+import type React from 'react';
 import {
   type UseFormRegister,
   type Path,
@@ -12,6 +13,7 @@ export const SelectField = <T extends FieldValues>({
   name,
   options,
   includeNoneOption = false,
+  onChange,
   register,
   wrapperStyle,
   labelStyle,
@@ -22,6 +24,7 @@ export const SelectField = <T extends FieldValues>({
   name: Path<T>;
   options: SelectOption[];
   includeNoneOption?: boolean;
+  onChange?: (e: React.ChangeEvent<HTMLSelectElement>) => void;
   register: UseFormRegister<T>;
   wrapperStyle?: string;
   labelStyle?: string;
@@ -37,6 +40,7 @@ export const SelectField = <T extends FieldValues>({
         className={`select select-primary ${inputStyle}`}
         {...register(name, {
           setValueAs: (value) => (value === '' ? null : value),
+          onChange: (e) => onChange?.(e),
         })}
       >
         {includeNoneOption && <option value="">None</option>}

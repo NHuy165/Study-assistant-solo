@@ -9,6 +9,7 @@ import {
 } from '@/features/documents/types/document';
 import { SubjectType } from '@/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
+import { useState } from 'react';
 import { type FieldError, type SubmitHandler, useForm } from 'react-hook-form';
 
 export const DocumentUploadForm = ({
@@ -20,6 +21,7 @@ export const DocumentUploadForm = ({
   const {
     register,
     handleSubmit,
+    setValue,
     reset,
     formState: { errors },
   } = useForm<DocumentInputForm, unknown, DocumentInput>({
@@ -27,10 +29,13 @@ export const DocumentUploadForm = ({
     defaultValues: {
       name: null,
       page_starts_at: 1,
-      subject_type: '' as unknown as null, // This bypasses the check and gets the select field to default to the nu;l; option (whose initial value is actually '')
+      subject_type: SubjectType.Other,
       subject_type_overwrite: 'false' as unknown as boolean,
+      // These castings are used to satisfy HTML, which only accepts strings or numbers as values and the Zod schema, which requires something else.
+      // String to boolean casting is done by Zod.
     },
   });
+  const [showSubjectType, setShowSubjectType] = useState(true);
 
   const uploadDocument = useUploadDocument();
 
@@ -39,6 +44,18 @@ export const DocumentUploadForm = ({
       { interactionId, documentInput: data },
       { onSuccess: () => reset() },
     );
+  };
+
+  const handleSubjectOverwriteToggle = (
+    e: React.ChangeEvent<HTMLSelectElement>,
+  ) => {
+    if (e.target.value === 'true') {
+      setValue('subject_type', null);
+      setShowSubjectType(false);
+    } else {
+      setValue('subject_type', SubjectType.Other);
+      setShowSubjectType(true);
+    }
   };
 
   return (
@@ -81,18 +98,19 @@ export const DocumentUploadForm = ({
         />
 
         {/* Subject type */}
-        <SelectField
-          label="Subject type"
-          name="subject_type"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          options={Object.entries(SubjectType).map(([label, value]) => {
-            return { label, value };
-          })}
-          includeNoneOption={true}
-          register={register}
-          error={errors.subject_type}
-        />
+        {showSubjectType && (
+          <SelectField
+            label="Subject type"
+            name="subject_type"
+            inputStyle="w-full"
+            labelStyle="font-semibold block mb-2"
+            options={Object.entries(SubjectType).map(([label, value]) => {
+              return { label, value };
+            })}
+            register={register}
+            error={errors.subject_type}
+          />
+        )}
 
         {/* Subject type overwrite */}
         <SelectField
@@ -100,6 +118,7 @@ export const DocumentUploadForm = ({
           name="subject_type_overwrite"
           inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
+          onChange={handleSubjectOverwriteToggle}
           options={[
             { label: 'Yes', value: 'true' },
             { label: 'No', value: 'false' },

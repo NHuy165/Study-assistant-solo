@@ -32,7 +32,7 @@ test.describe('Open ended - Success tests', () => {
     const studyActivity = {
       prompt: 'test-OpenEnded-prompt',
       activity_format: 'OPEN_ENDED',
-      subject_type: 'VIETNAMESE',
+      subject_type: 'LANGUAGES',
       name: 'test-OpenEnded-name',
       description: 'test-OpenEnded-description',
       n_items: 2,

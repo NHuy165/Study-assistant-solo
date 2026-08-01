@@ -4,31 +4,18 @@ import { z } from 'zod';
 
 // ----- INPUT ----- //
 
-export const DocumentInputSchema = z
-  .object({
-    file: z
-      .custom<FileList>()
-      .refine((files) => files && files.length === 1, 'A file is required.'),
-    name: z.string().nullable(),
-    page_starts_at: z.int().nullable(),
-    subject_type: z.enum(SubjectType).nullable(),
-    subject_type_overwrite: z.preprocess(
-      (value) => (typeof value === 'string' ? value === 'true' : value),
-      z.boolean(),
-    ),
-  })
-  .refine(
-    (data) => {
-      if (data.subject_type !== null && data.subject_type_overwrite === true) {
-        return false;
-      }
-      return true;
-    },
-    {
-      error: 'Overwrite not available when a subject type is already selected.',
-      path: ['subject_type_overwrite'],
-    },
-  );
+export const DocumentInputSchema = z.object({
+  file: z
+    .custom<FileList>()
+    .refine((files) => files && files.length === 1, 'A file is required.'),
+  name: z.string().nullable(),
+  page_starts_at: z.int().nullable(),
+  subject_type: z.enum(SubjectType).nullable(),
+  subject_type_overwrite: z.preprocess(
+    (value) => typeof value === 'string' && value === 'true',
+    z.boolean(),
+  ),
+});
 
 export type DocumentInput = z.output<typeof DocumentInputSchema>;
 export type DocumentInputForm = z.input<typeof DocumentInputSchema>;

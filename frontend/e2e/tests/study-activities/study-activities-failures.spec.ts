@@ -44,7 +44,7 @@ test.describe('Interactions - Failure tests', () => {
       .locator('label')
       .filter({ hasText: 'Name' })
       .getByRole('alert')
-      .first(); // First because Vietnamese has name in it, therefore this results in 2 elements
+      .first();
 
     await expect(nameError).toBeVisible();
     await expect(nameError).toContainText('Too small');

@@ -122,7 +122,6 @@ class DocumentAnalysisOutput(DocumentAnalysisBase):
 
 class DocumentAnalysisSchema(DocumentAnalysisBase):
     subject_type: SubjectType
-    subject_type_overwrite: bool
     material_recommendations: list[MaterialRecommendationSchema]
     question_recommendations: list[QuestionRecommendationSchema]
 

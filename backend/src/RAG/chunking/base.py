@@ -62,12 +62,8 @@ def save_document_analysis(
     """
     validated_analysis = DocumentAnalysisSchema.model_validate_json(analysis)
 
-    # Automatic subject type filling, validates based on 3 criteria: user's desire to overwrite, model's decision to overwrite, and whether the input type was null
-    if (
-        subject_type_overwrite
-        and validated_analysis.subject_type_overwrite
-        and document.subject_type is None
-    ):
+    # Automatic subject type filling
+    if subject_type_overwrite:
         document.subject_type = validated_analysis.subject_type
 
     material_recommendations = []

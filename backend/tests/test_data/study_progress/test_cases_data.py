@@ -14,20 +14,20 @@ study_activities = [
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.MATHS, True, False),
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.MATHS, False, True),
     (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.MATHS, True, True),
-    (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.ENGLISH, True, True),
+    (StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS, SubjectType.LITERATURE, True, True),
     (
         StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
-        SubjectType.VIETNAMESE,
+        SubjectType.LANGUAGES,
         False,
         False,
     ),
-    (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, False, False),
-    (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, True, False),
-    (StudyActivityFormat.OPEN_ENDED, SubjectType.VIETNAMESE, True, True),
+    (StudyActivityFormat.OPEN_ENDED, SubjectType.LANGUAGES, False, False),
+    (StudyActivityFormat.OPEN_ENDED, SubjectType.LANGUAGES, True, False),
+    (StudyActivityFormat.OPEN_ENDED, SubjectType.LANGUAGES, True, True),
     (StudyActivityFormat.OPEN_ENDED, SubjectType.MATHS, True, True),
-    (StudyActivityFormat.FLASHCARDS, SubjectType.ENGLISH, True, False),
-    (StudyActivityFormat.FLASHCARDS, SubjectType.ENGLISH, False, False),
-    (StudyActivityFormat.FLASHCARDS, SubjectType.VIETNAMESE, True, False),
+    (StudyActivityFormat.FLASHCARDS, SubjectType.LITERATURE, True, False),
+    (StudyActivityFormat.FLASHCARDS, SubjectType.LITERATURE, False, False),
+    (StudyActivityFormat.FLASHCARDS, SubjectType.LANGUAGES, True, False),
 ]
 
 # Test case 1: Counting activities by subject.
@@ -46,11 +46,11 @@ validation_1 = [
     ),
     (
         4,
-        SubjectType.VIETNAMESE,
+        SubjectType.LANGUAGES,
     ),
     (
         3,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
     ),
 ]
 
@@ -127,22 +127,22 @@ validation_4 = [
     (
         1,
         StudyActivityType.EXERCISE,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
     ),
     (
         3,
         StudyActivityType.EXERCISE,
-        SubjectType.VIETNAMESE,
+        SubjectType.LANGUAGES,
     ),
     (
         2,
         StudyActivityType.REVIEW,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
     ),
     (
         1,
         StudyActivityType.REVIEW,
-        SubjectType.VIETNAMESE,
+        SubjectType.LANGUAGES,
     ),
 ]
 
@@ -171,7 +171,7 @@ validation_5 = [
         50,
         100,
         StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
-        SubjectType.ENGLISH,
+        SubjectType.LITERATURE,
     ),
     (
         50,
@@ -183,6 +183,6 @@ validation_5 = [
         50,
         100,
         StudyActivityFormat.OPEN_ENDED,
-        SubjectType.VIETNAMESE,
+        SubjectType.LANGUAGES,
     ),
 ]

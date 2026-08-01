@@ -13,10 +13,8 @@ from backend.src.exceptions.core import (
 )
 from backend.src.models_schema.document.document_analysis import (
     DocumentAnalysisSchema,
-    MaterialRecommendationSchema,
 )
 from backend.src.models_schema.interaction.interaction import Interaction
-from backend.src.models_schema.miscellaneous.enums import StudyActivityFormat
 from backend.src.models_schema.user.user import User
 from backend.tests.fixtures.documents import SubjectType
 from backend.tests.utils.validators import (
@@ -115,7 +113,6 @@ async def test_create_document_failed_api(
         mock_analysis = DocumentAnalysisSchema(
             summary=mock_summary,
             subject_type=SubjectType.MATHS,
-            subject_type_overwrite=True,
             material_recommendations=[],
             question_recommendations=[],
         )

@@ -44,11 +44,11 @@ from backend.tests.utils.validators import (
         ),
         (
             StudyActivityFormat.OPEN_ENDED,
-            SubjectType.VIETNAMESE,
+            SubjectType.LANGUAGES,
         ),
         (
             StudyActivityFormat.FLASHCARDS,
-            SubjectType.ENGLISH,
+            SubjectType.LITERATURE,
         ),
     ],
 )
