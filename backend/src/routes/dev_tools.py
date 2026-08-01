@@ -1,4 +1,6 @@
-from fastapi import APIRouter
+from typing import Annotated
+
+from fastapi import APIRouter, Query, UploadFile
 
 from backend.src.core.database import reset_database
 from backend.src.core.dependencies import (
@@ -13,11 +15,13 @@ from backend.src.models_schema.activity.study_activity import (
     MockStudyActivityInput,
     StudyActivityOutputComplete,
 )
+from backend.src.models_schema.document.document import DocumentInput, DocumentOutput
+from backend.src.models_schema.document.document_analysis import DocumentAnalysisOutput
 from backend.src.models_schema.study_progress.assessment import (
     MockStudyAssessmentInput,
     StudyAssessmentOutput,
 )
-from backend.src.services.dev_tools import study_activity, study_assessment
+from backend.src.services.dev_tools import document, study_activity, study_assessment
 
 router = APIRouter()
 
@@ -30,6 +34,38 @@ async def wipe_database():
 @router.get("/ping", status_code=204)
 async def ping(session: SessionDep):
     await session.execute(select(1))
+
+
+@router.post(
+    "/document/{interaction_id}",
+    tags=["document"],
+    response_model=tuple[DocumentOutput, DocumentAnalysisOutput | None],
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+        404: Responses.RESPONSE_404_NOT_FOUND,
+    },
+)
+async def mock_save_document(
+    user: UserDep,
+    session: SessionDep,
+    current_datetime: DatetimeDep,
+    file: UploadFile,
+    document_input: Annotated[DocumentInput, Query()],
+    interaction: InteractionDep,
+):
+    """
+    Mock saves a user-uploaded document to the database, no embedding takes place.
+    """
+    document_output, document_analysis = await document.mock_save_document(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        file=file,
+        interaction=interaction,
+        document_input=document_input,
+    )
+
+    return document_output, document_analysis
 
 
 @router.post(
