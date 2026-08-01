@@ -26,7 +26,7 @@ async def register_user(
     session: SessionDep, current_datetime: DatetimeDep, user_input: UserInput
 ):
     """
-    Creates a user account.
+    Registers a user account.
     """
     user_output = await user_service.register_user(
         session=session,
@@ -48,7 +48,7 @@ async def register_user(
 )
 async def read_user(user: UserDep):
     """
-    Reads current user's public information.
+    Reads current user's profile information.
     """
     user_output = await user_service.read_user(
         user=user,
@@ -70,7 +70,7 @@ async def read_user(user: UserDep):
 )
 async def update_user(user: UserDep, session: SessionDep, user_update: UserUpdate):
     """
-    Updates current user's public information.
+    Updates current user's profile information.
     """
     user_output = await user_service.update_user(
         user=user,
@@ -91,7 +91,7 @@ async def update_password(
     user: UserDep, session: SessionDep, password_change: UserPasswordChange
 ):
     """
-    Updates current user's password.
+    Updates current user's password, requires old password to be provided.
     """
     await user_service.update_password(
         user=user,

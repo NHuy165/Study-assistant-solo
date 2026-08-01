@@ -49,7 +49,7 @@ async def mock_create_study_activity(
     mock_study_activity_input: MockStudyActivityInput,
 ):
     """
-    Create a study activity with predictable contents, used for testing only.
+    Mocks a study activity with predictable contents.
     """
     return await study_activity.mock_create_study_activity(
         session=session,
@@ -76,7 +76,7 @@ async def mock_submit_exercise_activity(
     study_activity_id: int,
 ):
     """
-    Nộp tài liệu dạng Exercise.
+    Mock submits an existing exercise activity with predictable contents.
     """
     unvalidated = await study_activity.mock_submit_exercise_activity(
         user=user,
@@ -106,6 +106,9 @@ async def mock_create_study_assessment(
     current_datetime: DatetimeDep,
     mock_study_assessment_input: MockStudyAssessmentInput,
 ):
+    """
+    Mocks a study assessment with predictable contents.
+    """
     result = await study_assessment.mock_create_study_assessment(
         user=user,
         session=session,

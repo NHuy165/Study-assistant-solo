@@ -50,7 +50,7 @@ async def create_study_activity(
     study_activity_input: StudyActivityInput,
 ):
     """
-    Tạo một dạng tài liệu tùy vào các yêu cầu trong request.
+    Creates a study activity based on the input request.
     """
     return await study_activity.create_study_activity(
         user=user,
@@ -76,7 +76,7 @@ async def create_flashcards_activity(
     flashcards_activity_input: FlashcardsActivityInput,
 ):
     """
-    Tạo một tài liệu Flashcards rỗng.
+    Creates an empty flashcards activity.
     """
     return await study_activity.create_flashcards_activity(
         session=session,
@@ -101,7 +101,7 @@ async def add_flashcards(
     flashcard_inputs: list[FlashcardInput],
 ):
     """
-    Thêm flashcards cho một tài liệu Flashcards.
+    Manually adds flashcards in a flashcards study activity.
     """
     return await study_activity.add_flashcards(
         user=user,
@@ -128,7 +128,7 @@ async def read_all_study_activity(
     interaction: InteractionDep,
 ):
     """
-    Đọc thông tin khái quát của tất cả dạng tài liệu đã tạo trong Interaction.
+    Reads the general information of the study activities in an interaction.
     """
     return await study_activity.read_all_study_activity(
         session=session,
@@ -150,7 +150,7 @@ async def read_study_activity_complete(
     study_activity_id: int,
 ):
     """
-    Đọc thông tin chi tiết của một tài liệu.
+    Reads the detailed information of one study activity, including its question contents.
     """
     unvalidated = await study_activity.read_study_activity_complete(
         user=user,
@@ -188,7 +188,7 @@ async def update_study_activity(
     study_activity_update: StudyActivityUpdate,
 ):
     """
-    Cập nhật thông tin khái quát của một tài liệu (tên và mô tả).
+    Updates the general information of a study activity.
     """
     return await study_activity.update_study_activity(
         user=user,
@@ -213,7 +213,7 @@ async def update_flashcard(
     flashcard_update: FlashcardUpdate,
 ):
     """
-    Chỉnh sửa một flashcard.
+    Updates a flashcard.
     """
     return await study_activity.update_flashcard(
         user=user,
@@ -239,7 +239,7 @@ async def answer_exercise_item(
     exercise_item_update: ExerciseItemUpdate,
 ):
     """
-    Trả lời MỘT câu hỏi trong một tài liệu dạng Exercise.
+    Saves the answer to a single question in an exercise activity.
     """
     return await study_activity.answer_exercise_item(
         user=user,
@@ -267,7 +267,7 @@ async def submit_exercise_activity(
     study_activity_id: int,
 ):
     """
-    Nộp tài liệu dạng Exercise.
+    Submits a study activity, receiving grading results.
     """
     unvalidated = await study_activity.submit_exercise_activity(
         user=user,
@@ -296,7 +296,7 @@ async def submit_exercise_activity(
 )
 async def delete_flashcard(user: UserDep, session: SessionDep, flashcard_id: int):
     """
-    Xóa một flashcard.
+    Deletes a single flashcard.
     """
     return await study_activity.delete_flashcard(
         user,
@@ -319,7 +319,7 @@ async def delete_study_activity(
     study_activity_id: int,
 ):
     """
-    Xóa một tài liệu.
+    Soft deletes a study activity (records will be saved for regular study assessments and study progress assessment).
     """
     return await study_activity.delete_study_activity(
         user,

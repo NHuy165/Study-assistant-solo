@@ -37,7 +37,7 @@ async def create_llm_response(
     llm_response_input: LLMResponseInput,
 ):
     """
-    Receives a user prompt and returns the model's answer. Conversations (prompts and answers) belong to an interaction.
+    Receives a user prompt and returns the model's answer.
     """
     llm_response_output = await llm_response_service.create_llm_response(
         user=user,

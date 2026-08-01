@@ -42,7 +42,7 @@ async def save_document(
     interaction: InteractionDep,
 ):
     """
-    Embeds and saves a user-uploaded document_service to the database. Documents belong to an interaction.
+    Embeds and saves a user-uploaded document to the database.
     """
     document_output, document_analysis = await document_service.save_document(
         user=user,
@@ -96,7 +96,7 @@ async def read_document_complete(
     document_id: int,
 ):
     """
-    Reads a document_service, together with the document_service analysis performed by the LLM.
+    Reads a document, together with its document analysis made by the LLM.
     """
     result = await document_service.read_document_complete(
         user=user,
@@ -124,7 +124,7 @@ async def update_document(
     document_update: DocumentUpdate,
 ):
     """
-    Updates a document_service's information. Document's contents cannot be updated.
+    Updates a document's information (metadata).
     """
     document_output = await document_service.update_document(
         user=user,
@@ -152,7 +152,7 @@ async def delete_document(
     document_id: int,
 ):
     """
-    Deletes a document_service from an interaction.
+    Deletes an uploaded document from an interaction.
     """
     await document_service.delete_document(
         user=user,

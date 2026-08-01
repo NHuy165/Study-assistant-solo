@@ -56,7 +56,7 @@ async def create_interaction(
 )
 async def read_all_interactions(user: UserDep, session: SessionDep):
     """
-    Gets all interactions of the current user.
+    Reads all interactions belonging to the current user.
     """
     interaction_output = await interaction_service.read_all_interactions(
         user=user,
@@ -107,6 +107,6 @@ async def update_interaction(
 )
 async def delete_interaction(user: UserDep, session: SessionDep, interaction_id: int):
     """
-    Deletes an interaction, along with all of its associated information like uploaded documents, notes, history,...
+    Soft deletes an interaction, together with its contents. Records are still kept in the database for study progress assessments.
     """
     await interaction_service.delete_interaction(user, session, interaction_id)

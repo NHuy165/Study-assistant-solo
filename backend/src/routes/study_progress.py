@@ -28,6 +28,9 @@ async def create_study_assessment(
     session: SessionDep,
     current_datetime: DatetimeDep,
 ):
+    """
+    Creates a daily study assessment for every past daily check in without a study assessment (multiple ones may pile up if user goes straight to a function instead of going to the Home page first).
+    """
     result = await study_progress.create_study_assessment(
         user=user,
         session=session,
@@ -53,6 +56,9 @@ async def get_study_progress(
     criteria: list[Criterion],
     target: AggregateTarget,
 ):
+    """
+    Fetches user study statistics based on input parameters.
+    """
     result = await study_progress.get_study_progress(
         user=user,
         session=session,
@@ -74,6 +80,9 @@ async def read_latest_study_assessment(
     user: UserDep,
     session: SessionDep,
 ):
+    """
+    Reads the latest study assessment.
+    """
     result = await study_progress.read_latest_study_assessment(
         user=user,
         session=session,
@@ -93,6 +102,9 @@ async def read_latest_study_assessment(
 async def read_study_assessment_by_date(
     user: UserDep, session: SessionDep, specific_date: date
 ):
+    """
+    Reads a study assessment by date.
+    """
     result = await study_progress.read_study_assessment_by_date(
         user=user,
         session=session,
@@ -115,6 +127,9 @@ async def read_study_assessments(
     offset: Annotated[int | None, Field(ge=0)] = None,
     limit: Annotated[int | None, Field(ge=0)] = None,
 ):
+    """
+    Reads all study assessments, supports 'offset' and 'limit' parameters.
+    """
     result = await study_progress.read_study_assessments(
         user,
         session,
