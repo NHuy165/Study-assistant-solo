@@ -17,11 +17,20 @@ from backend.src.models_schema.activity.study_activity import (
 )
 from backend.src.models_schema.document.document import DocumentInput, DocumentOutput
 from backend.src.models_schema.document.document_analysis import DocumentAnalysisOutput
+from backend.src.models_schema.llm_response.llm_response import (
+    LLMResponseInput,
+    LLMResponseOutput,
+)
 from backend.src.models_schema.study_progress.assessment import (
     MockStudyAssessmentInput,
     StudyAssessmentOutput,
 )
-from backend.src.services.dev_tools import document, study_activity, study_assessment
+from backend.src.services.dev_tools import (
+    document,
+    llm_response,
+    study_activity,
+    study_assessment,
+)
 
 router = APIRouter()
 
@@ -66,6 +75,35 @@ async def mock_save_document(
     )
 
     return document_output, document_analysis
+
+
+@router.post(
+    "/llm-response/{interaction_id}",
+    tags=["llm-response"],
+    response_model=LLMResponseOutput,
+    responses={
+        401: Responses.RESPONSE_401_UNAUTHORIZED,
+    },
+)
+async def mock_create_llm_response(
+    user: UserDep,
+    session: SessionDep,
+    current_datetime: DatetimeDep,
+    interaction: InteractionDep,
+    llm_response_input: LLMResponseInput,
+):
+    """
+    Receives a user prompt and mocks a model's answer.
+    """
+    llm_response_output = await llm_response.mock_create_llm_response(
+        user=user,
+        session=session,
+        current_datetime=current_datetime,
+        llm_response_input=llm_response_input,
+        interaction=interaction,
+    )
+
+    return llm_response_output
 
 
 @router.post(
