@@ -72,7 +72,7 @@ export const DocumentUploadForm = ({
         labelStyle="font-semibold block mb-2"
         accept="image/*, text/*, .pdf"
         register={register}
-        error={errors.name}
+        error={errors.file}
       />
 
       {/* Name */}
