@@ -271,7 +271,6 @@ async def create_study_activity(
                 "$!SUBJECT!$": "User's prompt contents doesn't match specified subject type.",
                 "$!FORMAT!$": "User's prompt contents doesn't match specified activity format.",
                 "$!SCOPE!$": "User's prompt contains irrelevant information.",
-                "$!KNOWLEDGE!$": "User's prompt contains information that is too advanced.",
             }
 
             if (
