@@ -2,6 +2,3 @@
 pytest
 pytest_asyncio
 time-machine
-
-# Stress test
-locust
