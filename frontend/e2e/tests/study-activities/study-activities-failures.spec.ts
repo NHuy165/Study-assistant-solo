@@ -6,7 +6,7 @@ import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { loginUser } from '@e2e/helpers/auth/login-user';
 import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
-import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
+import { mockCreateStudyActivity } from '@e2e/helpers/study-activities/mock-create-study-activity';
 
 test.describe('Interactions - Failure tests', () => {
   test.beforeEach(async ({ page, request }) => {
@@ -65,7 +65,7 @@ test.describe('Interactions - Failure tests', () => {
       n_items: 5,
     };
 
-    await createStudyActivity({
+    await mockCreateStudyActivity({
       page,
       request,
       interactionId,

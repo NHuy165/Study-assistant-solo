@@ -6,9 +6,8 @@ import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { loginUser } from '@e2e/helpers/auth/login-user';
 import { InteractionPage } from '@e2e/pages/interaction/InteractionPage';
-import mockStudyActivitiesData from '@e2e/data/study-activities/mock-study-activities.json' with { type: 'json' };
 import { replaceUnderscore, titleString } from '@/utils/format-string';
-import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
+import { mockCreateStudyActivity } from '@e2e/helpers/study-activities/mock-create-study-activity';
 import { StudyActivityPage } from '@e2e/pages/study-activity/StudyActivityPage';
 
 test.describe('Study activities - Success tests', () => {
@@ -35,7 +34,7 @@ test.describe('Study activities - Success tests', () => {
     await interactionPage.goto(interactionId);
   });
 
-  test('Create a study activity via an AI call and view its details for each study activity format type.', async ({
+  test('Create a study activity via a mocked API call and view its details for each study activity format type.', async ({
     page,
   }) => {
     const studyActivitiesSection = new InteractionPage(page)
@@ -43,79 +42,62 @@ test.describe('Study activities - Success tests', () => {
 
     const interactionId = Number(page.url().split('/').pop());
 
-    // Builds mock data
-    const responses = [
+    const requests = [
       {
-        ...mockStudyActivitiesData[0],
         prompt: 'Test prompt 1',
         subject_type: 'MATHS',
-        interaction_id: interactionId,
+        activity_format: 'MULTIPLE_CHOICE_QUESTIONS',
       },
       {
-        ...mockStudyActivitiesData[1],
         prompt: 'Test prompt 2',
         subject_type: 'LANGUAGES',
-        interaction_id: interactionId,
+        activity_format: 'OPEN_ENDED',
       },
       {
-        ...mockStudyActivitiesData[2],
         prompt: 'Test prompt 3',
         subject_type: 'LITERATURE',
-        interaction_id: interactionId,
+        activity_format: 'FLASHCARDS',
       },
     ];
-
-    const staticResponses = [...responses];
-    const history: unknown[] = [];
 
     // Mocks response
     await page.route(
       `**/api/study-activity/${interactionId}`,
       async (route) => {
-        const method = route.request().method();
-
-        if (method === 'GET') {
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            json: history,
-          });
-        } else if (method === 'POST') {
-          const mockResponse = responses.shift();
-
-          if (mockResponse) {
-            history.push(mockResponse);
-          }
-
-          await route.fulfill({
-            status: 200,
-            contentType: 'application/json',
-            json: {
-              ...mockResponse,
-            },
-          });
-        } else {
+        if (route.request().method() !== 'POST') {
           await route.continue();
+          return;
         }
+
+        const originalBody = route.request().postDataJSON();
+        const updatedBody = {
+          ...originalBody,
+          name: `Name of ${originalBody['prompt']}`,
+          description: `Description of ${originalBody['prompt']}`,
+          n_items: 2,
+        };
+
+        await route.continue({
+          url: `**/api/dev/study-activity/${interactionId}`,
+          postData: JSON.stringify(updatedBody),
+        });
       },
     );
 
     // Real test
-    for (let i = 0; i < mockStudyActivitiesData.length; i++) {
+    for (let i = 0; i < requests.length; i++) {
       await studyActivitiesSection.fillCreationInputs({
-        prompt: staticResponses[i].prompt,
+        prompt: requests[i].prompt,
         activityFormat: titleString(
-          replaceUnderscore(staticResponses[i].activity_format),
+          replaceUnderscore(requests[i].activity_format),
         ),
-        subjectType: titleString(
-          replaceUnderscore(staticResponses[i].subject_type),
-        ),
+        subjectType: titleString(replaceUnderscore(requests[i].subject_type)),
       });
       await studyActivitiesSection.creationButton.click();
 
       await expect(studyActivitiesSection.studyActivity).toHaveCount(i + 1);
       await expect(studyActivitiesSection.studyActivity.last()).toContainText(
-        staticResponses[i].name,
+        `Name of ${requests[i].prompt}`,
       );
 
       await expect(studyActivitiesSection.creationPromptInput).toBeEmpty();
@@ -206,12 +188,14 @@ test.describe('Study activities - Success tests', () => {
         n_items: 5,
       };
 
-      const studyActivityId = await createStudyActivity({
-        page,
-        request,
-        interactionId,
-        studyActivity,
-      });
+      const studyActivityId = (
+        await mockCreateStudyActivity({
+          page,
+          request,
+          interactionId,
+          studyActivity,
+        })
+      ).id as number;
       await page.reload();
 
       await studyActivitiesSection.studyActivity
@@ -244,12 +228,14 @@ test.describe('Study activities - Success tests', () => {
         n_items: 4,
       };
 
-      const studyActivityId = await createStudyActivity({
-        page,
-        request,
-        interactionId,
-        studyActivity,
-      });
+      const studyActivityId = (
+        await mockCreateStudyActivity({
+          page,
+          request,
+          interactionId,
+          studyActivity,
+        })
+      ).id as number;
       await page.reload();
 
       await studyActivitiesSection.studyActivity
@@ -282,12 +268,14 @@ test.describe('Study activities - Success tests', () => {
         n_items: 6,
       };
 
-      const studyActivityId = await createStudyActivity({
-        page,
-        request,
-        interactionId,
-        studyActivity,
-      });
+      const studyActivityId = (
+        await mockCreateStudyActivity({
+          page,
+          request,
+          interactionId,
+          studyActivity,
+        })
+      ).id as number;
       await page.reload();
 
       await studyActivitiesSection.studyActivity
@@ -321,7 +309,7 @@ test.describe('Study activities - Success tests', () => {
       n_items: 5,
     };
 
-    await createStudyActivity({
+    await mockCreateStudyActivity({
       page,
       request,
       interactionId,
@@ -393,7 +381,7 @@ test.describe('Study activities - Success tests', () => {
       n_items: 5,
     };
 
-    await createStudyActivity({
+    await mockCreateStudyActivity({
       page,
       request,
       interactionId,

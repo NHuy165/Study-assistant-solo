@@ -9,7 +9,7 @@ type StudyActivityCreationType = {
   n_items: number;
 };
 
-export const createStudyActivity = async ({
+export const mockCreateStudyActivity = async ({
   page,
   request,
   interactionId,
@@ -19,7 +19,7 @@ export const createStudyActivity = async ({
   request: APIRequestContext;
   interactionId: number;
   studyActivity: StudyActivityCreationType;
-}): Promise<number> => {
+}) => {
   try {
     const token = await page.evaluate(() => {
       const storageData = window.localStorage.getItem('token-storage');
@@ -46,7 +46,7 @@ export const createStudyActivity = async ({
 
     const body = await response.json();
 
-    return body.id as number;
+    return body;
   } catch (e) {
     const errorMessage = e instanceof Error ? e.message : String(e);
     throw new Error(`Failed to connect to server: ${errorMessage}`, {

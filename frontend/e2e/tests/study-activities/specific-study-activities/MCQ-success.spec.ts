@@ -5,7 +5,7 @@ import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
 import { loginUser } from '@e2e/helpers/auth/login-user';
-import { createStudyActivity } from '@e2e/helpers/study-activities/create-study-activity';
+import { mockCreateStudyActivity } from '@e2e/helpers/study-activities/mock-create-study-activity';
 import { StudyActivityPage } from '@e2e/pages/study-activity/StudyActivityPage';
 import { mockSubmitStudyActivity } from '@e2e/helpers/study-activities/mock-submit-study-activity';
 
@@ -37,12 +37,14 @@ test.describe('Multiple choice questions - Success tests', () => {
       description: 'test-MCQ-description',
       n_items: 2,
     };
-    const studyActivityId = await createStudyActivity({
-      page,
-      request,
-      interactionId,
-      studyActivity,
-    });
+    const studyActivityId = (
+      await mockCreateStudyActivity({
+        page,
+        request,
+        interactionId,
+        studyActivity,
+      })
+    ).id as number;
 
     // Mocks submit response
     await page.route(
