@@ -13,7 +13,7 @@ export const ButtonCreateStudyActivity = ({
   const createStudyActivity = useCreateStudyActivity();
 
   return (
-    <div className="flex justify-center items-center h-30">
+    <li className="flex justify-center items-center h-30">
       <Button
         text="Generate activity"
         textDisabled="Generating..."
@@ -39,6 +39,6 @@ export const ButtonCreateStudyActivity = ({
           )}
         </p>
       </div>
-    </div>
+    </li>
   );
 };

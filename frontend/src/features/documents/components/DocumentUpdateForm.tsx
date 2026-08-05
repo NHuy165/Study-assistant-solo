@@ -47,53 +47,56 @@ export const DocumentUpdateForm = ({
   };
 
   return (
-    <div className="card shadow-xl border border border-primary mt-3 mb-6 p-6">
+    <form
+      className="card shadow-xl border border border-primary mt-3 mb-6 p-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <h3 className="font-bold text-3xl mb-3">Update</h3>
 
-      <form onSubmit={handleSubmit(onSubmit)}>
-        {/* Name */}
+      {/* Name */}
+      <FormField
+        label="New name"
+        name="name"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.name}
+      />
+
+      {/* Page starts at, only available if document is a PDF */}
+      {document.type == DocumentType.Pdf && (
         <FormField
-          label="New Name"
-          name="name"
+          label="New page start"
+          name="page_starts_at"
+          type="number"
           inputStyle="w-1/1"
           labelStyle="font-semibold block mb-2"
           register={register}
-          error={errors.name}
+          error={errors.page_starts_at}
         />
+      )}
 
-        {/* Page starts at, only available if document is a PDF */}
-        {document.type == DocumentType.Pdf && (
-          <FormField
-            label="Page starts at"
-            name="page_starts_at"
-            inputStyle="w-1/1"
-            labelStyle="font-semibold block mb-2"
-            register={register}
-            error={errors.page_starts_at}
-          />
-        )}
+      {/* Subject type */}
+      <SelectField
+        label="New subject type"
+        name="subject_type"
+        inputStyle="w-1/1"
+        labelStyle="font-semibold block mb-2"
+        options={Object.entries(SubjectType).map(([label, value]) => {
+          return { label, value };
+        })}
+        register={register}
+        error={errors.subject_type}
+      />
 
-        {/* Subject type */}
-        <SelectField
-          label="Subject type"
-          name="subject_type"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          options={Object.entries(SubjectType).map(([label, value]) => {
-            return { label, value };
-          })}
-          register={register}
-          error={errors.subject_type}
-        />
-
-        {/* Submit button */}
-        <Button
-          disabled={updateDocument.isPending}
-          style="mt-3"
-          text="Update"
-          textDisabled="Updating..."
-        />
-      </form>
-    </div>
+      {/* Submit button */}
+      <Button
+        disabled={updateDocument.isPending}
+        style="mt-3"
+        text="Update"
+        textDisabled="Updating..."
+        type="submit"
+      />
+    </form>
   );
 };

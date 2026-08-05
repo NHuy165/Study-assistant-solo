@@ -39,7 +39,7 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
 
         {/* More details */}
         {showDetails && (
-          <div className="card shadow-xl border border-primary mt-3 p-6">
+          <section className="card shadow-xl border border-primary mt-3 p-6">
             <h3 className="font-bold text-3xl mb-3">Details</h3>
             <div className="space-y-2">
               {/* Normal details */}
@@ -83,14 +83,14 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                   getDocumentComplete.isPending || (
                     <div className="space-y-8">
                       {/* Study activity recommendations */}
-                      <div className="mt-4">
+                      <section className="mt-4">
                         <span className="font-bold divider mb-8 divider-primary">
                           Create study activities
                         </span>
-                        <div>
+                        <ul className="space-y-6">
                           {(getDocumentComplete.data?.[1]
                             ?.material_recommendations?.length ?? 0) > 0 ? (
-                            <div className="space-y-6">
+                            <>
                               {getDocumentComplete.data?.[1]?.material_recommendations?.map(
                                 (recommendation) => (
                                   <ButtonCreateStudyActivity
@@ -102,23 +102,24 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                                   />
                                 ),
                               )}
-                            </div>
+                            </>
                           ) : (
                             <span>
                               Document has no study activity recommendation.
                             </span>
                           )}
-                        </div>
-                      </div>
+                        </ul>
+                      </section>
+
                       {/* LLM chat recommendations */}
-                      <div>
+                      <section>
                         <span className="font-bold divider mb-8 divider-primary">
                           Chat with LLM
                         </span>
-                        <div>
+                        <ul className="space-y-6">
                           {(getDocumentComplete.data?.[1]
                             ?.question_recommendations?.length ?? 0) > 0 ? (
-                            <div className="space-y-6">
+                            <>
                               {getDocumentComplete.data?.[1]?.question_recommendations?.map(
                                 (recommendation) => (
                                   <ButtonCreateLLMResponse
@@ -130,14 +131,14 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                                   />
                                 ),
                               )}
-                            </div>
+                            </>
                           ) : (
                             <span>
                               Document has no LLM chat recommendation.
                             </span>
                           )}
-                        </div>
-                      </div>
+                        </ul>
+                      </section>
                     </div>
                   )}
               </p>
@@ -157,7 +158,7 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                 />
               </div>
             )}
-          </div>
+          </section>
         )}
       </div>
     </li>

@@ -53,89 +53,88 @@ export const DocumentUploadForm = ({
       setValue('subject_type', null);
       setShowSubjectType(false);
     } else {
-      setValue('subject_type', SubjectType.Other);
       setShowSubjectType(true);
     }
   };
 
   return (
-    <div className="card shadow-xl border border border-primary py-6 px-10 mx-10 mb-6">
+    <form
+      className="card flex flex-col shadow-xl border border border-primary py-6 px-10 mx-10 mb-6"
+      onSubmit={handleSubmit(onSubmit)}
+    >
       <h3 className="font-bold text-2xl mb-3">Upload a document</h3>
+      {/* File upload */}
+      <FormField
+        label="File:"
+        name="file"
+        type="file"
+        inputStyle="file-input file-input-primary w-full p-0"
+        labelStyle="font-semibold block mb-2"
+        accept="image/*, text/*, .pdf"
+        register={register}
+        error={errors.name}
+      />
 
-      <form className="flex flex-col" onSubmit={handleSubmit(onSubmit)}>
-        {/* File upload */}
-        <FormField
-          label="File:"
-          name="file"
-          type="file"
-          inputStyle="file-input file-input-primary w-full p-0"
-          labelStyle="font-semibold block mb-2"
-          accept="image/*, text/*, .pdf"
-          register={register}
-          error={errors.name}
-        />
+      {/* Name */}
+      <FormField
+        label="Name"
+        name="name"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        placeholder="Blank for original name"
+        register={register}
+        error={errors.name}
+      />
 
-        {/* Name */}
-        <FormField
-          label="Name"
-          name="name"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          placeholder="Blank for original name"
-          register={register}
-          error={errors.name}
-        />
+      {/* Page starts at */}
+      <FormField
+        label="Page starts at"
+        name="page_starts_at"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        register={register}
+        error={errors.page_starts_at}
+        type="number"
+      />
 
-        {/* Page starts at */}
-        <FormField
-          label="Page starts at"
-          name="page_starts_at"
-          inputStyle="w-full"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.page_starts_at}
-          type="number"
-        />
-
-        {/* Subject type */}
-        {showSubjectType && (
-          <SelectField
-            label="Subject type"
-            name="subject_type"
-            inputStyle="w-full"
-            labelStyle="font-semibold block mb-2"
-            options={Object.entries(SubjectType).map(([label, value]) => {
-              return { label, value };
-            })}
-            register={register}
-            error={errors.subject_type}
-          />
-        )}
-
-        {/* Subject type overwrite */}
+      {/* Subject type */}
+      {showSubjectType && (
         <SelectField
-          label="Allow automatic subject type overwrite"
-          name="subject_type_overwrite"
+          label="Subject type"
+          name="subject_type"
           inputStyle="w-full"
           labelStyle="font-semibold block mb-2"
-          onChange={handleSubjectOverwriteToggle}
-          options={[
-            { label: 'Yes', value: 'true' },
-            { label: 'No', value: 'false' },
-          ]}
+          options={Object.entries(SubjectType).map(([label, value]) => {
+            return { label, value };
+          })}
           register={register}
-          error={errors.subject_type_overwrite as FieldError | undefined}
+          error={errors.subject_type}
         />
+      )}
 
-        {/* Submit button */}
-        <Button
-          disabled={uploadDocument.isPending}
-          style="mt-6"
-          text="Upload"
-          textDisabled="Uploading..."
-          type="submit"
-        />
-      </form>
-    </div>
+      {/* Subject type overwrite */}
+      <SelectField
+        label="Allow automatic subject type overwrite"
+        name="subject_type_overwrite"
+        inputStyle="w-full"
+        labelStyle="font-semibold block mb-2"
+        onChange={handleSubjectOverwriteToggle}
+        options={[
+          { label: 'Yes', value: 'true' },
+          { label: 'No', value: 'false' },
+        ]}
+        register={register}
+        error={errors.subject_type_overwrite as FieldError | undefined}
+      />
+
+      {/* Submit button */}
+      <Button
+        disabled={uploadDocument.isPending}
+        style="mt-6"
+        text="Upload"
+        textDisabled="Uploading..."
+        type="submit"
+      />
+    </form>
   );
 };

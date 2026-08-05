@@ -12,7 +12,7 @@ export const ButtonCreateLLMResponse = ({
   const createChat = useCreateChat();
 
   return (
-    <div className="flex justify-center items-center h-20">
+    <li className="flex justify-center items-center h-20">
       <Button
         text="Chat with LLM"
         textDisabled="Generating..."
@@ -25,6 +25,6 @@ export const ButtonCreateLLMResponse = ({
           <span className="font-bold">Prompt: </span> {chatInput.prompt}
         </p>
       </div>
-    </div>
+    </li>
   );
 };
