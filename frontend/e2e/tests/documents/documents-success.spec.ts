@@ -255,7 +255,7 @@ test.describe('Documents - Success tests', () => {
           };
 
           await route.continue({
-            url: `**/api/dev/study-activity/${interactionId}`,
+            url: `${process.env.BASE_URL}/api/dev/study-activity/${interactionId}`,
             postData: JSON.stringify(updatedBody),
           });
         },
