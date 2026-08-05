@@ -28,7 +28,6 @@ export const DocumentUploadForm = ({
     resolver: zodResolver(DocumentInputSchema),
     defaultValues: {
       name: null,
-      page_starts_at: 1,
       subject_type: SubjectType.Other,
       subject_type_overwrite: 'false' as unknown as boolean,
       // These castings are used to satisfy HTML, which only accepts strings or numbers as values and the Zod schema, which requires something else.
@@ -84,17 +83,6 @@ export const DocumentUploadForm = ({
         placeholder="Blank for original name"
         register={register}
         error={errors.name}
-      />
-
-      {/* Page starts at */}
-      <FormField
-        label="Page starts at"
-        name="page_starts_at"
-        inputStyle="w-full"
-        labelStyle="font-semibold block mb-2"
-        register={register}
-        error={errors.page_starts_at}
-        type="number"
       />
 
       {/* Subject type */}

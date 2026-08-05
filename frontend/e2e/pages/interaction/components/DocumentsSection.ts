@@ -8,7 +8,6 @@ export class DocumentsSection {
   readonly creationForm: Locator;
   readonly creationFileInput: Locator;
   readonly creationNameInput: Locator;
-  readonly creationPageStartsAtInput: Locator;
   readonly creationSubjectTypeInput: Locator;
   readonly creationToggleAutomaticSubjectInput: Locator;
   readonly creationButton: Locator;
@@ -25,8 +24,7 @@ export class DocumentsSection {
     this.creationForm = rootLocator
       .locator('form')
       .filter({ hasText: 'File' })
-      .filter({ hasText: 'Name' })
-      .filter({ hasText: 'Page starts at' });
+      .filter({ hasText: 'Name' });
     this.creationFormHeader = this.creationForm.getByRole('heading', {
       name: 'Upload a document',
     });
@@ -34,9 +32,6 @@ export class DocumentsSection {
     this.creationFileInput = this.creationForm.locator('input[name="file"]');
     this.creationNameInput = this.creationForm.getByRole('textbox', {
       name: 'Name',
-    });
-    this.creationPageStartsAtInput = this.creationForm.getByRole('spinbutton', {
-      name: 'Page starts at',
     });
     this.creationSubjectTypeInput = this.creationForm.getByRole('combobox', {
       name: 'Subject type',
@@ -65,22 +60,17 @@ export class DocumentsSection {
   fillCreationInputs = async ({
     filepath,
     name,
-    pageStartsAt,
     subjectType,
     automaticSubject,
   }: {
     filepath: string;
     name?: string;
-    pageStartsAt?: string;
     subjectType?: string;
     automaticSubject: string;
   }) => {
     await this.creationFileInput.setInputFiles(filepath);
     if (name) {
       await this.creationNameInput.fill(name);
-    }
-    if (pageStartsAt) {
-      await this.creationPageStartsAtInput.fill(pageStartsAt);
     }
     if (subjectType) {
       await this.creationSubjectTypeInput.selectOption({ label: subjectType });

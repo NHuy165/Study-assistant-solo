@@ -74,16 +74,10 @@ async def mock_save_document(
             "Document name cannot be blank. Either specify a name to be overwritten or change the document's original name."
         )
 
-    # Page start check
-    page_starts_at = document_input.page_starts_at
-    if selected_type not in (DocumentType.PDF):
-        page_starts_at = 0
-
     # Saves document
     document = Document(
         name=name,
         interaction=interaction,
-        page_starts_at=page_starts_at,
         type=selected_type,
         subject_type=document_input.subject_type
         if document_input.subject_type

@@ -5,7 +5,6 @@ import { DocumentUpdateForm } from '@/features/documents/components/DocumentUpda
 import { useGetDocumentComplete } from '@/features/documents/api/useGetDocumentComplete';
 import { capitalizeString } from '@/utils/format-string';
 import { Button } from '@/components/miscellaneous/Button';
-import { DocumentType } from '@/features/documents/types/constants';
 import { ButtonCreateStudyActivity } from '@/features/documents/components/ButtonCreateStudyActivity';
 import { ButtonCreateLLMResponse } from '@/features/documents/components/ButtonCreateLLMResponse';
 
@@ -51,12 +50,6 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                 <span className="font-bold">Document type:</span>{' '}
                 {document.type}
               </p>
-              {document.type === DocumentType.Pdf && (
-                <p>
-                  <span className="font-bold">Page starts at:</span>{' '}
-                  {document.page_starts_at}
-                </p>
-              )}
 
               {/* Document analysis */}
 

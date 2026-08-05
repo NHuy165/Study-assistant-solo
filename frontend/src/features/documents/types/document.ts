@@ -9,7 +9,6 @@ export const DocumentInputSchema = z.object({
     .custom<FileList>()
     .refine((files) => files && files.length === 1, 'A file is required.'),
   name: z.string().nullable(),
-  page_starts_at: z.int().nullable(),
   subject_type: z.enum(SubjectType).nullable(),
   subject_type_overwrite: z.preprocess(
     (value) => typeof value === 'string' && value === 'true',
@@ -28,7 +27,6 @@ export const DocumentOutputSchema = z.object({
   id: z.int(),
   interaction_id: z.int(),
   name: z.string().min(1),
-  page_starts_at: z.int(),
   created_at: z.iso.datetime(),
   subject_type: z.enum(SubjectType),
   type: z.enum(DocumentType),
@@ -73,7 +71,6 @@ export type DocumentOutputComplete = z.infer<
 
 export const DocumentUpdateSchema = z.object({
   name: z.string().min(1),
-  page_starts_at: z.int(),
   subject_type: z.enum(SubjectType),
 });
 

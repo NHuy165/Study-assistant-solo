@@ -1,4 +1,4 @@
-from typing import Iterable
+from collections.abc import Iterable
 
 from backend.src.models_schema.document.document_chunk import DocumentChunk
 from backend.src.models_schema.miscellaneous.enums import DocumentType
@@ -16,10 +16,7 @@ def stitch(
     current_doc_text = []
 
     if is_pdf:
-        start_page = (
-            head_chunk.document_page_num + head_chunk.document.page_starts_at  # type: ignore
-        )
-        current_doc_text.append(f"[--- Page {start_page} ---]\n\n")  # type: ignore
+        current_doc_text.append(f"[--- Page {head_chunk.document_page_num} ---]\n\n")  # type: ignore
     current_doc_text.append(head_chunk.content_original)
 
     # Loops over chunks, watching out for gaps
@@ -28,39 +25,36 @@ def stitch(
         if chunks[j].document_chunk_index != chunks[j - 1].document_chunk_index + 1:  # type: ignore
             block_content = "".join(current_doc_text)
             end_page = (
-                chunks[j - 1].document_page_num + head_chunk.document.page_starts_at  # type: ignore
+                chunks[j - 1].document_page_num  # type: ignore
                 if head_chunk.document.type.value == "PDF"
                 else 0
             )
-            stitched_contents.append((head_chunk, end_page, block_content))
+            stitched_contents.append((head_chunk, end_page, block_content))  # type: ignore
 
             head_chunk = chunks[j]
             current_doc_text = []
 
             if is_pdf:
-                start_page = (
-                    head_chunk.document_page_num  # type: ignore
-                    + head_chunk.document.page_starts_at
+                current_doc_text.append(
+                    f"[--- Page {head_chunk.document_page_num} ---]\n\n"
                 )
-                current_doc_text.append(f"[--- Page {start_page} ---]\n\n")
 
         # If no gap, but we just crossed a page
         elif is_pdf and chunks[j].document_page_num != chunks[j - 1].document_page_num:
-            new_page = (
-                chunks[j].document_page_num + head_chunk.document.page_starts_at  # type: ignore
+            current_doc_text.append(
+                f"\n\n[--- Page {chunks[j].document_page_num} ---]\n\n"
             )
-            current_doc_text.append(f"\n\n[--- Page {new_page} ---]\n\n")
 
         current_doc_text.append(chunks[j].content_original)
 
     # Final save
     block_content = "".join(current_doc_text)
     end_page = (
-        chunks[-1].document_page_num + head_chunk.document.page_starts_at  # type: ignore
+        chunks[-1].document_page_num  # type: ignore
         if head_chunk.document.type.value == "PDF"
         else 0
     )
-    stitched_contents.append((head_chunk, end_page, block_content))
+    stitched_contents.append((head_chunk, end_page, block_content))  # type: ignore
 
 
 def chunks_stitcher(

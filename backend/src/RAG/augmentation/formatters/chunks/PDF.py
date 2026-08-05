@@ -16,7 +16,7 @@ class PDFFormatter(ContentFormatter):
 Source: 
 - Document name: {head_chunk.document.name}
 - Type: {DocumentType.PDF.value}
-- Page: {head_chunk.document_page_num + head_chunk.document.page_starts_at} -> {page_end}
+- Page: {head_chunk.document_page_num} -> {page_end}
 Contents:
 {stitched_content}
 """

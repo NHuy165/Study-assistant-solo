@@ -6,7 +6,6 @@ import {
   type DocumentUpdate,
 } from '@/features/documents/types/document';
 import { SubjectType } from '@/types/constants';
-import { DocumentType } from '@/features/documents/types/constants';
 import { zodResolver } from '@hookform/resolvers/zod';
 import { type SubmitHandler, useForm } from 'react-hook-form';
 import { FormField } from '@/components/form-elements/FormField';
@@ -28,7 +27,6 @@ export const DocumentUpdateForm = ({
     resolver: zodResolver(DocumentUpdateSchema),
     values: {
       name: document.name,
-      page_starts_at: document.page_starts_at,
       subject_type: document.subject_type,
     },
   });
@@ -62,19 +60,6 @@ export const DocumentUpdateForm = ({
         register={register}
         error={errors.name}
       />
-
-      {/* Page starts at, only available if document is a PDF */}
-      {document.type == DocumentType.Pdf && (
-        <FormField
-          label="New page start"
-          name="page_starts_at"
-          type="number"
-          inputStyle="w-1/1"
-          labelStyle="font-semibold block mb-2"
-          register={register}
-          error={errors.page_starts_at}
-        />
-      )}
 
       {/* Subject type */}
       <SelectField

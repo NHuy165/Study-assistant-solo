@@ -78,7 +78,7 @@ class PdfExtractor(DocumentExtractor):
                 for chunk_text in split_chunks:
                     # Adding metadata to chunk
                     embedding_content = (
-                        f"Source: {DocumentType.PDF.value} file {document.name}, page {page_num + document.page_starts_at}:\n"
+                        f"Source: {DocumentType.PDF.value} file {document.name}, page {page_num}:\n"
                         + chunk_text
                     )
 

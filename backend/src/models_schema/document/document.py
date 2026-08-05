@@ -21,7 +21,6 @@ if TYPE_CHECKING:
 
 class DocumentBase(SQLModel):
     name: Annotated[str, Field(min_length=1)]
-    page_starts_at: int = 1
     subject_type: SubjectType
 
 
@@ -59,7 +58,6 @@ class DocumentOutput(DocumentBase):
 
 class DocumentUpdate(DocumentBase):
     name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
-    page_starts_at: Annotated[int | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- TABLE MODEL ----- #
