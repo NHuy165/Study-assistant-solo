@@ -1,7 +1,6 @@
 import test, { expect } from '@playwright/test';
 import { createInteraction } from '@e2e/helpers/interactions/create-interaction';
 import interactionData from '@e2e/data/interactions/interaction.json' with { type: 'json' };
-import mockChatData from '@e2e/data/chat/mock-chat.json' with { type: 'json' };
 import userData from '@e2e/data/auth/user.json' with { type: 'json' };
 import { resetDatabase } from '@e2e/helpers/database';
 import { registerUser } from '@e2e/helpers/auth/register-user';
@@ -39,65 +38,49 @@ test.describe('Chat - Success tests', () => {
 
     const interactionId = Number(page.url().split('/').pop());
 
-    // Builds mock data
-    const responses = [
-      {
-        ...mockChatData[0],
-        prompt: 'Test prompt 1',
-        interaction_id: interactionId,
-      },
-      {
-        ...mockChatData[1],
-        prompt: 'Test prompt 2',
-        interaction_id: interactionId,
-      },
-    ];
-
-    const staticResponses = [...responses];
-    const history: unknown[] = [];
-
     // Mocks response
     await page.route(`**/api/llm-response/${interactionId}`, async (route) => {
-      const method = route.request().method();
-
-      if (method === 'GET') {
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          json: history,
-        });
-      } else if (method === 'POST') {
-        const mockResponse = responses.shift();
-
-        if (mockResponse) {
-          history.push(mockResponse);
-        }
-
-        await route.fulfill({
-          status: 200,
-          contentType: 'application/json',
-          json: {
-            ...mockResponse,
-          },
-        });
-      } else {
+      if (route.request().method() !== 'POST') {
         await route.continue();
+        return;
       }
+
+      // Route redirect
+      await route.continue({
+        url: `${process.env.BASE_URL}/api/dev/llm-response/${interactionId}`,
+      });
     });
 
-    // Real test
-    for (let i = 0; i < mockChatData.length; i++) {
-      await chatSection.chatInput.fill(staticResponses[i].prompt);
-      await chatSection.chatButton.click();
+    // Checks initial message
+    await expect(chatSection.infoNoChat).toBeVisible();
 
-      await expect(chatSection.chatInput).toBeEmpty();
-      await expect(chatSection.chatConversation).toHaveCount(i + 1);
-      await expect(chatSection.chatConversation.last()).toContainText(
-        `User: ${staticResponses[i].prompt}`,
-      );
-      await expect(chatSection.chatConversation.last()).toContainText(
-        `Chatbot: ${staticResponses[i].answer}`,
-      );
-    }
+    // Sends message
+    const prompt1 = 'test prompt 1';
+
+    await chatSection.chatInput.fill(prompt1);
+    await chatSection.chatButton.click();
+
+    await expect(chatSection.chatInput).toBeEmpty();
+    await expect(chatSection.chatConversation).toHaveCount(1);
+    await expect(chatSection.chatConversation.last()).toContainText(
+      `User: ${prompt1}`,
+    );
+    await expect(chatSection.chatConversation.last()).toContainText(
+      `Chatbot: Reply to: ${prompt1}`,
+    );
+
+    const prompt2 = 'test prompt 2';
+
+    await chatSection.chatInput.fill(prompt2);
+    await chatSection.chatButton.click();
+
+    await expect(chatSection.chatInput).toBeEmpty();
+    await expect(chatSection.chatConversation).toHaveCount(2);
+    await expect(chatSection.chatConversation.last()).toContainText(
+      `User: ${prompt2}`,
+    );
+    await expect(chatSection.chatConversation.last()).toContainText(
+      `Chatbot: Reply to: ${prompt2}`,
+    );
   });
 });
