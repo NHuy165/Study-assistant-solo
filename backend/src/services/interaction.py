@@ -14,7 +14,6 @@ from backend.src.models_schema.interaction.interaction import (
     InteractionUpdate,
 )
 from backend.src.models_schema.llm_response.llm_response import LLMResponse
-from backend.src.models_schema.note.note import Note
 from backend.src.models_schema.user.user import User
 
 # ----- CREATE ----- #
@@ -116,11 +115,6 @@ async def hard_delete_llm_responses(session: AsyncSession, interaction_id: int):
     await session.execute(query)
 
 
-async def hard_delete_notes(session: AsyncSession, interaction_id: int):
-    query = delete(Note).where(col(Note.interaction_id) == interaction_id)
-    await session.execute(query)
-
-
 async def delete_interaction(
     user: User, session: AsyncSession, interaction_id: int
 ) -> None:
@@ -152,7 +146,6 @@ async def delete_interaction(
     # Hard deletes the other things
     await hard_delete_documents(session, interaction_id)
     await hard_delete_llm_responses(session, interaction_id)
-    await hard_delete_notes(session, interaction_id)
 
     # Soft deletes the interaction
     interaction.is_deleted = True

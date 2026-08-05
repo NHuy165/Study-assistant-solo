@@ -23,7 +23,6 @@ from backend.src.routes import (
     document,
     interaction,
     llm_response,
-    note,
     study_activity,
     study_progress,
     user,
@@ -92,12 +91,6 @@ app.include_router(
     llm_response.router,
     prefix="/api/llm-response",
     tags=["llm-response"],
-)
-
-app.include_router(
-    note.router,
-    prefix="/api/note",
-    tags=["note"],
 )
 
 app.include_router(

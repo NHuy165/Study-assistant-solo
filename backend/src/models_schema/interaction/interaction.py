@@ -10,7 +10,6 @@ if TYPE_CHECKING:
     from backend.src.models_schema.activity.study_activity import StudyActivity
     from backend.src.models_schema.document.document import Document
     from backend.src.models_schema.llm_response.llm_response import LLMResponse
-    from backend.src.models_schema.note.note import Note
     from backend.src.models_schema.user.user import User
 
 # ----- BASE ----- #
@@ -68,10 +67,6 @@ class Interaction(InteractionBase, table=True):
         cascade_delete=True,
     )
     llm_responses: list["LLMResponse"] = Relationship(
-        back_populates="interaction",
-        cascade_delete=True,
-    )
-    notes: list["Note"] = Relationship(
         back_populates="interaction",
         cascade_delete=True,
     )
