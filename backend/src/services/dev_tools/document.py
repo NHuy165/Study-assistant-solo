@@ -7,6 +7,7 @@ from sqlmodel import col, delete, select
 
 from backend.src.exceptions.core import (
     ExceptionNotFound_404,
+    ExceptionRequest_400,
     ExceptionRequestValidation_400,
 )
 from backend.src.models_schema.document.document import (
@@ -67,6 +68,11 @@ async def mock_save_document(
         name = file.filename if file.filename else ""
     else:
         name = document_input.name
+
+    if not name:
+        raise ExceptionRequest_400(
+            "Document name cannot be blank. Either specify a name to be overwritten or change the document's original name."
+        )
 
     # Page start check
     page_starts_at = document_input.page_starts_at
