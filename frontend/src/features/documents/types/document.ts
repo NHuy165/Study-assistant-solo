@@ -27,10 +27,10 @@ export type DocumentInputForm = z.input<typeof DocumentInputSchema>;
 export const DocumentOutputSchema = z.object({
   id: z.int(),
   interaction_id: z.int(),
-  name: z.string(),
+  name: z.string().min(1),
   page_starts_at: z.int(),
   created_at: z.iso.datetime(),
-  subject_type: z.enum(SubjectType).nullable(),
+  subject_type: z.enum(SubjectType),
   type: z.enum(DocumentType),
 });
 
@@ -72,9 +72,9 @@ export type DocumentOutputComplete = z.infer<
 // ----- UPDATE ----- //
 
 export const DocumentUpdateSchema = z.object({
-  name: z.string(),
+  name: z.string().min(1),
   page_starts_at: z.int(),
-  subject_type: z.enum(SubjectType).nullable(),
+  subject_type: z.enum(SubjectType),
 });
 
 export type DocumentUpdate = z.infer<typeof DocumentUpdateSchema>;
