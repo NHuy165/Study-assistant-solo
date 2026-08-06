@@ -21,7 +21,9 @@ export class StudyAssessmentsSection {
     this.yesterdayAssessment = rootLocator
       .locator('section')
       .filter({ hasText: "Yesterday's assessment:" });
-    this.yesterdayAssessmentContent = this.yesterdayAssessment.locator('span');
+    this.yesterdayAssessmentContent = this.yesterdayAssessment
+      .locator('div')
+      .first();
 
     // Assessments history
     this.assessmentsHistory = rootLocator

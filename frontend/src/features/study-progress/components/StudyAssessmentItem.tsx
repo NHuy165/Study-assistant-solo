@@ -1,4 +1,5 @@
 import { Button } from '@/components/miscellaneous/Button';
+import { MarkdownText } from '@/components/miscellaneous/MarkdownText';
 import type { StudyAssessmentOutput } from '@/features/study-progress/types/study-assessment';
 import dayjs from 'dayjs';
 import utc from 'dayjs/plugin/utc';
@@ -23,12 +24,14 @@ export const StudyAssessmentItem = ({
       {/* Properly displays dummy assessments without content */}
 
       {showContent && (
-        <p className="block mt-3 p-6 border border-primary overflow-y-auto min-h-30 max-h-60 whitespace-pre-wrap break-words">
+        <p className="block mt-3 p-6 border border-primary overflow-y-auto min-h-30 max-h-100 break-words">
           <h3 className="font-bold text-3xl mb-5">
             Assessment of{' '}
             {`${dayjs.utc(assessment.assessment_of).format('YYYY-MM-DD')}`}
           </h3>
-          {assessment.content || 'Study assessment in progress...'}
+          <MarkdownText
+            content={assessment.content || 'Study assessment in progress...'}
+          />
         </p>
       )}
     </li>

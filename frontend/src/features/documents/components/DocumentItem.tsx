@@ -60,7 +60,7 @@ export const DocumentItem = ({ document }: { document: DocumentOutput }) => {
                 {getDocumentComplete.isPending && 'Fetching data...'}
                 {getDocumentComplete.isError ||
                   getDocumentComplete.isPending || (
-                    <div className="whitespace-pre-wrap max-h-30 overflow-y-auto">
+                    <div className="whitespace-pre-wrap max-h-60 overflow-y-auto">
                       {getDocumentComplete.data?.[1]?.summary ||
                         'This document has no content.'}
                     </div>

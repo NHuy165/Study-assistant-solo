@@ -96,12 +96,12 @@ test.describe('Study assessments - Success tests', () => {
 
     // Verifies content
     await assessmentItem1.getByRole('button').click();
-    await expect(assessmentItem1.locator('p')).toContainText(
+    await expect(assessmentItem1.locator('p').first()).toContainText(
       studyAssessment1.content,
     );
 
     await assessmentItem2.getByRole('button').click();
-    await expect(assessmentItem2.locator('p')).toContainText(
+    await expect(assessmentItem2.locator('p').first()).toContainText(
       studyAssessment2.content,
     );
 

@@ -1,5 +1,6 @@
 import { FormField } from '@/components/form-elements/FormField';
 import { Button } from '@/components/miscellaneous/Button';
+import { MarkdownText } from '@/components/miscellaneous/MarkdownText';
 import { useCreateStudyAssessment } from '@/features/study-progress/api/study-assessment/useCreateStudyAssessment';
 import { useGetStudyAssessments } from '@/features/study-progress/api/study-assessment/useGetStudyAssessments';
 import { StudyAssessmentItem } from '@/features/study-progress/components/StudyAssessmentItem';
@@ -57,12 +58,15 @@ export const StudyAssessments = () => {
                 Yesterday's assessment:
               </h3>
               {/* Properly displays dummy assessments without content */}
-              <span className="block border border-primary whitespace-pre-wrap p-3 min-h-30 max-h-60 overflow-y-auto break-words">
-                {yesterdayAssessment
-                  ? yesterdayAssessment.content ||
-                    'Study assessment in progress...'
-                  : "User didn't log in yesterday."}
-              </span>
+              <MarkdownText
+                style="border border-primary p-3 min-h-30 max-h-100 overflow-y-auto break-words"
+                content={
+                  yesterdayAssessment
+                    ? yesterdayAssessment.content ||
+                      'Study assessment in progress...'
+                    : "User didn't log in yesterday."
+                }
+              />
             </section>
 
             {/* Assessments history */}

@@ -1,3 +1,4 @@
+import { MarkdownText } from '@/components/miscellaneous/MarkdownText';
 import type { ChatOutput } from '@/features/chat/types/chat';
 
 export const ChatItem = ({ chat }: { chat: ChatOutput }) => {
@@ -5,11 +6,11 @@ export const ChatItem = ({ chat }: { chat: ChatOutput }) => {
     <li className="space-y-3">
       <div>
         <span className="font-bold">User: </span>
-        <span>{chat.prompt}</span>
+        <div>{chat.prompt}</div>
       </div>
       <div>
         <span className="font-bold">Chatbot: </span>
-        <span>{chat.answer}</span>
+        <MarkdownText content={chat.answer} />
       </div>
       <span className="divider divider-primary"></span>
     </li>

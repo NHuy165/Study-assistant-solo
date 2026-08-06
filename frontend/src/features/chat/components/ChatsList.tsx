@@ -5,7 +5,7 @@ export const ChatsList = ({ interactionId }: { interactionId: number }) => {
   const getChats = useGetChats(interactionId);
 
   return (
-    <section className="border border-primary min-h-30 max-h-140 p-3 whitespace-pre-wrap overflow-y-auto space-y-8 break-words">
+    <section className="border border-primary min-h-30 max-h-140 p-3 overflow-y-auto space-y-8 break-words">
       {getChats.isError && <p>Failed to fetch data.</p>}
       {getChats.isPending && <p>Fetching data...</p>}
 

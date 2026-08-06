@@ -50,6 +50,9 @@ Your task is to read the student's current raw input AND the conversation histor
 5. FIX & ENHANCE: Correct any spelling or grammar mistakes from the student. Unless this was likely done intentionally to mention an special concept, such as when something is placed inside quotes.
 5. CONTEXT RESOLUTION: If the student uses pronouns (it, that, this) or refers to previous steps, look at the PAST CONVERSATIONS and replace those pronouns with the exact specific nouns they represent. This step is to prevent context loss, as the past conversations will not be used in the vector search.
 
+=== TEXT FORMATTING CONSTRAINT ===
+- Throughout your entire generation process, any text you shall generate will ONLY contain plain text, no special markdown syntax. 
+
 === PAST CONVERSATIONS ===
 {context_conversations}
 
@@ -100,6 +103,9 @@ The data used when generating the material follows the following priority system
 2. INTERNAL KNOWLEDGE (LOW PRIORITY): If the above context does not contain any relevant information, you may use your internal LLM knowledge.
 3. PAST CONVERSATIONS: You may be passed a certain number of the Study Assistant's most recent conversations with the user. This is done automatically and may or may not contain any relevant information to the current task. The conversations are indexed so that the lower the number, the more recent the conversation (Conversation 1 is their last conversation).
 4. PERSONAL INFORMATION: The user's personal information, look out for any explicit, implicit request, knowledge background, preferences, resolution, etc... specified here. This information is also passed automatically and may or may not contain any relevant information to the current question.
+
+=== TEXT FORMATTING CONSTRAINT ===
+- Throughout your entire generation process, any text you shall generate will ONLY contain plain text, no special markdown syntax. 
 
 === JSON SCHEMA ===
 {json_schema}
@@ -179,6 +185,9 @@ You may grade the student's answers based on the following criteria:
     + If the user got the answer right, explain why it is right and provide additional information about the relevant topic and cover any obscure edge cases if necessary. Take care not to digress or overload the student with unnecessary information.
     + If the user got the answer wrong, explain why it is wrong and provide a clear, detailed correct answer for the question.
     + Feel free to provide any additional information you deem necessary for the current question and the user's answer. Again, make sure not to digress and include too much irrelevant information.
+    
+=== TEXT FORMATTING CONSTRAINT ===
+- Throughout your entire generation process, any text you shall generate (recommendation prompts, document summary...) will ONLY contain plain text, no special markdown syntax. 
 
 === EXERCISE JSON ===
 {prompt}
@@ -253,6 +262,9 @@ The data used when grading the answers follows the following priority system.
     + If the user got the answer right, explain why it is right and provide additional information about the relevant topic and cover any obscure edge cases if necessary. Take care not to digress or overload the student with unnecessary information.
     + If the user got the answer wrong, explain why it is wrong and provide a clear, detailed correct answer for the question.
     + Feel free to provide any additional information you deem necessary for the current question and the user's answer. Again, make sure not to digress and include too much irrelevant information.
+    
+=== TEXT FORMATTING CONSTRAINT ===
+- Throughout your entire generation process, any text you shall generate will ONLY contain plain text, no special markdown syntax. 
 
 === JSON INPUT ===
 {prompt}
@@ -322,6 +334,9 @@ You are acting as a backend data generator, NOT a conversational chatbot, your a
     + 'FLASHCARDS': A 'review' type material. The classic flashcards with each one containing a front, shown to the user, and a back, hidden initially and shown only after the user has interacted with the flashcard. Good for helping the student memorize concepts or reviewing stuff in general. Especially good for english and vietnamese, good for memorizing maths concepts.
 - It is recommended to diversify your material recommendations and question recommendations, utilizing many different material formats in order to cover all the major contents of the document.
 - You will also be passed the user's personal information in the `PERSONAL INFORMATION` section. Look out for any explicit, implicit request, knowledge background, preferences, resolution, etc... specified here. This information is passed automatically and may or may not contain any relevant information to the current question.
+
+=== TEXT FORMATTING CONSTRAINT ===
+- Throughout your entire generation process, any text you shall generate (recommendation prompts, document summary...) will ONLY contain plain text, no special markdown syntax. 
 
 === PERSONAL INFORMATION ===
 {personal_information}
