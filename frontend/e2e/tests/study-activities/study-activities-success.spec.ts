@@ -172,10 +172,13 @@ test.describe('Study activities - Success tests', () => {
     await expect(studyActivitiesSection.studyActivity).toContainText(name);
   });
 
-  test.describe('Go inside a study activity page for each of the activity type', () => {
-    test('Go inside an MCQ page', async ({ page, request }) => {
-      const studyActivitiesSection = new InteractionPage(page)
-        .studyActivitiesSection;
+  test.describe('Go inside a study activity page then back to the main interaction page for each of the activity type', () => {
+    test('Go inside an MCQ page and back to the interaction page', async ({
+      page,
+      request,
+    }) => {
+      const interactionPage = new InteractionPage(page);
+      const studyActivitiesSection = interactionPage.studyActivitiesSection;
 
       const interactionId = Number(page.url().split('/').pop());
 
@@ -198,6 +201,7 @@ test.describe('Study activities - Success tests', () => {
       ).id as number;
       await page.reload();
 
+      // Goes to the activity page
       await studyActivitiesSection.studyActivity
         .getByRole('button', {
           name: studyActivity.name,
@@ -211,11 +215,26 @@ test.describe('Study activities - Success tests', () => {
         descriptionText: studyActivity.description,
         numberItems: studyActivity.n_items,
       });
+
+      // Goes back to the interaction page
+      await studyActivityPage.interactionPageLink.click();
+
+      await expect(page).toHaveURL(`/interaction/${interactionId}`);
+      await expect(interactionPage.pageHeader).toBeVisible();
+      await expect(interactionPage.pageHeader).toContainText(
+        interactionData.interaction.name,
+      );
+      await expect(interactionPage.pageDescription).toContainText(
+        interactionData.interaction.description,
+      );
     });
 
-    test('Go inside an Open Ended page', async ({ page, request }) => {
-      const studyActivitiesSection = new InteractionPage(page)
-        .studyActivitiesSection;
+    test('Go inside an Open Ended page and back to the interaction page', async ({
+      page,
+      request,
+    }) => {
+      const interactionPage = new InteractionPage(page);
+      const studyActivitiesSection = interactionPage.studyActivitiesSection;
 
       const interactionId = Number(page.url().split('/').pop());
 
@@ -238,6 +257,7 @@ test.describe('Study activities - Success tests', () => {
       ).id as number;
       await page.reload();
 
+      // Goes to the activity page
       await studyActivitiesSection.studyActivity
         .getByRole('button', {
           name: studyActivity.name,
@@ -251,11 +271,26 @@ test.describe('Study activities - Success tests', () => {
         descriptionText: studyActivity.description,
         numberItems: studyActivity.n_items,
       });
+
+      // Goes back to the interaction page
+      await studyActivityPage.interactionPageLink.click();
+
+      await expect(page).toHaveURL(`/interaction/${interactionId}`);
+      await expect(interactionPage.pageHeader).toBeVisible();
+      await expect(interactionPage.pageHeader).toContainText(
+        interactionData.interaction.name,
+      );
+      await expect(interactionPage.pageDescription).toContainText(
+        interactionData.interaction.description,
+      );
     });
 
-    test('Go inside a Flashcards page', async ({ page, request }) => {
-      const studyActivitiesSection = new InteractionPage(page)
-        .studyActivitiesSection;
+    test('Go inside a Flashcards page and back to the interaction page', async ({
+      page,
+      request,
+    }) => {
+      const interactionPage = new InteractionPage(page);
+      const studyActivitiesSection = interactionPage.studyActivitiesSection;
 
       const interactionId = Number(page.url().split('/').pop());
 
@@ -278,6 +313,7 @@ test.describe('Study activities - Success tests', () => {
       ).id as number;
       await page.reload();
 
+      // Goes to the activity page
       await studyActivitiesSection.studyActivity
         .getByRole('button', {
           name: studyActivity.name,
@@ -291,6 +327,18 @@ test.describe('Study activities - Success tests', () => {
         descriptionText: studyActivity.description,
         numberItems: studyActivity.n_items,
       });
+
+      // Goes back to the interaction page
+      await studyActivityPage.interactionPageLink.click();
+
+      await expect(page).toHaveURL(`/interaction/${interactionId}`);
+      await expect(interactionPage.pageHeader).toBeVisible();
+      await expect(interactionPage.pageHeader).toContainText(
+        interactionData.interaction.name,
+      );
+      await expect(interactionPage.pageDescription).toContainText(
+        interactionData.interaction.description,
+      );
     });
   });
 

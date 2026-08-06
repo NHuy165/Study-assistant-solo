@@ -7,6 +7,7 @@ export class InteractionPage {
   readonly page: Page;
   readonly pageHeader: Locator;
   readonly pageDescription: Locator;
+  readonly homePageLink: Locator;
 
   // Components
   readonly chatSection: ChatSection;
@@ -22,6 +23,7 @@ export class InteractionPage {
     this.pageDescription = page
       .locator('p')
       .filter({ has: page.getByText('Description:', { exact: true }).first() });
+    this.homePageLink = page.getByRole('link', { name: 'Back to Home Page' });
 
     // Components
     const chatSectionHeader = page.getByRole('heading', {

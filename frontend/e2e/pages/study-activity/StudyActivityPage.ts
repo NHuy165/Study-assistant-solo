@@ -7,6 +7,7 @@ export class StudyActivityPage {
   readonly page: Page;
   readonly pageHeader: Locator;
   readonly pageDescription: Locator;
+  readonly interactionPageLink: Locator;
 
   // Components
   readonly MCQActivity: MCQActivity;
@@ -22,6 +23,9 @@ export class StudyActivityPage {
     this.pageDescription = page
       .locator('p')
       .filter({ has: page.getByText('Description:', { exact: true }).first() });
+    this.interactionPageLink = page.getByRole('link', {
+      name: 'Back to main interaction',
+    });
 
     // Components
     this.MCQActivity = new MCQActivity(

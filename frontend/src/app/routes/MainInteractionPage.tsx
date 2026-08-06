@@ -23,6 +23,9 @@ export const MainInteractionPage = () => {
         <div className="space-y-8">
           {/* Title */}
           <div>
+            <Link className="link link-primary link-hover" to={'/home'}>
+              Back to Home Page
+            </Link>
             <h1 className="text-6xl font-bold text-center">
               {interaction?.name}
             </h1>

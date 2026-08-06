@@ -59,7 +59,10 @@ test.describe('Interactions - Success tests', () => {
     await expect(detailsPanel).not.toBeVisible();
   });
 
-  test('Go inside an interaction page', async ({ page, request }) => {
+  test('Go inside an interaction page and then back to the home page', async ({
+    page,
+    request,
+  }) => {
     const interaction = interactionData.interaction;
 
     const interactionId = await createInteraction({
@@ -69,8 +72,10 @@ test.describe('Interactions - Success tests', () => {
     });
     await page.reload();
 
-    const interactionSection = new HomePage(page).interactionsSection;
+    const homePage = new HomePage(page);
+    const interactionSection = homePage.interactionsSection;
 
+    // Goes to the interaction page
     await interactionSection.interactionItem
       .getByRole('button', {
         name: `#${interactionId} ${interaction.name}`,
@@ -83,6 +88,12 @@ test.describe('Interactions - Success tests', () => {
       headerText: interaction.name,
       descriptionText: interaction.description,
     });
+
+    // Goes back to the home page
+    await interactionPage.homePageLink.click();
+
+    await expect(page).toHaveURL('/home');
+    await expect(homePage.pageHeader).toBeVisible();
   });
 
   test('Update an interaction', async ({ page, request }) => {
