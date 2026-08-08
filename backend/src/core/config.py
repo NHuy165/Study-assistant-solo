@@ -50,12 +50,6 @@ class Settings(BaseSettings):
     VISION_MODEL_GOOGLE: str
     ANSWER_MODEL_GOOGLE: str
 
-    # ** Ollama ** #
-    OLLAMA_HOST: str
-    EMBED_MODEL_OLLAMA: str
-    VISION_MODEL_OLLAMA: str
-    ANSWER_MODEL_OLLAMA: str
-
     # ** Cloudflare ** #
     EMBED_MODEL_CLOUDFLARE: str
     VISION_MODEL_CLOUDFLARE: str

@@ -2,11 +2,10 @@ import asyncio
 import base64
 from abc import ABC, abstractmethod
 from types import FunctionType
-from typing import Any
+from typing import Any, ClassVar
 from weakref import WeakKeyDictionary
 
 import httpx
-import ollama
 from fastapi import UploadFile
 from google import genai
 from google.genai import Client, errors
@@ -56,12 +55,6 @@ class GeminiKeysManager:
 
 
 keys_manager = GeminiKeysManager(settings.gemini_keys_list)
-
-# GOOGLE_CLIENT = genai.Client(api_key=settings.API_KEY_GEMINI)
-
-# === OLLAMA === #
-
-OLLAMA_CLIENT = ollama.AsyncClient(host=settings.OLLAMA_HOST)
 
 # === CLOUDFLARE === #
 CLOUDFLARE_URL_EMBED = f"https://api.cloudflare.com/client/v4/accounts/{settings.CLOUDFLARE_ACCOUNT_ID}/ai/run/{settings.EMBED_MODEL_CLOUDFLARE}"
@@ -274,155 +267,6 @@ class GoogleAPI(API):
         return await cls.wrapper(call_api)
 
 
-class OllamaAPI(API):
-    @classmethod
-    async def wrapper(cls, func: FunctionType) -> Any:
-        attempt_traffic = 0
-
-        while True:
-            try:
-                return await func()
-
-            except ollama.ResponseError as e:
-                # Potentially dangerous error
-                if e.status_code in (429, 502, 503, 504):
-                    wait_time = (attempt_traffic + 1) * 2
-                    await asyncio.sleep(wait_time)
-                    attempt_traffic += 1
-
-                    if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
-                        break
-                    continue
-                else:
-                    raise ExceptionInternalError_500(f"Ollama Config error: {str(e)}")
-
-            except httpx.RequestError:
-                # Network, connection issues
-                wait_time = (attempt_traffic + 1) * 2
-                await asyncio.sleep(wait_time)
-                attempt_traffic += 1
-
-                if attempt_traffic >= settings.DEFAULT_N_API_CALL_RETRIES:
-                    break
-
-                continue
-
-        raise ExceptionExternalService_503(
-            "Ollama failed after multiple retries. Please come back again later."
-        )
-
-    @classmethod
-    async def embed(cls, content: str) -> list[float]:
-        async def call_api() -> list[float]:
-
-            # API call
-            response = await OLLAMA_CLIENT.embeddings(
-                model=settings.EMBED_MODEL_OLLAMA,
-                prompt=content,
-            )
-
-            embeddings = response.get("embedding")
-
-            # Validation
-            assert embeddings is not None
-            assert isinstance(embeddings, list)
-
-            if len(embeddings) > settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA:
-                embeddings = embeddings[
-                    : settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA
-                ]
-
-            return embeddings
-
-        return await cls.wrapper(call_api)
-
-    @classmethod
-    async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
-        async def call_api() -> list[list[float]]:
-
-            # API call
-            response = await OLLAMA_CLIENT.embed(
-                model=settings.EMBED_MODEL_OLLAMA,
-                input=contents,
-            )
-
-            embeddings = response.get("embeddings")
-
-            # Validation
-            assert embeddings is not None
-            assert isinstance(embeddings, list)
-            assert isinstance(embeddings[0], list)
-
-            if len(embeddings[0]) > settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA:
-                embeddings = [
-                    vector[: settings.DEFAULT_EMBED_DIMENSIONALITY_GOOGLE_OLLAMA]
-                    for vector in embeddings
-                ]
-
-            return embeddings
-
-        return await cls.wrapper(call_api)
-
-    @classmethod
-    async def caption_image(cls, file: UploadFile) -> str:
-        # Extracting information from the image
-        image_bytes = await file.read()
-
-        async def call_api() -> str:
-            prompt_text = "Extract all readable text from this image exactly as written.\nThen, describe the layout, charts, figures, subjects, and any data points in exhaustive detail."
-
-            # Reads the image using the model
-            response = await OLLAMA_CLIENT.generate(
-                model=settings.VISION_MODEL_OLLAMA,
-                prompt=prompt_text,
-                images=[image_bytes],
-                options={"num_ctx": 8192},
-            )
-
-            result_text = response.get("response")
-
-            # Validation
-            if not result_text:
-                raise ExceptionRequest_400("Image could not be saved properly.")
-
-            return result_text
-
-        return await cls.wrapper(call_api)
-
-    @classmethod
-    async def generate_content(
-        cls,
-        prompt: str,
-        response_schema: type[BaseModel] | None = None,
-    ) -> str:
-        async def call_api() -> str:
-            if response_schema:
-                response = await OLLAMA_CLIENT.generate(
-                    model=settings.ANSWER_MODEL_OLLAMA,
-                    prompt=prompt,
-                    options={"num_ctx": 8192},
-                    format=response_schema.model_json_schema(),
-                )
-            else:
-                response = await OLLAMA_CLIENT.generate(
-                    model=settings.ANSWER_MODEL_OLLAMA,
-                    prompt=prompt,
-                    options={"num_ctx": 8192},
-                )
-
-            result_text = response.get("response")
-
-            # Validation
-            if not result_text:
-                raise ExceptionRequest_400(
-                    "A response could not be generated. Please recheck your question."
-                )
-
-            return result_text
-
-        return await cls.wrapper(call_api)
-
-
 class CloudFlareAPI(API):
     @classmethod
     async def wrapper(cls, func: FunctionType) -> Any:
@@ -572,12 +416,11 @@ class CloudFlareAPI(API):
 
 
 class GlobalAPI:
-    models: dict[str, type[API]] = {
+    models: ClassVar[dict[str, type[API]]] = {
         "GOOGLE": GoogleAPI,
-        "OLLAMA": OllamaAPI,
         "CLOUDFLARE": CloudFlareAPI,
     }
-    mass_embed_supported = ["GOOGLE", "OLLAMA", "CLOUDFLARE"]
+    mass_embed_supported: ClassVar[list] = ["GOOGLE", "CLOUDFLARE"]
 
     @classmethod
     async def embed(cls, content: str) -> list[float]:
@@ -586,7 +429,9 @@ class GlobalAPI:
     @classmethod
     async def mass_embed(cls, contents: list[str]) -> list[list[float]]:
         if settings.MODEL_IN_USE_GENERATE_CHAT not in cls.mass_embed_supported:
-            raise Exception("Current model does not support mass embedding.")
+            raise ExceptionInternalError_500(
+                "Current model does not support mass embedding."
+            )
 
         return await cls.models[settings.MODEL_IN_USE_EMBED].mass_embed(contents)
 
