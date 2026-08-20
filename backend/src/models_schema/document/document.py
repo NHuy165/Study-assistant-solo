@@ -57,7 +57,12 @@ class DocumentOutput(DocumentBase):
 
 
 class DocumentUpdate(DocumentBase):
-    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    name: Annotated[
+        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
+    ] = None
+    subject_type: Annotated[SubjectType | None, BeforeValidator(beva_forbid_none)] = (
+        None
+    )
 
 
 # ----- TABLE MODEL ----- #

@@ -79,6 +79,9 @@ class StudyActivityUpdate(SQLModel):
         str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
     ] = None
     description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
+    subject_type: Annotated[SubjectType | None, BeforeValidator(beva_forbid_none)] = (
+        None
+    )
 
 
 # ----- TABLE MODEL ----- #

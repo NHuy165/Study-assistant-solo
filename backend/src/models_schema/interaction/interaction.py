@@ -39,10 +39,10 @@ class InteractionOutput(InteractionBase):
 
 
 class InteractionUpdate(SQLModel):
-    name: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
-    description: Annotated[str | None, BeforeValidator(beva_forbid_none), Field()] = (
-        None
-    )
+    name: Annotated[
+        str | None, BeforeValidator(beva_forbid_none), Field(min_length=1)
+    ] = None
+    description: Annotated[str | None, BeforeValidator(beva_forbid_none)] = None
 
 
 # ----- TABLE MODEL ----- #
