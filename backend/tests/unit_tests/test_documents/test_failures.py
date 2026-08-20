@@ -11,6 +11,7 @@ from backend.src.exceptions.core import (
     ExceptionResponse,
     ExceptionType,
 )
+from backend.src.models_schema.document.document import Document, DocumentUpdate
 from backend.src.models_schema.document.document_analysis import (
     DocumentAnalysisSchema,
 )
@@ -23,6 +24,8 @@ from backend.tests.utils.validators import (
     validate_status_code,
 )
 
+# ----- CREATE ----- #
+
 
 @pytest.mark.parametrize(
     "filename, query_parameters",
@@ -30,6 +33,7 @@ from backend.tests.utils.validators import (
         ("test_file_pdf.pdf", ""),
         ("test_file_pdf.pdf", "?subject_type=MATHS&subject_type_overwrite=true"),
         ("test_file_wrong.xlsx", "?subject_type_overwrite=false"),
+        ("test_file_pdf.pdf", "?subject_type_overwrite=true&name="),
     ],
 )
 async def test_create_document(
@@ -44,6 +48,7 @@ async def test_create_document(
     Fails to upload a document by not specifying overwrite mode.
     Fails to upload a document by setting overwrite to true while subject type is not null.
     Fails to upload a document with invalid format.
+    Fails to upload a document with an empty name.
     """
 
     filepath = (
@@ -145,4 +150,29 @@ async def test_create_document_failed_api(
     validate_response_model(response, ExceptionResponse)
     validate_response_contents(
         response, {"exception_type": ExceptionType.EXTERNAL_SERVICE}
+    )
+
+
+# ----- UPDATE ----- #
+
+
+async def test_update_document(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_test: Interaction,
+    create_document_test: Document,
+):
+    """
+    Fails to upload a document with an empty name.
+    """
+    response = await client.patch(
+        f"/api/document/{create_document_test.id}",
+        json={"name": ""},
+    )
+
+    validate_status_code(response, 400)
+    validate_response_model(response, ExceptionResponse)
+    validate_response_contents(
+        response, {"exception_type": ExceptionType.REQUEST_VALIDATION}
     )

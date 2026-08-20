@@ -159,6 +159,43 @@ async def test_create_study_activity_wrong_api_generation(
 # ----- UPDATE ----- #
 
 
+async def test_update_study_activity(
+    client: AsyncClient,
+    register_user_test: User,
+    login_user_test: None,
+    create_interaction_test: Interaction,
+    create_study_activity_custom: Callable[
+        [Interaction, str, StudyActivityFormat, SubjectType, str, bool, bool],
+        CoroutineType[Any, Any, StudyActivity],
+    ],
+):
+    """
+    Fails to update a study activity with an empty name.
+    """
+
+    study_activity = await create_study_activity_custom(
+        create_interaction_test,
+        "Study activity creation prompt",
+        StudyActivityFormat.MULTIPLE_CHOICE_QUESTIONS,
+        SubjectType.MATHS,
+        "Study activity name",
+        True,
+        False,
+    )
+
+    response = await client.patch(
+        f"/api/study-activity/{study_activity.id}",
+        json={"name": ""},
+    )
+
+    validate_status_code(response, 400)
+    validate_response_model(response, ExceptionResponse)
+    validate_response_contents(
+        response,
+        {"exception_type": ExceptionType.REQUEST_VALIDATION},
+    )
+
+
 async def test_answer_exercise_item(
     client: AsyncClient,
     register_user_test: User,
